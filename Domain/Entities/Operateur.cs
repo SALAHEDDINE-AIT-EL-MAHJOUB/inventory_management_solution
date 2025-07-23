@@ -14,7 +14,7 @@ namespace Domain.Entities
     public long SiteId { get; set; }
         public Site Site { get; set; } // Navigation property to Site
         public virtual ICollection<CodeBarreOperateur>? CodeBarreOperateurs { get; set; }
-
+     public string? UserId { get; set; }
     public virtual ICollection<EquipeOperateur>? EquipeOperateurs { get; set; }
 
     public virtual Site? OperateurSite { get; set; }

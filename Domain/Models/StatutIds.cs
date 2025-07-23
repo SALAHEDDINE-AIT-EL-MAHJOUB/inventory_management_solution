@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace StockPilot.Domain.Constants
+namespace Domain.Constants
 {
     public static class StatutIds
     {
         public const int Planifié = 1;
-        public const int EnCours = 3;     // pas 2 ❌
+        public const int EnCours = 3;     
         public const int Terminé = 4;
 
         public const int EnArbitrage = 5;

@@ -10,14 +10,15 @@ namespace Domain.Entities
         public string Ville { get; set; }
         public string ClientId { get; set; }
         public string Nom { get; set; }
-        public string CodePostal { get; set; }
-        public string Pays { get; set; }
-        public string Fax { get; set; }
-        public string Slogan { get; set; }
-        public string Logo { get; set; } // URL ou chemin vers le logo
-    public Client SocietéClient { get; set; } // Client name
+        
+         public int? SocieteClientId { get; set; }
+       public Client SocietéClient { get; set; } // Client name
         public string Email { get; set; }
      public bool IsDeleted { get; set; }
-     
-       }
+     public virtual ICollection<Site>? Sites { get; set; }
+
+   
+    public virtual Ville? SocietéVille { get; set; }
+}
+       
 }
