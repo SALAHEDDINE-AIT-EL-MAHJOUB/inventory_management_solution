@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Domain.Entities;
-using Domain.IRepositories;
+using Repository.IRepositories;
 using Repository.Data;
 using System;
 using System.Collections.Generic;

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using Domain.IRepositories;
+using Repository.IRepositories;
 using Microsoft.Extensions.Logging;
 
 namespace Repository.Repositories

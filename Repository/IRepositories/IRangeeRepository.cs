@@ -5,7 +5,7 @@ using System.Linq; // Add this using directive for List<T> methods if not alread
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.IRepositories
+namespace Repository.IRepositories
 {
     public interface IRangeeRepository : IGenericRepository<Rangee>
     {
@@ -13,7 +13,7 @@ namespace Domain.IRepositories
         Task<List<Rangee>> GetByRackId(int id);
 
         // Method to get a list of Rangée entities by their exact name for a given client
-        Task<List<Rangee>> GetRangéeByName(int clientId, string rangéeNom);
+        Task<List<Rangee>> GetRangeeByName(int clientId, string rangeeNom);
 
         // Method to get a list of Rangée entities by a list of their IDs
         // This is crucial for efficient fetching in handlers that get multiple related entities

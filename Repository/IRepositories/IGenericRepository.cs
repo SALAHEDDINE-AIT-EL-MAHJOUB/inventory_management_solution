@@ -7,7 +7,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.IRepositories
+namespace Repository.IRepositories
 {
     public interface IGenericRepository<TEntity> where TEntity : class
     {

@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.IRepositories
+namespace Repository.IRepositories
 {
     public interface IClientRepository : IGenericRepository<Client>
     {

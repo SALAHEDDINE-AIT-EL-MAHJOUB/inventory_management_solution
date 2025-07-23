@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace Domain.IRepositories
+namespace Repository.IRepositories
 {
     public interface IEtageRepository : IGenericRepository<Etage>
     {

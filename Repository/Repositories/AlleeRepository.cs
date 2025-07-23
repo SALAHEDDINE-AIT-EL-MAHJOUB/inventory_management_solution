@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 using Domain.Entities;
-using Domain.IRepositories;
+using Repository.IRepositories;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;

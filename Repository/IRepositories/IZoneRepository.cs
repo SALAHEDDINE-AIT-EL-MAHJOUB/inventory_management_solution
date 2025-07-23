@@ -1,6 +1,6 @@
 ﻿using Domain.Entities;
 
-namespace Domain.IRepositories
+namespace Repository.IRepositories
 {
     public interface IZoneRepository : IGenericRepository<Zone>
     {

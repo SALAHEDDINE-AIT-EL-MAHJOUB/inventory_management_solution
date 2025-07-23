@@ -1,19 +1,22 @@
 using Domain.Entities;
-using Domain.IRepositories;
+using Repository.IRepositories;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Repository.Repositories
 {
     public class AdminRepository : GenericRepository<Admin>, IAdminRepository
     {
         private readonly DbContext _context;
+        private readonly ILogger<GenericRepository<Admin>> _logger;
 
-        public AdminRepository(DbContext context) : base(context)
+        public AdminRepository(DbContext context, ILogger<GenericRepository<Admin>> logger) : base(context, logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         public async Task<Admin> GetByUserIdAsync(string userId)

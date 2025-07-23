@@ -1,5 +1,5 @@
 ﻿using Domain.Entities;
-using Domain.IRepositories;
+using Repository.IRepositories;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +25,7 @@ namespace Repository.Repositories
             try
             {
                 var res = await _context.FormProduits
-                    .Where(p=>p.Id == id)
+                    .Where(p=>p.ProduitId == id)
                     .ToListAsync();
                 return res;
             }
