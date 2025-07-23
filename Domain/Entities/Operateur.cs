@@ -9,9 +9,9 @@ namespace Domain.Entities
       
         public string Email { get; set; }
         public string Telephone { get; set; }
-        public HashCode MotDePasse { get; set; }
+        public string? MotDePasse { get; set; }
         public bool EstActif { get; set; } = true;
-    public long SiteId { get; set; }
+    public int SiteId { get; set; }
         public Site Site { get; set; } // Navigation property to Site
         public virtual ICollection<CodeBarreOperateur>? CodeBarreOperateurs { get; set; }
      public string? UserId { get; set; }

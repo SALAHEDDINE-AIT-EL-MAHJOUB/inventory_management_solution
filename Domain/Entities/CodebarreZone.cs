@@ -13,9 +13,11 @@ namespace Domain.Entities
 
     public virtual ICollection<Allee>? Allees { get; set; }
 
-    public virtual ICollection<CodeBarreZone>? CodeBarreZones { get; set; }
+public string Code { get; set; } = null!;
+        public virtual ICollection<CodeBarreZone>? CodeBarreZones { get; set; }
 
     public virtual ICollection<OperationInventaire>? OperationInventaires { get; set; }
+   public virtual Zone? CodeBarreZoneZone { get; set; }
 
     public virtual Site? ZoneSite { get; set; }
        

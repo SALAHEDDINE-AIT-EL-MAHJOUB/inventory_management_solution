@@ -10,6 +10,7 @@ namespace Domain.Entities
         public string? ZoneNom { get; set; }
         public bool? IsDeleted { get; set; }
 
+    public int? ZoneSiteId { get; set; }
         public virtual ICollection<CodeBarreZone>? CodeBarreZones { get; set; }
 
         public virtual ICollection<OperationInventaire>? OperationInventaires { get; set; }

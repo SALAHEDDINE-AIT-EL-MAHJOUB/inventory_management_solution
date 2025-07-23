@@ -27,7 +27,7 @@ namespace Repository.Repositories
         public async Task<CodeBarreEtage?> GetByIdAsync(int id)
         {
             return await _context.CodeBarreEtages.Include(e => e.CodeBarreEtageEtage)
-                .FirstOrDefaultAsync(e => e.Id == id);
+                .FirstOrDefaultAsync(e => e.CodeBarreEtageId == id);
         }
 
         public async Task<CodeBarreEtage?> GetByCodeAsync(string code)
