@@ -1,0 +1,11 @@
+namespace Domain.Entities
+{
+    public class CodeBarreEtage
+    {
+        public int Id { get; set; }
+        public string? Code { get; set; }
+        public int? CodeBarreEtageEtageId { get; set; }
+        public int Etage { get; set; }
+        public virtual Etage? CodeBarreEtageEtage { get; set; }
+    }
+}
