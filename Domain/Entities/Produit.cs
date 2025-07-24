@@ -5,12 +5,15 @@ namespace Domain.Entities
         public int Id { get; set; }
         public string Nom { get; set; }
         public decimal Prix { get; set; }
-        public int? ProduitEtageId { get; set; }
-        public int? QuantiteEnStock { get; set; }
-        public virtual CodeBarreEtage CodeBarreEtage { get; set; }
-        public virtual Etage? ProduitEtage { get; set; }
- public virtual ICollection<FormProduit> FormProduits { get; set; } = new List<FormProduit>();
 
+        public int FournisseurId { get; set; }
+        public int?FormProduitsId { get; set; }
+        public int? CodebarreProduitId { get; set; }
+        
+        public virtual ICollection<GestionProduit> GestionProduit { get; set; } = new List<GestionProduit>();
+ public virtual Fournisseur Fournisseur { get; set; }
+   public virtual ICollection<CodebarreProduit> CodebarreProduits { get; set; } = new List<CodebarreProduit>();
+        public bool IsDeleted { get; set; } = false;
     }
 }
     

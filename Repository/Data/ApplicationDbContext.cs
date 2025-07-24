@@ -25,17 +25,16 @@ namespace Repository.Data
         public DbSet<Societe> Societes { get; set; }
         public DbSet<Zone> Zones { get; set; }
         public DbSet<Allee> Allees { get; set; }
-        public DbSet<Rack> Racks { get; set; }
+       
         public DbSet<Rangee> Rangees { get; set; }
         public DbSet<Etage> Etages { get; set; }
         public DbSet<Produit> Produits { get; set; }
-        public DbSet<FormProduit> FormProduits { get; set; }
+        public DbSet<GestionProduit> GestionProduit { get; set; }
         public DbSet<ResultatInventaire> ResultatInventaires { get; set; }
         public DbSet<Inventaire> Inventaires { get; set; }
         public DbSet<Equipe> Equipes { get; set; }
         public DbSet<EquipeOperateur> EquipeOperateurs { get; set; }
         public DbSet<CodeBarreAllee> CodeBarreAllees { get; set; }
-        public DbSet<CodeBarreRack> CodeBarreRacks { get; set; }
         public DbSet<CodeBarreRangee> CodeBarreRangees { get; set; }
         public DbSet<CodeBarreEtage> CodeBarreEtages { get; set; }
         public DbSet<CodeBarreOperateur> CodeBarreOperateurs { get; set; }
@@ -47,7 +46,15 @@ namespace Repository.Data
         public DbSet<Ville> Villes { get; set; }
         public DbSet<Region> Regions { get; set; }
         public DbSet<Admin> Admins { get; set; }
-       
+       public DbSet<Fournisseur> Fournisseurs { get; set; }
+        public DbSet<CodeBarreCommercial> CodeBarreCommercials { get; set; }
+
+       public DbSet<CodebarreProduit> CodebarreProduits { get; set; }
+
+
+
+
+
        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
@@ -153,9 +160,9 @@ namespace Repository.Data
                     .HasForeignKey(d => d.CodeBarreAlleeAlleeId)
                     .HasConstraintName("CodeBarreAllee_AlleeId");
 
-               modelBuilder.Entity<CodeBarreAllee>()
-                    .HasIndex(c => c.Code)
-                    .IsUnique();
+                modelBuilder.Entity<CodeBarreAllee>()
+                     .HasIndex(c => c.Code)
+                     .IsUnique();
 
             });
 
@@ -203,27 +210,7 @@ namespace Repository.Data
                    .IsUnique();
             });
 
-            modelBuilder.Entity<CodeBarreRack>(entity =>
-            {
-                entity.HasKey(e => e.CodeBarreRackId).HasName("PK__CodeBarr__4A88C0C48D7878BA");
 
-                entity.ToTable("CodeBarreRack");
-
-                entity.Property(e => e.CodeBarreRackId)
-                    .HasComment("Identifiant unique pour chaque association entre un code-barres et un rack.")
-                    .HasColumnName("CodeBarreRack_Id");
-                entity.Property(e => e.CodeBarreRackRackId)
-                    .HasComment("Référence à l'identifiant du rack avec ce code-barres est situé. C'est une clé étrangère.")
-                    .HasColumnName("CodeBarreRack_RackId");
-
-                entity.HasOne(d => d.CodeBarreRackRack).WithMany(p => p.CodeBarreRacks)
-                    .HasForeignKey(d => d.CodeBarreRackRackId)
-                    .HasConstraintName("CodeBarreRack_RackId");
-
-                modelBuilder.Entity<CodeBarreRack>()
-                    .HasIndex(c => c.Code)
-                    .IsUnique();
-            });
 
             modelBuilder.Entity<CodeBarreRangee>(entity =>
             {
@@ -260,10 +247,10 @@ namespace Repository.Data
                     .HasComment("Référence à l'identifiant de la zone avec ce code-barres est situé. C'est une clé étrangère.")
                     .HasColumnName("CodeBarreZone_ZoneId");
 
-                  entity.HasOne(d => d.CodeBarreZoneZone)
-        .WithMany(p => p.CodeBarreZones)
-        .HasForeignKey(d => d.ZoneId)
-        .HasConstraintName("CodeBarreZone_ZoneId");
+                entity.HasOne(d => d.CodeBarreZoneZone)
+      .WithMany(p => p.CodeBarreZones)
+      .HasForeignKey(d => d.ZoneId)
+      .HasConstraintName("CodeBarreZone_ZoneId");
 
 
                 modelBuilder.Entity<CodeBarreZone>()
@@ -338,31 +325,7 @@ namespace Repository.Data
                     .HasConstraintName("Etage_RangéeId");
             });
 
-            modelBuilder.Entity<FormProduit>(entity =>
-            {
-                entity.HasKey(e => e.FormProduitProduitId).HasName("PK__FormProd__277478DA1E43E773");
-
-                entity.ToTable("FormProduit");
-
-                entity.Property(e => e.ProduitId)
-                    .HasComment("Identifiant unique pour chaque forme de produit")
-                    .HasColumnName("FormProduit_Id");
-                entity.Property(e => e.CodeBarre)
-                    .HasMaxLength(50)
-                    .IsUnicode(false)
-                    .HasComment("Code-barres unique pour identifier cette forme spécifique du produit.")
-                    .HasColumnName("FormProduit_CodeBarre");
-                entity.Property(e => e.FormProduitProduitId)
-                    .HasComment("Référence à l'identifiant du produit parent. C'est une clé étrangère.")
-                    .HasColumnName("FormProduit_ProduitId");
-                entity.Property(e => e.FormProduitQuantite)
-                    .HasComment("Quantité disponible de cette forme du produit.")
-                    .HasColumnName("FormProduit_Quantite");
-
-                entity.HasOne(d => d.FormProduitProduit).WithMany(p => p.FormProduits)
-                    .HasForeignKey(d => d.FormProduitProduitId)
-                    .HasConstraintName("FormProduit_ProduitId");
-            });
+          
 
             modelBuilder.Entity<Inventaire>(entity =>
             {
@@ -439,7 +402,7 @@ namespace Repository.Data
                     .HasConstraintName("Operateur_SiteId");
                 entity.Property(e => e.UserId)
                     .HasColumnName("Operateur_AspNetUsersId");
-               
+
             });
 
 
@@ -470,50 +433,34 @@ namespace Repository.Data
                     .HasConstraintName("OperationInventaire_ZoneId");
             });
 
-            modelBuilder.Entity<Produit>(entity =>
+              modelBuilder.Entity<Produit>(entity =>
             {
-                entity.HasKey(e => e.Id).HasName("PK__Produit__DBDF7B2C20682064");
+                entity.HasKey(p => p.Id);
 
-                entity.ToTable("Produit");
+                entity.Property(p => p.Nom)
+                      .IsRequired()
+                      .HasMaxLength(200);
 
-                entity.Property(e => e.Id)
-                    .HasComment("Identifiant unique pour chaque produit.")
-                    .HasColumnName("Produit_Id");
-                entity.Property(e => e.ProduitEtageId)
-                    .HasComment("Référence à l'identifiant de l'étage où le produit est stocké. C'est une clé étrangère.")
-                    .HasColumnName("Produit_EtageId");
-                
-                entity.Property(e => e.Prix)
-                    .HasComment("Prix du produit.")
-                    .HasColumnType("decimal(10, 2)")
-                    .HasColumnName("Produit_Prix");
+                entity.Property(p => p.Prix)
+                      .HasColumnType("decimal(18,2)");
 
-                entity.HasOne(d => d.ProduitEtage).WithMany(p => p.Produits)
-                    .HasForeignKey(d => d.ProduitEtageId)
-                    .HasConstraintName("Produit_EtageId");
-            });
+                entity.HasOne(p => p.Fournisseur)
+                      .WithMany()
+                      .HasForeignKey(p => p.FournisseurId)
+                      .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Rack>(entity =>
-            {
-                entity.HasKey(e => e.RackId).HasName("PK__Rack__3B72075B69B2E97F");
+                entity.HasMany(p => p.GestionProduit)
+                      .WithOne(fp => fp.GestionProduitProduit)
+                      .HasForeignKey(fp => fp.ProduitId)
+                      .OnDelete(DeleteBehavior.Cascade);
 
-                entity.ToTable("Rack");
+                entity.HasMany(p => p.CodebarreProduits)
+                      .WithOne()
+                      .HasForeignKey(cb => cb.ProduitId)
+                      .OnDelete(DeleteBehavior.Cascade);
 
-                entity.Property(e => e.RackId)
-                    .HasComment("Identifiant unique pour chaque rack")
-                    .HasColumnName("Rack_Id");
-                entity.Property(e => e.RackAlleeId)
-                    .HasComment("Référence à l'identifiant de l'Allee dans laquelle le rack est situé. C'est une clé étrangère.")
-                    .HasColumnName("Rack_AlleeId");
-                entity.Property(e => e.RackNom)
-                    .HasMaxLength(50)
-                    .IsUnicode(false)
-                    .HasComment("Nom du rack")
-                    .HasColumnName("Rack_Nom");
-
-                entity.HasOne(d => d.RackAllee).WithMany(p => p.Racks)
-                    .HasForeignKey(d => d.RackAlleeId)
-                    .HasConstraintName("Rack_AlleeId");
+                entity.Property(p => p.IsDeleted)
+                      .HasDefaultValue(false);
             });
 
             modelBuilder.Entity<Rangee>(entity =>
@@ -530,13 +477,13 @@ namespace Repository.Data
                     .IsUnicode(false)
                     .HasComment("Nom de la rangée")
                     .HasColumnName("Rangée_Nom");
-                entity.Property(e => e.RangeeRackId)
-                    .HasComment("Référence à l'identifiant du rack dans lequel la rangée est située. C'est une clé étrangère")
-                    .HasColumnName("Rangée_RackId");
-
-                entity.HasOne(d => d.RangeeRack).WithMany(p => p.Rangées)
-                    .HasForeignKey(d => d.RangeeRackId)
-                    .HasConstraintName("Rangée_RackId");
+                entity.Property(e => e.IsDeleted)
+                    .HasDefaultValue(false)
+                    .HasComment("Indique si la rangée est supprimée (true) ou active (false)")
+                    .HasColumnName("Rangée_IsDeleted");
+                    
+               
+              
             });
 
             modelBuilder.Entity<Region>(entity =>
@@ -567,9 +514,9 @@ namespace Repository.Data
                 entity.Property(e => e.ResultatInventaireEquipeId)
                     .HasComment("Référence à l'identifiant de l'équipe responsable de l'inventaire, liée à la table Equipe.")
                     .HasColumnName("ResultatInventaire_EquipeId");
-                entity.Property(e => e.ResultatInventaireFormProduitId)
-                    .HasComment("Référence à l'identifiant du produit formulé, lié à la table FormProduit.")
-                    .HasColumnName("ResultatInventaire_FormProduitId");
+                entity.Property(e => e.ResultatInventaireGestionProduitId)
+                    .HasComment("Référence à l'identifiant du produit géré, lié à la table GestionProduit.")
+                    .HasColumnName("ResultatInventaire_GestionProduitId");
                 entity.Property(e => e.ResultatInventaireInventaireId)
                     .HasComment("Référence à l'identifiant de l'inventaire, liée à la table Inventaire.")
                     .HasColumnName("ResultatInventaire_InventaireId");
@@ -581,9 +528,9 @@ namespace Repository.Data
                     .HasForeignKey(d => d.ResultatInventaireEquipeId)
                     .HasConstraintName("ResultatInventaire_EquipeId");
 
-                entity.HasOne(d => d.ResultatInventaireFormProduit).WithMany(p => p.ResultatInventaires)
-                    .HasForeignKey(d => d.ResultatInventaireFormProduitId)
-                    .HasConstraintName("ResultatInventaire_FormProduitId");
+                entity.HasOne(d => d.ResultatInventaireGestionProduit).WithMany(p => p.ResultatInventaires)
+                    .HasForeignKey(d => d.ResultatInventaireGestionProduitId)
+                    .HasConstraintName("ResultatInventaire_GestionProduitId");
 
                 entity.HasOne(d => d.ResultatInventaireInventaire).WithMany(p => p.ResultatInventaires)
                     .HasForeignKey(d => d.ResultatInventaireInventaireId)
@@ -774,7 +721,7 @@ namespace Repository.Data
             modelBuilder.Entity<IdentityUserRole<string>>(entity =>
             {
                 entity.HasKey(r => new { r.UserId, r.RoleId });
-             
+
             });
             modelBuilder.Entity<IdentityUserRole<string>>().HasNoDiscriminator();
 
@@ -788,7 +735,7 @@ namespace Repository.Data
             modelBuilder.Entity<User>(entity =>
             {
                 entity.ToTable("AspNetUsers"); // Correct table name in your schema
-                
+
             });
 
             modelBuilder.Entity<Role>(entity =>
@@ -833,6 +780,188 @@ namespace Repository.Data
                 entity.ToTable("AspNetUserTokens");
             });
 
+            modelBuilder.Entity<Fournisseur>(entity =>
+            {
+                entity.HasKey(e => e.FournisseurId); // Clé primaire unique
+                entity.ToTable("Fournisseur");
+
+                entity.Property(e => e.FournisseurId)
+                    .HasColumnName("Fournisseur_Id");
+
+                entity.Property(e => e.Nom)
+                    .HasMaxLength(100)
+                    .IsUnicode(false)
+                    .HasColumnName("Fournisseur_Nom");
+
+                entity.Property(e => e.Contact)
+                    .HasMaxLength(100)
+                    .IsUnicode(false)
+                    .HasColumnName("Fournisseur_Contact");
+
+                entity.Property(e => e.Email)
+                    .HasMaxLength(100)
+                    .IsUnicode(false)
+                    .HasColumnName("Fournisseur_Email");
+
+                entity.Property(e => e.Telephone)
+                    .HasMaxLength(20)
+                    .IsUnicode(false)
+                    .HasColumnName("Fournisseur_Telephone");
+
+                entity.Property(e => e.IsDeleted)
+                    .HasColumnName("IsDeleted");
+            });
+
+         modelBuilder.Entity<CodebarreProduit>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.ToTable("CodebarreProduit");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("CodebarreProduit_Id");
+
+                entity.Property(e => e.Code)
+                    .HasMaxLength(100)
+                    .IsUnicode(false)
+                    .HasColumnName("CodebarreProduit_Code");
+
+                entity.HasIndex(e => e.Code)
+                    .IsUnique();
+
+                entity.Property(e => e.ProduitId)
+                    .HasColumnName("CodebarreProduit_ProduitId");
+
+                entity.HasOne(e => e.Produit)
+                    .WithMany(p => p.CodebarreProduits)
+                    .HasForeignKey(e => e.ProduitId)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK_CodebarreProduit_Produit");
+            });
+
+
+  modelBuilder.Entity<GestionProduit>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.ToTable("GestionProduit");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("GestionProduit_Id");
+
+                entity.Property(e => e.ProduitId)
+                    .IsRequired()
+                    .HasColumnName("GestionProduit_ProduitId");
+
+                entity.Property(e => e.ProduitNom)
+                    .HasMaxLength(200)
+                    .HasColumnName("GestionProduit_ProduitNom");
+
+                entity.Property(e => e.CodeBarreproduit)
+                    .HasMaxLength(100)
+                    .HasColumnName("GestionProduit_CodeBarre");
+
+                entity.Property(e => e.GestionProduitQuantiteId)
+                    .HasColumnName("GestionProduit_QuantiteId");            
+
+                entity.Property(e => e.CodeBarreCommercialId)
+                    .HasColumnName("GestionProduit_CodeBarreCommercialId");
+
+                entity.Property(e => e.ResultatInventaireId)
+                    .HasColumnName("GestionProduit_ResultatInventaireId");
+
+                entity.Property(e => e.CodeBarreAlleeId)
+                    .HasColumnName("GestionProduit_CodeBarreAlleeId");
+
+                entity.Property(e => e.CodeBarreZoneId)
+                    .HasColumnName("GestionProduit_CodeBarreZoneId");
+
+                entity.Property(e => e.CodeBarreCommercialId)
+                    .HasColumnName("GestionProduit_CodeBarreCommercialId");
+
+                entity.Property(e => e.CodeBarreRangeeId)
+                    .HasColumnName("GestionProduit_CodeBarreRangeeId");
+
+                entity.Property(e => e.CodeBarreEtageId)
+                    .HasColumnName("GestionProduit_CodeBarreEtageId");
+
+                entity.Property(e => e.ProduitEtageId)
+                    .HasColumnName("GestionProduit_ProduitEtageId");
+
+                entity.Property(e => e.QuantiteEnStock)
+                    .HasColumnName("GestionProduit_Quantite En Stock");
+
+                // Relations
+                entity.HasOne(e => e.CodeBarreEtage)
+                    .WithMany()
+                    .HasForeignKey(e => e.CodeBarreEtageId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasOne(e => e.CodeBarreRangee)
+                    .WithMany()
+                    .HasForeignKey(e => e.CodeBarreRangeeId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasOne(e => e.CodeBarreCommercial)
+                    .WithMany()
+                    .HasForeignKey(e => e.CodeBarreCommercialId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasOne(e => e.CodeBarreAllee)
+                    .WithMany()
+                    .HasForeignKey(e => e.CodeBarreAlleeId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasOne(e => e.CodeBarreZone)
+                    .WithMany()
+                    .HasForeignKey(e => e.CodeBarreZoneId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                 entity.HasOne(e => e.CodeBarreCommercial)
+                    .WithMany()
+                    .HasForeignKey(e => e.CodeBarreCommercialId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasOne(e => e.ProduitEtage)
+                    .WithMany()
+                    .HasForeignKey(e => e.ProduitEtageId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasOne(e => e.GestionProduitProduit)
+                    .WithMany(p => p.GestionProduit)
+                    .HasForeignKey(e => e.ProduitId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(e => e.QuantiteEnStock)
+                    .WithMany()
+                    .HasForeignKey(e => e.QuantiteEnStock)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasMany(e => e.ResultatInventaires)
+                    .WithOne(r => r.ResultatInventaireGestionProduit)
+                    .HasForeignKey(r => r.ResultatInventaireGestionProduitId)
+                    .OnDelete(DeleteBehavior.SetNull);
+            });
+modelBuilder.Entity<CodeBarreCommercial>(entity =>
+    {
+        entity.HasKey(e => e.CommercialId);
+        entity.ToTable("CodeBarreCommercial");
+
+        entity.Property(e => e.CommercialId)
+            .HasColumnName("CodeBarreCommercial_Id");
+
+        entity.Property(e => e.Code)
+            .HasMaxLength(100)
+            .IsUnicode(false)
+            .HasColumnName("CodeBarreCommercial_Code");
+
+        entity.HasIndex(e => e.Code)
+            .IsUnique();
+
+       entity.HasOne(g => g.Code)
+        .WithMany() 
+        .HasForeignKey(g => g.CommercialId)
+        .OnDelete(DeleteBehavior.Restrict); 
+    });
             OnModelCreatingPartial(modelBuilder);
         }
 

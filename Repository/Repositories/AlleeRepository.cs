@@ -11,6 +11,7 @@ using Repository.Data;
 namespace Repository.Repositories
 
 {
+    
     public class AlleeRepository : GenericRepository<Allee>, IAlleeRepository
     {
         private readonly ApplicationDbContext _context;
@@ -22,6 +23,24 @@ namespace Repository.Repositories
             _context = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
+
+public async Task<IEnumerable<Allee>> GetAllAsync()
+{
+    return await _context.Allees
+        .Where(a => a.IsDeleted == false || a.IsDeleted == null)
+        .ToListAsync();
+}
+
+public async Task<Allee?> GetByIdAsync(int id)
+{
+    return await _context.Allees
+        .FirstOrDefaultAsync(a => a.AlleeId == id && (a.IsDeleted == false || a.IsDeleted == null));
+}
+        public async Task AddAsync(Allee entity)
+        {
+            await AddAsync(entity); // méthode du GenericRepository
+            await SaveChangesAsync();
+}
 
 
 

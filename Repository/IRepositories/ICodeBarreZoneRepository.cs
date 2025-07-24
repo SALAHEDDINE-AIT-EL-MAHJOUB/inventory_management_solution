@@ -14,6 +14,9 @@ namespace Repository.IRepositories
         Task<CodeBarreZone?> GetByCodeAsync(string code);
         Task AddAsync(CodeBarreZone entity);
         void Delete(CodeBarreZone entity);
+        Task UpdateAsync(CodeBarreZone entity);
+        Task DeleteAsync(CodeBarreZone entity);
+
         Task SaveAsync();
         
        

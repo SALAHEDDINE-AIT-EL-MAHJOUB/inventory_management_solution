@@ -1,92 +1,109 @@
-﻿using System;
+﻿using Domain.Entities;
+using Repository.IRepositories;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Domain.Entities;
-using Repository.IRepositories;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Repository;
 using Repository.Data;
+
 namespace Repository.Repositories
 {
-    public class ProduitRepository :GenericRepository<Produit> , IProduitRepository
+    public class ProduitRepository : IProduitRepository
     {
         private readonly ApplicationDbContext _context;
-        private readonly ILogger<GenericRepository<Produit>> _logger;
-        public ProduitRepository(ApplicationDbContext dbContext, ILogger<GenericRepository<Produit>> logger) : base(dbContext, logger)
+
+        public ProduitRepository(ApplicationDbContext context)
         {
-            _context = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _context = context;
         }
 
-        public async Task<List<Produit>> GetByEtageId(int id)
-        {
-            try
-            {
-                var res = await _context.Produits
-                    .Where(p=>p.ProduitEtageId == id)
-                    .ToListAsync();
-                return res;
-            }
-            catch (Exception ex)
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        public async Task<List<Produit>> GetAllProduitsAsync()
+        public async Task<IEnumerable<Produit>> GetAllAsync()
         {
             return await _context.Produits
-        .Include(p => p.ProduitEtage) 
-                .AsNoTracking()
+                .Include(p => p.Fournisseur)
+                .Include(p => p.GestionProduit)
+                .Include(p => p.CodebarreProduits)
+                .Where(p => !p.IsDeleted)
                 .ToListAsync();
         }
 
-        public async Task<List<Produit>> GetProduitsByClientIdAsync(int clientId)
+        public async Task<Produit> GetByIdAsync(int id)
         {
             return await _context.Produits
-                    .Include(p => p.ProduitEtage)
-                        .ThenInclude(e => e.EtageRangee)
-                            .ThenInclude(r => r.RangeeRack)
-                                .ThenInclude(rk => rk.RackAllee)
-                                    .ThenInclude(a => a.AlleeZone)
-                                        .ThenInclude(z => z.ZoneSite)
-                                            .ThenInclude(s => s.Societe)
-                    .Include(p => p.FormProduits) 
-                    .Where(p =>
-                        p.ProduitEtage != null &&
-                        p.ProduitEtage.EtageRangee != null &&
-                        p.ProduitEtage.EtageRangee.RangeeRack != null &&
-                        p.ProduitEtage.EtageRangee.RangeeRack.RackAllee != null &&
-                        p.ProduitEtage.EtageRangee.RangeeRack.RackAllee.AlleeZone != null &&
-                        p.ProduitEtage.EtageRangee.RangeeRack.RackAllee.AlleeZone.ZoneSite != null &&
-                        p.ProduitEtage.EtageRangee.RangeeRack.RackAllee.AlleeZone.ZoneSite.Societe != null &&
-                        p.ProduitEtage.EtageRangee.RangeeRack.RackAllee.AlleeZone.ZoneSite.Societe.SocieteClientId == clientId
-                    )
-                    .ToListAsync();
-
+                .Include(p => p.Fournisseur)
+                .Include(p => p.GestionProduit)
+                .Include(p => p.CodebarreProduits)
+                .FirstOrDefaultAsync(p => p.Id == id && !p.IsDeleted);
         }
 
-        public async Task<List<Produit>> GetProduitsParSite(int siteId)
+        public async Task AddAsync(Produit produit)
+        {
+            await _context.Produits.AddAsync(produit);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateAsync(Produit produit)
+        {
+            _context.Produits.Update(produit);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            var produit = await _context.Produits.FindAsync(id);
+            if (produit != null)
+            {
+                produit.IsDeleted = true;
+                _context.Produits.Update(produit);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task<IEnumerable<Produit>> GetByCodeBarreAsync(string codeBarre)
         {
             return await _context.Produits
-                .Include(p => p.ProduitEtage)
-                    .ThenInclude(e => e.EtageRangee)
-                        .ThenInclude(r => r.RangeeRack)
-                            .ThenInclude(rack => rack.RackAllee)
-                                .ThenInclude(allée => allée.AlleeZone)
-                                    .ThenInclude(zone => zone.ZoneSite)
-                .Where(p => p.ProduitEtage != null &&
-                            p.ProduitEtage.EtageRangee != null &&
-                            p.ProduitEtage.EtageRangee.RangeeRack != null &&
-                            p.ProduitEtage.EtageRangee.RangeeRack.RackAllee != null &&
-                            p.ProduitEtage.EtageRangee.RangeeRack.RackAllee.AlleeZone != null &&
-                            p.ProduitEtage.EtageRangee.RangeeRack.RackAllee.AlleeZone.ZoneSite.Id == siteId)
+                .Include(p => p.GestionProduit)
+                .Where(p => p.GestionProduit.Any(fp => fp.CodeBarreCommercial == codeBarre) && !p.IsDeleted)
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<Produit>> GetByFournisseurIdAsync(int fournisseurId)
+        {
+            return await _context.Produits
+                .Where(p => p.FournisseurId == fournisseurId && !p.IsDeleted)
+                .ToListAsync();
+        }
 
+        public async Task<IEnumerable<Produit>> GetByFormProduitAlleeIdAsync(int alleeId)
+        {
+            return await _context.Produits
+                .Include(p => p.GestionProduit)
+                .Where(p => p.GestionProduit.Any(fp => fp.CodeBarreAlleeId == alleeId) && !p.IsDeleted)
+                .ToListAsync();
+        }
 
+        public async Task<IEnumerable<Produit>> GetByFormProduitZoneIdAsync(int zoneId)
+        {
+            return await _context.Produits
+                .Include(p => p.GestionProduit)
+                .Where(p => p.GestionProduit.Any(fp => fp.CodeBarreZoneId == zoneId) && !p.IsDeleted)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Produit>> GetByFormProduitRangeeIdAsync(int rangeeId)
+        {
+            return await _context.Produits
+                .Include(p => p.GestionProduit)
+                .Where(p => p.GestionProduit.Any(fp => fp.CodeBarreRangeeId == rangeeId) && !p.IsDeleted)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Produit>> GetByFormProduitEtageIdAsync(int etageId)
+        {
+            return await _context.Produits
+                .Include(p => p.GestionProduit)
+                .Where(p => p.GestionProduit.Any(fp => fp.CodeBarreEtageId == etageId) && !p.IsDeleted)
+                .ToListAsync();
+        }
     }
 }

@@ -11,8 +11,11 @@ namespace Repository.IRepositories
 {
     public interface IGenericRepository<TEntity> where TEntity : class
     {
-        Task AddedAsync(TEntity entity);
-        Task AddedAsync(IEnumerable<TEntity> entities);
+        Task<List<TEntity>> GetAllAsync();
+        Task<TEntity?> GetByIdAsync(int id);
+        Task AddAsync(TEntity entity);
+        Task UpdateAsync(TEntity entity);
+        Task DeleteAsync(TEntity entity);
         Task<TEntity?> GetAsync(Expression<Func<TEntity, bool>>? predicate = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object?>>? include = null, bool disableTracking = true);
         Task<IEnumerable<TEntity>> GetListAsync(Expression<Func<TEntity, bool>>? predicate = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object?>>? include = null, bool disableTracking = true);
         Task<GenericPaginatedList<TEntity>> GetPaginatedListAsync(int currentPage, int itemsPerPage, Expression<Func<TEntity, bool>>? predicate = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object?>>? include = null, bool disableTracking = true);
@@ -24,10 +27,7 @@ namespace Repository.IRepositories
         Task<int> GetCount(Expression<Func<TEntity, bool>>? predicate = null);
         IQueryable<TEntity> GetAll();
         Task<int> SaveChangesAsync();
-
-        Task UpdateAsync(TEntity entity);
-        Task DeleteAsync(object id);
-
+        
     }
 }
 

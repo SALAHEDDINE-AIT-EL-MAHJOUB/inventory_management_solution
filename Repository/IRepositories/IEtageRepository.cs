@@ -1,20 +1,16 @@
-﻿
-using Domain.Entities;
-using System;
+﻿using Domain.Entities;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-
 
 namespace Repository.IRepositories
 {
-    public interface IEtageRepository : IGenericRepository<Etage>
+    public interface IEtageRepository
     {
-        public Task<List<Etage>> GetByRangeeId(int id);
-        Task<List<Etage>> GetEtagesByRangeeName(int clientId, string rangeeNom);
-
-        Task<List<Etage>> GetEtagesByClientId(int clientId);
-
+        Task<IEnumerable<Etage>> GetAllAsync();
+        Task<Etage?> GetByIdAsync(int id);
+        Task AddAsync(Etage entity);
+        Task UpdateAsync(Etage entity);
+        Task DeleteAsync(Etage entity);
+        Task SaveAsync();
     }
 }

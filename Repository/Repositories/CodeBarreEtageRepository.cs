@@ -51,6 +51,18 @@ namespace Repository.Repositories
         {
             await _context.SaveChangesAsync();
         }
+
+        public async Task UpdateAsync(CodeBarreEtage entity)
+        {
+            _context.CodeBarreEtages.Update(entity);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(CodeBarreEtage entity)
+        {
+            _context.CodeBarreEtages.Remove(entity);
+            await _context.SaveChangesAsync();
+        }
     }
 
 }

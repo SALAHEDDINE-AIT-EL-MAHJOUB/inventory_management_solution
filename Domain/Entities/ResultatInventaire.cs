@@ -2,13 +2,13 @@ namespace Domain.Entities
 {
     public class ResultatInventaire
     {
-        public int Id { get; set; }
-        public int FormProduitId { get; set; }
-        public virtual FormProduit FormProduit { get; set; } 
+       
+        public int GestionProduitProduitId { get; set; }
+        public virtual GestionProduit GestionProduit { get; set; } 
         public int ResultatInventaireId { get; set; }
 
        
-        public int? ResultatInventaireFormProduitId { get; set; }
+        public int? ResultatInventaireGestionProduitId { get; set; }
         public int? ResultatInventaireEquipeId { get; set; }
  public int? ResultatInventaireInventaireId { get; set; }
         public int? ResultatInventaireOperateurId { get; set; }
@@ -19,7 +19,7 @@ namespace Domain.Entities
 
         public virtual Equipe? ResultatInventaireEquipe { get; set; }
 
-        public virtual FormProduit? ResultatInventaireFormProduit { get; set; }
+        public virtual GestionProduit? ResultatInventaireGestionProduit { get; set; }
 
         public virtual Inventaire? ResultatInventaireInventaire { get; set; }
 

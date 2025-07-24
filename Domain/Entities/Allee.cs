@@ -15,6 +15,5 @@ namespace Domain.Entities
 
      
   
-    public virtual ICollection<Rack>? Racks { get; set; }
-}
+ }
     }

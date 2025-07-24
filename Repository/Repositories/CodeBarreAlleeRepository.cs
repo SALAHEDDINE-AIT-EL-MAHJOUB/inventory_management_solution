@@ -53,5 +53,20 @@ namespace Repository.Repositories
                 .FirstOrDefaultAsync(c => c.Code == code);
         }
 
+        public async Task UpdateAsync(CodeBarreAllee entity)
+        {
+            _context.CodeBarreAllees.Update(entity);
+            await _context.SaveChangesAsync();
+        }
+      
+
+public async Task DeleteAsync(CodeBarreAllee entity)
+{
+    _context.CodeBarreAllees.Remove(entity);
+    await _context.SaveChangesAsync();
+}
+
+
+
     }
 }

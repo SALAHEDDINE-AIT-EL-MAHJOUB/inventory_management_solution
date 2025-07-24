@@ -17,7 +17,7 @@ namespace Repository.Repositories
         public async Task<IEnumerable<ResultatInventaire>> GetByInventaireIdAsync(int inventaireId)
         {
             return await _context.ResultatInventaires
-                .Include(r => r.ResultatInventaireFormProduit)
+                .Include(r => r.ResultatInventaireGestionProduit)
                 .Include(r => r.ResultatInventaireEquipe)
                 .Include(r => r.ResultatInventaireOperateur)
                 .Where(r => r.ResultatInventaireInventaireId == inventaireId)
@@ -47,21 +47,21 @@ namespace Repository.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<List<ResultatInventaire>> GetByInventaireAndProduitAsync(int inventaireId, int formProduitId)
+        public async Task<List<ResultatInventaire>> GetByInventaireAndProduitAsync(int inventaireId, int gestionProduitId)
         {
             return await _context.ResultatInventaires
                 .Where(r => r.ResultatInventaireInventaireId == inventaireId
-                         && r.ResultatInventaireFormProduitId == formProduitId)
+                         && r.ResultatInventaireGestionProduitId == gestionProduitId)
                 .ToListAsync();
         }
 
         public async Task<ResultatInventaire?> GetByInventaireProduitOperateurEtapeAsync(
-    int inventaireId, int formProduitId, int operateurId, int etapeComptage)
+    int inventaireId, int gestionProduitId, int operateurId, int etapeComptage)
         {
             return await _context.ResultatInventaires
                 .FirstOrDefaultAsync(r =>
                     r.ResultatInventaireInventaireId == inventaireId &&
-                    r.ResultatInventaireFormProduitId == formProduitId &&
+                    r.ResultatInventaireGestionProduitId == gestionProduitId &&
                     r.ResultatInventaireOperateurId == operateurId &&
                     r.ÉtapeComptage == etapeComptage
                 );
@@ -80,22 +80,22 @@ namespace Repository.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<bool> ExisteAsync(int formProduitId, int operateurId, int inventaireId, int etapeComptage)
+        public async Task<bool> ExisteAsync(int gestionProduitId, int operateurId, int inventaireId, int etapeComptage)
         {
             return await _context.ResultatInventaires.AnyAsync(r =>
-                r.ResultatInventaireFormProduitId == formProduitId &&
+                r.ResultatInventaireGestionProduitId == gestionProduitId &&
                 r.ResultatInventaireOperateurId == operateurId &&
                 r.ResultatInventaireInventaireId == inventaireId &&
                 r.ÉtapeComptage == etapeComptage);
         }
-        public async Task<List<int>> GetFormProduitIdsScannesAsync(int operateurId, int inventaireId, int etapeComptage)
+        public async Task<List<int>> GetGestionProduitIdsScannesAsync(int operateurId, int inventaireId, int etapeComptage)
         {
             return await _context.ResultatInventaires
                  .Where(r =>
                      r.ResultatInventaireOperateurId == operateurId &&
                      r.ResultatInventaireInventaireId == inventaireId &&
                      r.ÉtapeComptage == etapeComptage)
-                 .Select(r => r.ResultatInventaireFormProduitId)
+                 .Select(r => r.ResultatInventaireGestionProduitId)
                  .Where(id => id.HasValue)
                  .Select(id => id.Value)
                  .ToListAsync();
@@ -105,19 +105,21 @@ namespace Repository.Repositories
         public async Task<List<ResultatInventaire>> GetResultatsParInventaireEtOperateurAsync(int inventaireId, int operateurId)
         {
             return await _context.ResultatInventaires
-                .Include(r => r.ResultatInventaireFormProduit)
-                    .ThenInclude(fp => fp.FormProduitProduit)
-                        .ThenInclude(p => p.ProduitEtage)
+                .Include(r => r.ResultatInventaireGestionProduit)
+                    .ThenInclude(fp => fp.GestionProduitProduit)
+                .Include(r => r.ResultatInventaireEquipe)
+                .Include(r => r.ResultatInventaireOperateur)
+                
                 .Where(r =>
                     r.ResultatInventaireInventaireId == inventaireId &&
                     r.ResultatInventaireOperateurId == operateurId)
                 .ToListAsync();
         }
 
-        public async Task<bool> ExisteParFormProduitEtInventaireAsync(int formProduitId, int inventaireId, int etapeComptage)
+        public async Task<bool> ExisteParGestionProduitEtInventaireAsync(int gestionProduit, int inventaireId, int etapeComptage)
         {
             return await _context.ResultatInventaires.AnyAsync(r =>
-                r.ResultatInventaireFormProduitId == formProduitId &&
+               
                 r.ResultatInventaireInventaireId == inventaireId &&
                 r.ÉtapeComptage == etapeComptage
             );

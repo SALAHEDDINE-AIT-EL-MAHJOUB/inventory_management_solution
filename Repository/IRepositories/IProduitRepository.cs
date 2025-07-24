@@ -1,20 +1,27 @@
 ﻿using Domain.Entities;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Repository.IRepositories
 {
-    public interface IProduitRepository :IGenericRepository<Produit>
+    public interface IProduitRepository
     {
-        public Task<List<Produit>> GetByEtageId(int id);
-        Task<List<Produit>> GetAllProduitsAsync();
+        Task<IEnumerable<Produit>> GetAllAsync();
+        Task<Produit> GetByIdAsync(int id);
+        Task AddAsync(Produit produit);
+        Task UpdateAsync(Produit produit);
+        Task DeleteAsync(int id);
 
-        Task<List<Produit>> GetProduitsByClientIdAsync(int clientId);
-        Task<List<Produit>> GetProduitsParSite(int siteId);
+        // Recherche par code produit (CodeBarre)
+        Task<IEnumerable<Produit>> GetByCodeBarreAsync(string codeBarre);
 
+        // Recherche par fournisseur
+        Task<IEnumerable<Produit>> GetByFournisseurIdAsync(int fournisseurId);
 
+        // Recherche par forme produit (ex: Allee, Zone, Rangee, Etage)
+        Task<IEnumerable<Produit>> GetByFormProduitAlleeIdAsync(int alleeId);
+        Task<IEnumerable<Produit>> GetByFormProduitZoneIdAsync(int zoneId);
+        Task<IEnumerable<Produit>> GetByFormProduitRangeeIdAsync(int rangeeId);
+        Task<IEnumerable<Produit>> GetByFormProduitEtageIdAsync(int etageId);
     }
 }

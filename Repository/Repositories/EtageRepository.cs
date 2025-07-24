@@ -1,117 +1,60 @@
 ﻿using Domain.Entities;
 using Repository.IRepositories;
+using Repository.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Extensions.Logging;
-using Repository;
-using Repository.Data;
-using System.Linq.Expressions;
+using System.Threading.Tasks;
+
 namespace Repository.Repositories
 {
-    public class EtageRepository : GenericRepository<Etage>, IEtageRepository
+    public class EtageRepository : IEtageRepository
     {
         private readonly ApplicationDbContext _context;
-        private readonly ILogger<GenericRepository<Etage>> _logger;
 
-        public EtageRepository(ApplicationDbContext dbContext, ILogger<GenericRepository<Etage>> logger) : base(dbContext, logger)
+        public EtageRepository(ApplicationDbContext context)
         {
-            _context = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _context = context;
         }
 
-        public async Task<List<Etage>> GetByRangeeId(int id)
-        {
-            try
-            {
-                var res = await _context.Etages
-                    .Where(e => e.RangeeId == id && !e.IsDeleted) // MODIFIED: Filter by IsDeleted
-                    .Include(e => e.EtageRangee)
-                    .ThenInclude(r => r.RangeeRack)
-                    .ThenInclude(ra => ra.RackAllee)
-                    .ThenInclude(z => z.AlleeZone)
-                    .ThenInclude(s => s.ZoneSite)
-                    .ThenInclude(so => so.Societe)
-                    .ToListAsync();
-                return res;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Erreur lors de la récupération des étages par ID de Rangee.");
-                throw;
-            }
-        }
-
-        public async Task<List<Etage>> GetEtagesByRangeeName(int clientId, string rangeeNom)
-        {
-            try
-            {
-                var query = _context.Etages
-                    .Include(e => e.EtageRangee)
-                        .ThenInclude(r => r.RangeeRack)
-                            .ThenInclude(rack => rack.RackAllee)
-                                .ThenInclude(allee => allee.AlleeZone)
-                                    .ThenInclude(zone => zone.ZoneSite)
-                                        .ThenInclude(site => site.Societe)
-                                            .ThenInclude(soc => soc.SocietéClient)
-                    .Where(e =>
-                        !e.IsDeleted &&
-                        e.EtageRangee != null &&
-                        !e.EtageRangee.IsDeleted &&
-                        e.EtageRangee.RangeeNom!.ToLower() == rangeeNom.ToLower() &&
-                        e.EtageRangee.RangeeRack != null &&
-                        e.EtageRangee.RangeeRack.RackAllee != null &&
-                        e.EtageRangee.RangeeRack.RackAllee.AlleeZone != null &&
-                        e.EtageRangee.RangeeRack.RackAllee.AlleeZone.ZoneSite != null &&
-                        e.EtageRangee.RangeeRack.RackAllee.AlleeZone.ZoneSite.Societe != null &&
-                        e.EtageRangee.RangeeRack.RackAllee.AlleeZone.ZoneSite.Societe.SocietéClient != null &&
-                        e.EtageRangee.RangeeRack.RackAllee.AlleeZone.ZoneSite.Societe.SocietéClient.ClientId == clientId
-                    )
-                    .AsNoTracking();
-
-                return await query.ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Erreur lors de la récupération des étages par nom de Rangee.");
-                throw;
-            }
-        }
-
-
-        public async Task<int?> GetEquipeIdByOperateurEtInventaireAsync(int operateurId, int inventaireId)
-        {
-            return await _context.EquipeOperateurs
-                .Where(eo => eo.EquipeOperateurOperateurId == operateurId && eo.EquipeOperateurEquipe!.EquipeInventaireId == inventaireId)
-                .Select(eo => (int?)eo.EquipeOperateurEquipeId)
-                .FirstOrDefaultAsync();
-        }
-
-        public async Task<List<Etage>> GetEtagesByClientId(int clientId)
+        public async Task<IEnumerable<Etage>> GetAllAsync()
         {
             return await _context.Etages
+                .Include(e => e.CodeBarreEtages)
                 .Include(e => e.EtageRangee)
-                    .ThenInclude(r => r.RangeeRack)
-                        .ThenInclude(rack => rack.RackAllee)
-                            .ThenInclude(allee => allee.AlleeZone)
-                                .ThenInclude(zone => zone.ZoneSite)
-                                    .ThenInclude(site => site.Societe)
-                                        .ThenInclude(soc => soc.SocietéClient)
-                .Where(e =>
-                    !e.IsDeleted &&
-                    e.EtageRangee != null &&
-                    e.EtageRangee.RangeeRack != null &&
-                    e.EtageRangee.RangeeRack.RackAllee != null &&
-                    e.EtageRangee.RangeeRack.RackAllee.AlleeZone != null &&
-                    e.EtageRangee.RangeeRack.RackAllee.AlleeZone.ZoneSite != null &&
-                    e.EtageRangee.RangeeRack.RackAllee.AlleeZone.ZoneSite.Societe != null &&
-                    e.EtageRangee.RangeeRack.RackAllee.AlleeZone.ZoneSite.Societe.SocietéClient != null &&
-                    e.EtageRangee.RangeeRack.RackAllee.AlleeZone.ZoneSite.Societe.SocietéClient.ClientId == clientId
-                )
+                .Include(e => e.Produits)
                 .ToListAsync();
         }
 
+        public async Task<Etage?> GetByIdAsync(int id)
+        {
+            return await _context.Etages
+                .Include(e => e.CodeBarreEtages)
+                .Include(e => e.EtageRangee)
+                .Include(e => e.Produits)
+                .FirstOrDefaultAsync(e => e.Id == id);
+        }
 
+        public async Task AddAsync(Etage entity)
+        {
+            await _context.Etages.AddAsync(entity);
+            await _context.SaveChangesAsync();
+        }
 
+        public async Task UpdateAsync(Etage entity)
+        {
+            _context.Etages.Update(entity);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(Etage entity)
+        {
+            _context.Etages.Remove(entity);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task SaveAsync()
+        {
+            await _context.SaveChangesAsync();
+        }
     }
 }

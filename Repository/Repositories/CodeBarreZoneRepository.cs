@@ -46,6 +46,20 @@ namespace Repository.Repositories
         {
             _context.CodeBarreZones.Remove(entity);
         }
+      
+
+        public async Task UpdateAsync(CodeBarreZone entity)
+        {
+            _context.CodeBarreZones.Update(entity);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(CodeBarreZone entity)
+        {
+            _context.CodeBarreZones.Remove(entity);
+            await _context.SaveChangesAsync();
+        }
+
 
         public async Task SaveAsync()
         {

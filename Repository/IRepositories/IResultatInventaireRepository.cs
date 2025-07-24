@@ -11,19 +11,19 @@ namespace Repository.IRepositories
         void Update(ResultatInventaire entity);
 
         Task SaveAsync();
-        Task<List<ResultatInventaire>> GetByInventaireAndProduitAsync(int inventaireId, int formProduitId);
+        Task<List<ResultatInventaire>> GetByInventaireAndProduitAsync(int inventaireId, int gestionProduitId);
 
         Task<ResultatInventaire?> GetByInventaireProduitOperateurEtapeAsync(
-    int inventaireId, int formProduitId, int operateurId, int etapeComptage);
+    int inventaireId, int gestionProduitId, int operateurId, int etapeComptage);
 
         Task AddAsync(ResultatInventaire entity);
         Task UpdateAsync(ResultatInventaire entity);
         Task SaveChangesAsync();
-        Task<bool> ExisteAsync(int formProduitId, int operateurId, int inventaireId, int etapeComptage);
-        Task<List<int>> GetFormProduitIdsScannesAsync(int operateurId, int inventaireId, int etapeComptage);
+        Task<bool> ExisteAsync(int gestionProduitId, int operateurId, int inventaireId, int etapeComptage);
+        Task<List<int>> GetGestionProduitIdsScannesAsync(int operateurId, int inventaireId, int etapeComptage);
         Task<List<ResultatInventaire>> GetResultatsParInventaireEtOperateurAsync(int inventaireId, int operateurId);
 
-        Task<bool> ExisteParFormProduitEtInventaireAsync(int formProduitId, int inventaireId, int etapeComptage);
+        Task<bool> ExisteParGestionProduitEtInventaireAsync(int gestionProduitId, int inventaireId, int etapeComptage);
 
     }
 }

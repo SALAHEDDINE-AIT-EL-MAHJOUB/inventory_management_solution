@@ -21,12 +21,12 @@ namespace Repository.Repositories
             _logger = logger;
         }
 
-        public async Task AddedAsync(TEntity entity)
+        public async Task AddAsync(TEntity entity)
         {
             await _context.Set<TEntity>().AddAsync(entity);
         }
 
-        public async Task AddedAsync(IEnumerable<TEntity> entities)
+        public async Task AddAsync(IEnumerable<TEntity> entities)
         {
             await _context.Set<TEntity>().AddRangeAsync(entities);
         }
@@ -127,6 +127,13 @@ namespace Repository.Repositories
             }
         }
 
+        public async Task DeleteAsync(TEntity entity)
+        {
+            _context.Set<TEntity>().Remove(entity);
+            await _context.SaveChangesAsync();
+        }
+
+
         public async Task<GenericPaginatedList<TEntity>> GetPaginatedListAsync(
             int currentPage,
             int itemsPerPage,
@@ -156,6 +163,16 @@ namespace Repository.Repositories
                 TotalItems = totalItems,
                 TotalPages = (int)System.Math.Ceiling((double)totalItems / itemsPerPage)
             };
+        }
+
+        public async Task<List<TEntity>> GetAllAsync()
+        {
+            return await _context.Set<TEntity>().AsNoTracking().ToListAsync();
+        }
+
+        public async Task<TEntity?> GetByIdAsync(int id)
+        {
+            return await _context.Set<TEntity>().FindAsync(id);
         }
     }
 }

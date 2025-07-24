@@ -13,7 +13,6 @@ namespace Service.IServices
         Task DeleteAsync(CodeBarreAllee entity);
         Task<CodeBarreAllee?> GetByCodeAsync(string code);
 
-        // Déclenche une alerte si le code-barres est inconnu
-        Task DeclencherAlerteCodeInconnuAsync(string code, int equipeId);
+      
     }
 }
