@@ -9,7 +9,7 @@ namespace Domain.Entities
     public class Admin
     {
         public int AdminId { get; set; }
-        public string UserId { get; set; } 
+        public string UserId { get; set; }
         public string AdminName { get; set; }
         public string Email { get; set; }
         public bool IsSuperAdmin { get; set; }
