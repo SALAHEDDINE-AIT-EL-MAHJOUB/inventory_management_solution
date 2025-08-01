@@ -1,0 +1,73 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@600&display=swap');
+body {
+  background: #eaeef6;
+  font-family: 'Open Sans', sans-serif;
+}
+.navbar {
+  position: fixed;
+  top: 1px; /* Hauteur de l'AppBar */
+  left: 0;
+  height: calc(100vh - 64px);
+  width: 300px;
+  background: #1976d2;
+  padding: 1rem 0;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  z-index: 1000;
+  max-width: 90vw;
+  margin-top: 0;
+  
+  border-radius: 0 16px 16px 0;
+}
+.navbar__menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.navbar__item {
+  margin-bottom: 0.5rem;
+}
+.navbar__link {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  height: 3.5rem;
+  color: #fff;
+  text-decoration: none;
+  padding: 0 1.5rem;
+  border-radius: 0;
+  transition: background 0.2s, color 0.2s;
+  position: relative;
+  font-weight: 600;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 1rem;
+  outline: none;
+}
+.navbar__link:hover,
+.navbar__link:focus {
+  background: #1565c0;
+  color: #fff;
+  outline: 2px solid #fff;
+  outline-offset: -2px;
+  box-shadow: 0 2px 8px rgba(21,101,192,0.12);
+}
+.navbar__link span {
+  margin-left: 1rem;
+  color: #fff;
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  opacity: 1;
+  position: static;
+  transform: none;
+  pointer-events: auto;
+  font-weight: 600;
+  transition: none;
+}
+
+/* Responsive : cache la navbar sur mobile si besoin */
+@media (max-width: 600px) {
+  .navbar {
+    width: 80vw;
+    max-width: 95vw;
+  }
+}
