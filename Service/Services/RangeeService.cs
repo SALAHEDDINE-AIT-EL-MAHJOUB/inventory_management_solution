@@ -39,5 +39,30 @@ namespace Service.Services
         {
             await _rangeeRepository.DeleteAsync(id);
         }
+
+        public async Task<IEnumerable<Societe>> GetSocietesAsync()
+        {
+            return await _rangeeRepository.GetSocietesAsync();
+        }
+
+        public async Task<IEnumerable<Site>> GetSitesBySocieteIdAsync(int societeId)
+        {
+            return await _rangeeRepository.GetSitesBySocieteIdAsync(societeId);
+        }
+
+        public async Task<IEnumerable<Zone>> GetZonesBySiteIdAsync(int siteId)
+        {
+            return await _rangeeRepository.GetZonesBySiteIdAsync(siteId);
+        }
+
+        public async Task<IEnumerable<Allee>> GetAlleesByZoneIdAsync(int zoneId)
+        {
+            return await _rangeeRepository.GetAlleesByZoneIdAsync(zoneId);
+        }
+
+        public async Task AddRangeeAsync(string rangeeNom, int societeId, int siteId, int zoneId, int alleeId)
+        {
+            await _rangeeRepository.AddRangeeAsync(rangeeNom, societeId, siteId, zoneId, alleeId);
+        }
     }
 }

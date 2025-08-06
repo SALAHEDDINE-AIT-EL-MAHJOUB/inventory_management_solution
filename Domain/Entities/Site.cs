@@ -25,7 +25,9 @@ namespace Domain.Entities
         public Ville? SiteVille { get; set; } // Navigation property to Ville    
 
         public int? SiteSocieteId { get; set; }
-
+public virtual Allee? Allees { get; set; }
+        public virtual ICollection<Rangee>? Rangees { get; set; } = new List<Rangee>();
+        
         public virtual ICollection<Inventaire>? Inventaires { get; set; }
         public virtual ICollection<Operateur>? Operateurs { get; set; }
         public virtual ICollection<CodeBarreOperateur>? CodeBarreOperateurs { get; set; }

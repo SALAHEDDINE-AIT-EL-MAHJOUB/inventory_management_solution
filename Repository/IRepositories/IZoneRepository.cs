@@ -13,6 +13,7 @@ namespace Repository.IRepositories
         // New method to get zone names by site name and client ID
         Task<List<string>> GetZoneNamesBySiteName(int clientId, string siteName);
         Task<List<Zone>> GetZoneBySocieteId(int societeId);
-         Task<List<Zone>> GetZoneBySocieteName(string societeNom);
+        Task<List<Zone>> GetZoneBySocieteName(string societeNom);
+            Task<Zone?> GetByIdWithSiteAndSocieteAsync(int id);
     }
 }

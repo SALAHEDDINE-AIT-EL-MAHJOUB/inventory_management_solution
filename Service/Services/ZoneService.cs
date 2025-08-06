@@ -59,10 +59,14 @@ namespace Service.Services
         {
             return await _zoneRepository.GetZoneBySocieteId(societeId);
         }
- 
+
         public async Task<List<Zone>> GetZoneBySocieteName(string societeNom)
         {
             return await _zoneRepository.GetZoneBySocieteName(societeNom);
         }
+         public async Task<Zone?> GetByIdWithSiteAndSocieteAsync(int id)
+    {
+        return await _zoneRepository.GetByIdWithSiteAndSocieteAsync(id);
+    }
     }
 }

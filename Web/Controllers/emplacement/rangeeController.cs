@@ -33,6 +33,59 @@ namespace Web.Controllers.emplacement
             return Ok(rangee);
         }
 
+        // --- Ajout des endpoints pour la sélection hiérarchique ---
+
+        [HttpGet("societes")]
+        public async Task<ActionResult<IEnumerable<Societe>>> GetSocietes()
+        {
+            var societes = await _rangeeService.GetSocietesAsync();
+            return Ok(societes);
+        }
+
+        [HttpGet("sites/{societeId}")]
+        public async Task<ActionResult<IEnumerable<Site>>> GetSitesBySocieteId(int societeId)
+        {
+            var sites = await _rangeeService.GetSitesBySocieteIdAsync(societeId);
+            return Ok(sites);
+        }
+
+        [HttpGet("zones/{siteId}")]
+        public async Task<ActionResult<IEnumerable<Zone>>> GetZonesBySiteId(int siteId)
+        {
+            var zones = await _rangeeService.GetZonesBySiteIdAsync(siteId);
+            return Ok(zones);
+        }
+
+        [HttpGet("allees/{zoneId}")]
+        public async Task<ActionResult<IEnumerable<Allee>>> GetAlleesByZoneId(int zoneId)
+        {
+            var allees = await _rangeeService.GetAlleesByZoneIdAsync(zoneId);
+            return Ok(allees);
+        }
+
+        // Création d'une rangée avec sélection hiérarchique
+        [HttpPost("create")]
+        public async Task<ActionResult> CreateRangee([FromBody] CreateRangeeRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(request.RangeeNom) ||
+                request.SocieteId <= 0 ||
+                request.SiteId <= 0 ||
+                request.ZoneId <= 0 ||
+                request.AlleeId <= 0)
+            {
+                return BadRequest("Tous les champs sont obligatoires.");
+            }
+
+            await _rangeeService.AddRangeeAsync(
+                request.RangeeNom,
+                request.SocieteId,
+                request.SiteId,
+                request.ZoneId,
+                request.AlleeId
+            );
+            return Ok(new { message = "Rangée créée avec succès." });
+        }
+
         [HttpPost]
         public async Task<ActionResult> Add([FromBody] Rangee rangee)
         {
@@ -56,5 +109,15 @@ namespace Web.Controllers.emplacement
             await _rangeeService.DeleteAsync(id);
             return NoContent();
         }
+    }
+
+    // DTO pour la création hiérarchique
+    public class CreateRangeeRequest
+    {
+        public string RangeeNom { get; set; }
+        public int SocieteId { get; set; }
+        public int SiteId { get; set; }
+        public int ZoneId { get; set; }
+        public int AlleeId { get; set; }
     }
 }

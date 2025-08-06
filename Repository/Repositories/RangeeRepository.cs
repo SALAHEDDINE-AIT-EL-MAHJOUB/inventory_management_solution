@@ -52,5 +52,46 @@ namespace Repository.Repositories
                 await _context.SaveChangesAsync();
             }
         }
+
+        public async Task<IEnumerable<Societe>> GetSocietesAsync()
+        {
+            return await _context.Set<Societe>().ToListAsync();
+        }
+
+        public async Task<IEnumerable<Site>> GetSitesBySocieteIdAsync(int societeId)
+        {
+            return await _context.Set<Site>()
+                .Where(s => s.SocieteId == societeId)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Zone>> GetZonesBySiteIdAsync(int siteId)
+        {
+            return await _context.Set<Zone>()
+                .Where(z => z.ZoneSiteId == siteId)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Allee>> GetAlleesByZoneIdAsync(int zoneId)
+        {
+            return await _context.Set<Allee>()
+                .Where(a => a.AlleeZoneId == zoneId)
+                .ToListAsync();
+        }
+
+        public async Task AddRangeeAsync(string rangeeNom, int societeId, int siteId, int zoneId, int alleeId)
+        {
+            var rangee = new Rangee
+            {
+                RangeeNom = rangeeNom,
+                SocieteId = societeId,
+                SiteId = siteId,
+                ZoneId = zoneId,
+                AlleeId = alleeId,
+                IsDeleted = false
+            };
+            await _dbSet.AddAsync(rangee);
+            await _context.SaveChangesAsync();
+        }
     }
 }

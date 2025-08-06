@@ -15,9 +15,19 @@ namespace Service.Services
             _alleeRepository = alleeRepository;
         }
 
+        public async Task AddAsync(Allee entity)
+        {
+            await _alleeRepository.AddAsync(entity);
+        }
+
         public async Task<IEnumerable<Allee>> GetAllAsync()
         {
             return await _alleeRepository.GetAllAsync();
+        }
+
+        public async Task<List<Allee>> GetAllAlleesWithDetails()
+        {
+            return await _alleeRepository.GetAllAlleesWithDetails();
         }
 
         public async Task<Allee?> GetByIdAsync(int id)
@@ -25,9 +35,14 @@ namespace Service.Services
             return await _alleeRepository.GetByIdAsync(id);
         }
 
-        public async Task AddAsync(Allee entity)
+        public async Task DeleteAsync(int id)
         {
-            await _alleeRepository.AddAsync(entity);
+            await _alleeRepository.DeleteAsync(id);
+        }
+
+        public async Task<Allee?> GetByIdWithSiteAndSocieteAsync(int id)
+        {
+            return await _alleeRepository.GetByIdWithSiteAndSocieteAsync(id);
         }
 
         public async Task<List<Allee>> GetAlleeByClientId(int clientId)
@@ -40,11 +55,6 @@ namespace Service.Services
             return await _alleeRepository.GetAlleeByZoneId(zoneId);
         }
 
-        public async Task<List<Allee>> GetByIds(List<int?> ids)
-        {
-            return await _alleeRepository.GetByIds(ids);
-        }
-
         public async Task<List<Allee>> GetAlleeByName(int clientId, string alleeNom)
         {
             return await _alleeRepository.GetAlleeByName(clientId, alleeNom);
@@ -54,11 +64,6 @@ namespace Service.Services
         {
             return await _alleeRepository.GetAlleeNamesByZoneName(clientId, zoneName);
         }
-        
-        public async Task DeleteAsync(int id)
-        {
-          
-            await _alleeRepository.DeleteAsync(id);
-        }
     }
 }
+

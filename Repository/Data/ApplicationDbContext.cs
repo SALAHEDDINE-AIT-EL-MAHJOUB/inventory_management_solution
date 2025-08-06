@@ -97,11 +97,12 @@ namespace Repository.Data
                 entity.HasOne(d => d.AlleeZone).WithMany(p => p.Allee)
                     .HasForeignKey(d => d.AlleeZoneId)
                     .HasConstraintName("Allee_ZoneId");
-
-                // Ignore calculated/not mapped properties
-                entity.Ignore(e => e.zoneNom);
-                entity.Ignore(e => e.societeNom);
-                entity.Ignore(e => e.siteNom);
+ entity.Property(e => e.ZoneNom).HasColumnName("zoneNom");
+                entity.Property(e => e.SocieteNom).HasColumnName("societeNom")
+                .HasMaxLength(100)
+                .IsUnicode(false)
+                .HasComment("Nom de la société liée à l'allée.");
+                entity.Property(e => e.SiteNom).HasColumnName("siteNom");
             });
 
             // Configuration de l'entité Client

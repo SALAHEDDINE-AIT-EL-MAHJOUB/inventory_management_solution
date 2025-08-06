@@ -16,6 +16,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Add this line:
+builder.Services.AddScoped<DbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
+
 // ...puis AddIdentity...
 builder.Services.AddIdentity<User, Role>(options =>
 {
@@ -93,7 +96,8 @@ builder.Services.AddScoped<IZoneService, ZoneService>();
 builder.Services.AddScoped<IZoneRepository, ZoneRepository>();
 builder.Services.AddScoped<IAlleeRepository, AlleeRepository>();
 builder.Services.AddScoped<IAlleeService, AlleeService>();
-
+builder.Services.AddScoped<IRangeeRepository, RangeeRepository>();
+builder.Services.AddScoped<IRangeeService, RangeeService>();
 
 var app = builder.Build();
 

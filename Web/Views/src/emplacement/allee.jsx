@@ -2,24 +2,63 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 const AlleeForm = () => {
+  const [societes, setSocietes] = useState([]);
+  const [sites, setSites] = useState([]);
   const [zones, setZones] = useState([]);
+  const [selectedSocieteId, setSelectedSocieteId] = useState("");
+  const [selectedSiteId, setSelectedSiteId] = useState("");
   const [selectedZoneId, setSelectedZoneId] = useState("");
   const [alleeNom, setAlleeNom] = useState("");
   const [message, setMessage] = useState("");
-  const [loadingZones, setLoadingZones] = useState(true);
   const [allees, setAllees] = useState([]);
   const [showForm, setShowForm] = useState(false);
 
+  // Charger les sociétés au montage
   useEffect(() => {
     axios
-      .get("/api/Zone")
-      .then((res) => setZones(res.data))
-      .finally(() => setLoadingZones(false));
+      .get("/api/client-societes")
+      .then((res) => setSocietes(res.data))
+      .catch(() => setSocietes([]));
   }, []);
 
+  // Charger les sites quand une société est sélectionnée
+  useEffect(() => {
+    if (selectedSocieteId) {
+      axios
+        .get(`/api/Site/societe/${selectedSocieteId}`)
+        .then((res) => setSites(res.data))
+        .catch(() => setSites([]));
+    } else {
+      setSites([]);
+      setZones([]);
+      setSelectedSiteId("");
+      setSelectedZoneId("");
+    }
+  }, [selectedSocieteId]);
+
+  // Charger les zones quand un site est sélectionné
+  useEffect(() => {
+    if (selectedSiteId) {
+      axios
+        .get(`/api/Zone/by-site/${selectedSiteId}`)
+        .then((res) => setZones(res.data))
+        .catch(() => setZones([]));
+    } else {
+      setZones([]);
+      setSelectedZoneId("");
+    }
+  }, [selectedSiteId]);
+
+  // Charger les allées
   const fetchAllees = async () => {
-    const res = await axios.get("/api/Allee");
-    setAllees(res.data);
+    try {
+      // Utilise l'endpoint standard pour la liste enrichie
+      const res = await axios.get("/api/Allee");
+      setAllees(res.data);
+    } catch (err) {
+      setMessage("Erreur lors du chargement des allées.");
+      console.error(err);
+    }
   };
 
   useEffect(() => {
@@ -35,6 +74,8 @@ const AlleeForm = () => {
         alleeZoneId: selectedZoneId,
       });
       setAlleeNom("");
+      setSelectedSocieteId("");
+      setSelectedSiteId("");
       setSelectedZoneId("");
       setMessage("Allée ajoutée !");
       fetchAllees();
@@ -55,7 +96,6 @@ const AlleeForm = () => {
     }
   };
 
-  // Réinitialise le message à l'ouverture du formulaire
   const handleShowForm = () => {
     setShowForm((prev) => !prev);
     setMessage("");
@@ -97,6 +137,116 @@ const AlleeForm = () => {
         >
           <div style={{ marginBottom: 16 }}>
             <label
+              htmlFor="societeSelect"
+              style={{
+                display: "block",
+                marginBottom: 6,
+                fontWeight: 500,
+              }}
+            >
+              Société :
+            </label>
+            <select
+              id="societeSelect"
+              value={selectedSocieteId}
+              onChange={(e) => {
+                setSelectedSocieteId(e.target.value);
+                setSelectedSiteId("");
+                setSelectedZoneId("");
+                setMessage("");
+              }}
+              style={{
+                width: "100%",
+                padding: 8,
+                borderRadius: 4,
+                border: "1px solid #ccc",
+                fontSize: 16,
+              }}
+              required
+            >
+              <option value="">Sélectionnez une société</option>
+              {societes.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.nom}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div style={{ marginBottom: 16 }}>
+            <label
+              htmlFor="siteSelect"
+              style={{
+                display: "block",
+                marginBottom: 6,
+                fontWeight: 500,
+              }}
+            >
+              Site :
+            </label>
+            <select
+              id="siteSelect"
+              value={selectedSiteId}
+              onChange={(e) => {
+                setSelectedSiteId(e.target.value);
+                setSelectedZoneId("");
+                setMessage("");
+              }}
+              style={{
+                width: "100%",
+                padding: 8,
+                borderRadius: 4,
+                border: "1px solid #ccc",
+                fontSize: 16,
+              }}
+              required
+              disabled={!selectedSocieteId}
+            >
+              <option value="">Sélectionnez un site</option>
+              {sites.map((site) => (
+                <option key={site.id || site.siteId} value={site.id || site.siteId}>
+                  {site.siteNom}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div style={{ marginBottom: 16 }}>
+            <label
+              htmlFor="zoneSelect"
+              style={{
+                display: "block",
+                marginBottom: 6,
+                fontWeight: 500,
+              }}
+            >
+              Zone :
+            </label>
+            <select
+              id="zoneSelect"
+              value={selectedZoneId}
+              onChange={(e) => {
+                setSelectedZoneId(e.target.value);
+                setMessage("");
+              }}
+              style={{
+                width: "100%",
+                padding: 8,
+                borderRadius: 4,
+                border: "1px solid #ccc",
+                fontSize: 16,
+              }}
+              required
+              disabled={!selectedSiteId}
+            >
+              <option value="">Sélectionnez une zone</option>
+              {zones.map((zone) => (
+                <option key={zone.zoneId} value={zone.zoneId}>
+                  {zone.zoneNom}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div style={{ marginBottom: 16 }}>
+            <label
               htmlFor="alleeNom"
               style={{
                 display: "block",
@@ -124,48 +274,8 @@ const AlleeForm = () => {
               required
             />
           </div>
-          <div style={{ marginBottom: 16 }}>
-            <label
-              htmlFor="zoneSelect"
-              style={{
-                display: "block",
-                marginBottom: 6,
-                fontWeight: 500,
-              }}
-            >
-              Zone :
-            </label>
-            {loadingZones ? (
-              <span>Chargement des zones...</span>
-            ) : (
-              <select
-                id="zoneSelect"
-                value={selectedZoneId}
-                onChange={(e) => {
-                  setSelectedZoneId(e.target.value);
-                  setMessage("");
-                }}
-                style={{
-                  width: "100%",
-                  padding: 8,
-                  borderRadius: 4,
-                  border: "1px solid #ccc",
-                  fontSize: 16,
-                }}
-                required
-              >
-                <option value="">Sélectionnez une zone</option>
-                {zones.map((zone) => (
-                  <option key={zone.zoneId} value={zone.zoneId}>
-                    {zone.zoneNom}
-                  </option>
-                ))}
-              </select>
-            )}
-          </div>
           <button
             type="submit"
-            disabled={loadingZones}
             style={{
               background: "#2980d9",
               color: "#fff",
@@ -228,23 +338,13 @@ const AlleeForm = () => {
                     {allee.alleeZoneId}
                   </td>
                   <td style={{ padding: 10, border: "1px solid #eee" }}>
-                    {allee.zoneNom ||
-                      (allee.alleeZone ? allee.alleeZone.zoneNom : "—")}
+                    {allee.zoneNom || "—"}
                   </td>
                   <td style={{ padding: 10, border: "1px solid #eee" }}>
-                    {allee.siteNom ||
-                      (allee.alleeZone &&
-                      allee.alleeZone.zoneSite
-                        ? allee.alleeZone.zoneSite.siteNom
-                        : "—")}
+                    {allee.siteNom || "—"}
                   </td>
                   <td style={{ padding: 10, border: "1px solid #eee" }}>
-                    {allee.societeNom ||
-                      (allee.alleeZone &&
-                      allee.alleeZone.zoneSite &&
-                      allee.alleeZone.zoneSite.societe
-                        ? allee.alleeZone.zoneSite.societe.nom
-                        : "—")}
+                    {allee.societeNom || "—"}
                   </td>
                   <td style={{ padding: 10, border: "1px solid #eee" }}>
                     <button

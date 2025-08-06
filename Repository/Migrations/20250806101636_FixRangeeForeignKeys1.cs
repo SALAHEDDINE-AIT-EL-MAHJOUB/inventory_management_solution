@@ -29,17 +29,7 @@ namespace Repository.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "AlleeNom",
-                table: "Rangee");
-
-            migrationBuilder.DropColumn(
-                name: "SocieteNom",
-                table: "Rangee");
-
-            migrationBuilder.DropColumn(
-                name: "ZoneNom",
-                table: "Rangee");
+            
         }
     }
 }

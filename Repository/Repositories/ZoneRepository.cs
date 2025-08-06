@@ -149,7 +149,7 @@ namespace Repository.Repositories
                 .AsNoTracking()
                 .ToListAsync();
         }
-         public async Task<List<Zone>> GetZoneBySocieteId(int societeId)
+        public async Task<List<Zone>> GetZoneBySocieteId(int societeId)
         {
             return await _context.Zones
                 .Where(z => z.SocieteId == societeId && (z.IsDeleted == null || z.IsDeleted == false))
@@ -162,5 +162,12 @@ namespace Repository.Repositories
                 .Where(z => z.SocieteNom != null && z.SocieteNom.ToLower() == societeNom.ToLower() && (z.IsDeleted == null || z.IsDeleted == false))
                 .ToListAsync();
         }
+           public async Task<Zone?> GetByIdWithSiteAndSocieteAsync(int id)
+    {
+        return await _context.Zones
+            .Include(z => z.ZoneSite)
+                .ThenInclude(s => s.Societe)
+            .FirstOrDefaultAsync(z => z.ZoneId == id);
+    }
     }
 }

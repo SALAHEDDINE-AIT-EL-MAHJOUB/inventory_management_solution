@@ -3,6 +3,7 @@ using Service.IServices;
 using Domain.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace Web.Controllers
 {
@@ -20,44 +21,72 @@ namespace Web.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Allee>>> GetAll()
+        public async Task<ActionResult<IEnumerable<object>>> GetAll()
         {
             var allees = await _alleeService.GetAllAsync();
-            return Ok(allees);
+            var result = allees.Select(a => new {
+                a.AlleeId,
+                a.AlleeNom,
+                a.AlleeZoneId,
+                zoneNom = a.AlleeZone != null ? a.AlleeZone.ZoneNom : a.ZoneNom,
+                siteNom = a.AlleeZone != null && a.AlleeZone.ZoneSite != null ? a.AlleeZone.ZoneSite.SiteNom : a.SiteNom,
+                societeNom = a.AlleeZone != null && a.AlleeZone.ZoneSite != null && a.AlleeZone.ZoneSite.Societe != null
+                    ? a.AlleeZone.ZoneSite.Societe.Nom
+                    : a.SocieteNom
+            });
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Allee>> GetById(int id)
+        public async Task<ActionResult<object>> GetById(int id)
         {
-            var allee = await _alleeService.GetByIdAsync(id);
+            var allee = await _alleeService.GetByIdWithSiteAndSocieteAsync(id);
             if (allee == null)
                 return NotFound();
-            return Ok(allee);
+            return Ok(new {
+                allee.AlleeId,
+                allee.AlleeNom,
+                allee.AlleeZoneId,
+                zoneNom = allee.AlleeZone?.ZoneNom ?? allee.ZoneNom,
+                siteNom = allee.AlleeZone?.ZoneSite?.SiteNom ?? allee.SiteNom,
+                societeNom = allee.AlleeZone?.ZoneSite?.Societe?.Nom ?? allee.SocieteNom
+            });
         }
 
         [HttpPost]
-        public async Task<ActionResult<Allee>> Create([FromBody] Allee allee)
+        public async Task<ActionResult<object>> Create([FromBody] Allee allee)
         {
-            try
-            {
-                if (allee.AlleeZoneId == null)
-                    return BadRequest("ZoneId is required.");
+            if (allee.AlleeZoneId == null)
+                return BadRequest("Zone obligatoire");
 
-                var zone = await _zoneService.GetByIdAsync(allee.AlleeZoneId.Value);
-                if (zone == null)
-                    return BadRequest("Zone not found.");
+            // Charger la zone avec site et société
+            var zone = await _zoneService.GetByIdWithSiteAndSocieteAsync(allee.AlleeZoneId.Value);
+            if (zone == null)
+                return BadRequest("Zone introuvable");
 
-                // Ensure navigation properties are not set to avoid EF tracking issues
-                allee.AlleeZone = null;
-                allee.CodeBarreAllee = null;
+            allee.ZoneNom = zone.ZoneNom;
+            allee.SiteNom = zone.ZoneSite?.SiteNom;
+            allee.SocieteNom = zone.ZoneSite?.Societe?.Nom;
 
-                await _alleeService.AddAsync(allee);
-                return CreatedAtAction(nameof(GetById), new { id = allee.AlleeId }, allee);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            // Correction : affecter les IDs liés
+            allee.SiteId = zone.ZoneSite?.Id; // <-- Remplacez SiteId par Id
+            allee.SocieteId = zone.ZoneSite?.Societe?.Id; // <-- Remplacez SocieteId par Id
+            allee.SiteNom = zone.ZoneSite?.SiteNom;
+            allee.SocieteNom = zone.ZoneSite?.Societe?.Nom;
+
+            await _alleeService.AddAsync(allee);
+
+            // Récupérer l'entité insérée avec ses relations pour retourner les bons noms
+            var created = await _alleeService.GetByIdWithSiteAndSocieteAsync(allee.AlleeId);
+
+            return Ok(new {
+                created.AlleeId,
+                created.AlleeNom,
+                created.AlleeZoneId,
+                zoneNom = created.AlleeZone?.ZoneNom ?? created.ZoneNom,
+                siteNom = created.AlleeZone?.ZoneSite?.SiteNom ?? created.SiteNom,
+                societeNom = created.AlleeZone?.ZoneSite?.Societe?.Nom ?? created.SocieteNom
+            });
         }
 
         [HttpGet("by-client/{clientId}")]
