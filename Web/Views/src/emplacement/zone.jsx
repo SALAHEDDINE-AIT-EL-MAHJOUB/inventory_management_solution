@@ -2,28 +2,47 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 
 const Zone = () => {
+  const [societes, setSocietes] = useState([]);
+  const [societeId, setSocieteId] = useState("");
   const [sites, setSites] = useState([]);
-  const [zones, setZones] = useState([]); // <-- Ajout
-  const [zoneNom, setZoneNom] = useState("");
   const [zoneSiteId, setZoneSiteId] = useState("");
+  const [zones, setZones] = useState([]);
+  const [zoneNom, setZoneNom] = useState("");
   const [message, setMessage] = useState("");
 
-  // Charger les sites au montage
+  // Charger les sociétés au montage
   useEffect(() => {
-    axios.get("/api/site")
-      .then(res => setSites(res.data))
-      .catch(() => setSites([]));
-    fetchZones(); // Charger les zones au montage
+    axios.get("/api/client-societes")
+      .then(res => setSocietes(res.data))
+      .catch(() => setSocietes([]));
   }, []);
 
-  // Fonction pour charger les zones
-  const fetchZones = () => {
-    axios.get("/api/zone/by-site/" + zoneSiteId)
-      .then(res => setZones(res.data))
-      .catch(() => setZones([]));
-  };
+  // Charger les sites quand une société est sélectionnée
+  useEffect(() => {
+    if (societeId) {
+      axios.get(`/api/Site/societe/${societeId}`)
+        .then(res => setSites(res.data))
+        .catch(() => setSites([]));
+      setZoneSiteId(""); // reset site selection
+      setZones([]); // reset zones
+    } else {
+      setSites([]);
+      setZoneSiteId("");
+      setZones([]);
+    }
+  }, [societeId]);
 
-  // Recharge les zones après création
+  // Charger les zones quand un site est sélectionné
+  useEffect(() => {
+    if (zoneSiteId) {
+      axios.get("/api/zone/by-site/" + zoneSiteId)
+        .then(res => setZones(res.data))
+        .catch(() => setZones([]));
+    } else {
+      setZones([]);
+    }
+  }, [zoneSiteId]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!zoneNom || !zoneSiteId) {
@@ -34,11 +53,16 @@ const Zone = () => {
       await axios.post("/api/zone", {
         ZoneNom: zoneNom,
         ZoneSiteId: parseInt(zoneSiteId),
+        SocieteId: parseInt(societeId),
+        SocieteNom: societes.find(s => s.id === parseInt(societeId))?.nom || "",
         IsDeleted: false
       });
       setMessage("Zone créée avec succès !");
       setZoneNom("");
-      fetchZones(); // Recharge la liste
+      // Recharge les zones
+      axios.get("/api/zone/by-site/" + zoneSiteId)
+        .then(res => setZones(res.data))
+        .catch(() => setZones([]));
     } catch (err) {
       setMessage(
         "Erreur lors de la création de la zone: " +
@@ -47,24 +71,24 @@ const Zone = () => {
     }
   };
 
-  // Met à jour la liste des zones quand le site change
-  useEffect(() => {
-    if (zoneSiteId) fetchZones();
-    else setZones([]);
-  }, [zoneSiteId]);
-
   return (
     <div style={{ maxWidth: 600, margin: "auto", padding: 20 }}>
       <h2>Créer une Zone</h2>
       <form onSubmit={handleSubmit} style={{ marginBottom: 30 }}>
         <div style={{ marginBottom: 10 }}>
-          <label>Nom de la zone:</label>
-          <input
-            type="text"
-            value={zoneNom}
-            onChange={e => setZoneNom(e.target.value)}
+          <label>Société:</label>
+          <select
+            value={societeId}
+            onChange={e => setSocieteId(e.target.value)}
             style={{ marginLeft: 10, padding: 5 }}
-          />
+          >
+            <option value="">-- Choisir une société --</option>
+            {societes.map(soc => (
+              <option key={soc.id} value={soc.id}>
+                {soc.nom}
+              </option>
+            ))}
+          </select>
         </div>
         <div style={{ marginBottom: 10 }}>
           <label>Site:</label>
@@ -72,6 +96,7 @@ const Zone = () => {
             value={zoneSiteId}
             onChange={e => setZoneSiteId(e.target.value)}
             style={{ marginLeft: 10, padding: 5 }}
+            disabled={!societeId}
           >
             <option value="">-- Choisir un site --</option>
             {sites.map(site => (
@@ -81,7 +106,21 @@ const Zone = () => {
             ))}
           </select>
         </div>
-        <button type="submit" style={{ padding: "6px 16px", background: "#1976d2", color: "#fff", border: "none", borderRadius: 4 }}>
+        <div style={{ marginBottom: 10 }}>
+          <label>Nom de la zone:</label>
+          <input
+            type="text"
+            value={zoneNom}
+            onChange={e => setZoneNom(e.target.value)}
+            style={{ marginLeft: 10, padding: 5 }}
+            disabled={!zoneSiteId}
+          />
+        </div>
+        <button
+          type="submit"
+          style={{ padding: "6px 16px", background: "#1976d2", color: "#fff", border: "none", borderRadius: 4 }}
+          disabled={!zoneSiteId || !zoneNom}
+        >
           Créer
         </button>
       </form>

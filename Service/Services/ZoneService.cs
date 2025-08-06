@@ -44,7 +44,25 @@ namespace Service.Services
         {
             return await _zoneRepository.CreateZone(zone);
         }
-    }
 
-   
+        public async Task<Zone?> GetByIdAsync(int id)
+        {
+            return await _zoneRepository.GetByIdAsync(id);
+        }
+
+        public async Task<List<Zone>> GetAllAsync()
+        {
+            return await _zoneRepository.GetAllAsync();
+        }
+
+        public async Task<List<Zone>> GetZoneBySocieteId(int societeId)
+        {
+            return await _zoneRepository.GetZoneBySocieteId(societeId);
+        }
+ 
+        public async Task<List<Zone>> GetZoneBySocieteName(string societeNom)
+        {
+            return await _zoneRepository.GetZoneBySocieteName(societeNom);
+        }
+    }
 }

@@ -8,12 +8,13 @@ const Ville = () => {
   const [error, setError] = useState("");
   const [newVille, setNewVille] = useState({ nom: "", regionId: "" });
   const [creating, setCreating] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [villesRes, regionsRes] = await Promise.all([
-          axios.get("/api/regionville/villes"),
+          axios.get("/api/ville"),
           axios.get("/api/regionville/regions"),
         ]);
         setVilles(villesRes.data);
@@ -41,8 +42,7 @@ const Ville = () => {
         RegionId: parseInt(newVille.regionId, 10),
       });
       setNewVille({ nom: "", regionId: "" });
-      // Recharge la liste
-      const villesRes = await axios.get("/api/regionville/villes");
+      const villesRes = await axios.get("/api/ville");
       setVilles(villesRes.data);
     } catch (err) {
       setError("Erreur lors de la création de la ville");
@@ -51,34 +51,137 @@ const Ville = () => {
     }
   };
 
-  if (loading) return <div>Chargement des villes...</div>;
-  if (error) return <div>{error}</div>;
+  const handleDelete = async (id) => {
+    if (!window.confirm("Voulez-vous vraiment supprimer cette ville ?")) return;
+    setDeletingId(id);
+    setError("");
+    try {
+      await axios.delete(`/api/ville/${id}`);
+      setVilles(villes.filter((v) => v.id !== id));
+    } catch (err) {
+      setError("Erreur lors de la suppression de la ville");
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  if (loading)
+    return <div style={{ padding: 30 }}>Chargement des villes...</div>;
+  if (error)
+    return <div style={{ color: "red", padding: 30 }}>{error}</div>;
 
   return (
-    <div>
-      <h3>Liste des villes</h3>
+    <div
+      style={{
+        maxWidth: 700,
+        margin: "40px auto",
+        background: "#fff",
+        borderRadius: 10,
+        boxShadow: "0 2px 12px #eee",
+        padding: 30,
+      }}
+    >
+      <h2 style={{ color: "#1976d2", marginBottom: 20 }}>Liste des villes</h2>
       {villes.length === 0 ? (
-        <div>Aucune ville trouvée.</div>
+        <div style={{ marginBottom: 20 }}>Aucune ville trouvée.</div>
       ) : (
-        <ul>
-          {villes.map((ville) => (
-            <li key={ville.id}>
-              {ville.nom ?? ville.Nom ?? "Nom inconnu"}{" "}
-              {ville.region?.name || ville.Region?.name ? (
-                <span>
-                  (
-                  {ville.region?.name || ville.Region?.name}
-                  )
-                </span>
-              ) : null}
-            </li>
-          ))}
-        </ul>
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "collapse",
+            marginBottom: 30,
+          }}
+        >
+          <thead>
+            <tr style={{ background: "#f5f5f5" }}>
+              <th
+                style={{
+                  padding: 10,
+                  border: "1px solid #eee",
+                  textAlign: "left",
+                }}
+              >
+                Nom
+              </th>
+              <th
+                style={{
+                  padding: 10,
+                  border: "1px solid #eee",
+                  textAlign: "left",
+                }}
+              >
+                Région
+              </th>
+              <th
+                style={{
+                  padding: 10,
+                  border: "1px solid #eee",
+                  textAlign: "center",
+                }}
+              >
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {villes.map((ville) => (
+              <tr key={ville.id}>
+                <td
+                  style={{
+                    padding: 10,
+                    border: "1px solid #eee",
+                  }}
+                >
+                  {ville.nom ?? ville.Nom ?? "Nom inconnu"}
+                </td>
+                <td
+                  style={{
+                    padding: 10,
+                    border: "1px solid #eee",
+                  }}
+                >
+                  {ville.region?.name || ville.Region?.name || "Non défini"}
+                </td>
+                <td
+                  style={{
+                    padding: 10,
+                    border: "1px solid #eee",
+                    textAlign: "center",
+                  }}
+                >
+                  <button
+                    onClick={() => handleDelete(ville.id)}
+                    disabled={deletingId === ville.id}
+                    style={{
+                      background: "#e53935",
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: 4,
+                      padding: "6px 14px",
+                      cursor: "pointer",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {deletingId === ville.id ? "Suppression..." : "Supprimer"}
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )}
-      <h3>Ajouter une ville</h3>
-      <form onSubmit={handleCreateVille}>
-        <div>
-          <label>
+      <h3 style={{ color: "#1976d2", marginBottom: 10 }}>Ajouter une ville</h3>
+      <form
+        onSubmit={handleCreateVille}
+        style={{
+          background: "#f9f9f9",
+          borderRadius: 8,
+          padding: 20,
+          border: "1px solid #eee",
+        }}
+      >
+        <div style={{ marginBottom: 15 }}>
+          <label style={{ display: "block", marginBottom: 6 }}>
             Nom:
             <input
               type="text"
@@ -86,17 +189,31 @@ const Ville = () => {
               value={newVille.nom}
               onChange={handleChange}
               required
+              style={{
+                marginLeft: 10,
+                padding: 7,
+                borderRadius: 4,
+                border: "1px solid #ccc",
+                width: "70%",
+              }}
             />
           </label>
         </div>
-        <div>
-          <label>
+        <div style={{ marginBottom: 15 }}>
+          <label style={{ display: "block", marginBottom: 6 }}>
             Région:
             <select
               name="regionId"
               value={newVille.regionId}
               onChange={handleChange}
               required
+              style={{
+                marginLeft: 10,
+                padding: 7,
+                borderRadius: 4,
+                border: "1px solid #ccc",
+                width: "75%",
+              }}
             >
               <option value="">Sélectionnez une région</option>
               {regions.map((region) => (
@@ -107,7 +224,19 @@ const Ville = () => {
             </select>
           </label>
         </div>
-        <button type="submit" disabled={creating}>
+        <button
+          type="submit"
+          disabled={creating}
+          style={{
+            background: "#1976d2",
+            color: "#fff",
+            border: "none",
+            borderRadius: 4,
+            padding: "10px 22px",
+            cursor: "pointer",
+            fontWeight: "bold",
+          }}
+        >
           {creating ? "Création en cours..." : "Créer la ville"}
         </button>
       </form>

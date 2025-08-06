@@ -97,6 +97,11 @@ namespace Repository.Data
                 entity.HasOne(d => d.AlleeZone).WithMany(p => p.Allee)
                     .HasForeignKey(d => d.AlleeZoneId)
                     .HasConstraintName("Allee_ZoneId");
+
+                // Ignore calculated/not mapped properties
+                entity.Ignore(e => e.zoneNom);
+                entity.Ignore(e => e.societeNom);
+                entity.Ignore(e => e.siteNom);
             });
 
             // Configuration de l'entité Client
@@ -511,7 +516,17 @@ namespace Repository.Data
                     .HasComment("Indique si la rangée est supprimée (true) ou active (false)")
                     .HasColumnName("Rangée_IsDeleted");
                     
-               
+                entity.HasOne(r => r.Zone)
+        .WithMany(z => z.Rangees)
+        .HasForeignKey(r => r.ZoneId)
+        .OnDelete(DeleteBehavior.NoAction)
+        .HasConstraintName("FK_Rangee_Zone");
+
+    entity.HasOne(r => r.Societe)
+        .WithMany(s => s.Rangees)
+        .HasForeignKey(r => r.SocieteId)
+        .OnDelete(DeleteBehavior.NoAction)
+        .HasConstraintName("FK_Rangee_Societe");
               
             });
 
@@ -735,9 +750,28 @@ namespace Repository.Data
                     .HasComment("Référence à l'identifiant du site auquel appartient la zone. C'est une clé étrangère.")
                     .HasColumnName("Zone_SiteId");
 
+                // Ajout de la colonne SocieteId
+                entity.Property(e => e.SocieteId)
+                    .HasComment("Référence à l'identifiant de la société à laquelle appartient la zone.")
+                    .HasColumnName("Zone_SocieteId");
+
+                // Ajout de la colonne SocieteNom
+                entity.Property(e => e.SocieteNom)
+                    .HasMaxLength(100)
+                    .IsUnicode(false)
+                    .HasComment("Nom de la société liée à la zone.")
+                    .HasColumnName("Zone_SocieteNom");
+
+                // Relation avec Site
                 entity.HasOne(d => d.ZoneSite).WithMany(p => p.Zones)
                     .HasForeignKey(d => d.ZoneSiteId)
                     .HasConstraintName("Zone_SiteId");
+
+                // Relation avec Societe
+                entity.HasOne(d => d.Societe).WithMany(s => s.Zones)
+                    .HasForeignKey(d => d.SocieteId)
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .HasConstraintName("Zone_SocieteId");
             });
 
             modelBuilder.Entity<IdentityUserLogin<string>>(entity =>

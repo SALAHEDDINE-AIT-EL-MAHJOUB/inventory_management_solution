@@ -128,14 +128,39 @@ namespace Repository.Repositories
                 throw;
             }
         }
-        
+
 
         public async Task<Zone> CreateZone(Zone zone)
         {
-                    _context.Zones.Add(zone);
-                    await _context.SaveChangesAsync();
-                    return zone;
+            _context.Zones.Add(zone);
+            await _context.SaveChangesAsync();
+            return zone;
         }
 
+        public async Task<Zone?> GetByIdAsync(int id)
+        {
+            return await _context.Zones.FindAsync(id);
+        }
+
+        public async Task<List<Zone>> GetAllAsync()
+        {
+            return await _context.Zones
+                .Where(z => z.IsDeleted == false || z.IsDeleted == null)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+         public async Task<List<Zone>> GetZoneBySocieteId(int societeId)
+        {
+            return await _context.Zones
+                .Where(z => z.SocieteId == societeId && (z.IsDeleted == null || z.IsDeleted == false))
+                .ToListAsync();
+        }
+
+        public async Task<List<Zone>> GetZoneBySocieteName(string societeNom)
+        {
+            return await _context.Zones
+                .Where(z => z.SocieteNom != null && z.SocieteNom.ToLower() == societeNom.ToLower() && (z.IsDeleted == null || z.IsDeleted == false))
+                .ToListAsync();
+        }
     }
 }

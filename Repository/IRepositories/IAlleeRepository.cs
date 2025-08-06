@@ -17,8 +17,6 @@ namespace Repository.IRepositories
   Task<IEnumerable<Allee>> GetAllAsync();
         Task<Allee?> GetByIdAsync(int id);
         Task AddAsync(Allee entity);
-
-      
-    
+        Task DeleteAsync(int id);
     }
 }

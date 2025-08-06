@@ -54,5 +54,11 @@ namespace Service.Services
         {
             return await _alleeRepository.GetAlleeNamesByZoneName(clientId, zoneName);
         }
+        
+        public async Task DeleteAsync(int id)
+        {
+          
+            await _alleeRepository.DeleteAsync(id);
+        }
     }
 }

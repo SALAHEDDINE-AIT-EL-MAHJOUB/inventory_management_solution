@@ -12,5 +12,9 @@ namespace Service.IServices
         Task<List<Zone>> GetZoneBySiteId(int id);
         Task<List<Zone>> GetZoneByName(int clientId, string zoneNom);
         Task<List<string>> GetZoneNamesBySiteName(int clientId, string siteName);
+        Task<Zone?> GetByIdAsync(int id);
+        Task<List<Zone>> GetAllAsync();
+      Task<List<Zone>> GetZoneBySocieteId(int societeId);
+        Task<List<Zone>> GetZoneBySocieteName(string societeNom);
     }
 }

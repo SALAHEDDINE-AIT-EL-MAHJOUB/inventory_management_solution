@@ -91,6 +91,8 @@ builder.Services.AddScoped<ISiteService, SiteService>();
 builder.Services.AddScoped<Repository.IRepositories.ISiteRepository, Repository.Repositories.SiteRepository>();
 builder.Services.AddScoped<IZoneService, ZoneService>();
 builder.Services.AddScoped<IZoneRepository, ZoneRepository>();
+builder.Services.AddScoped<IAlleeRepository, AlleeRepository>();
+builder.Services.AddScoped<IAlleeService, AlleeService>();
 
 
 var app = builder.Build();
@@ -98,6 +100,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
+    app.UseCors("AllowFrontend");
 }
 else
 {
@@ -105,7 +108,6 @@ else
     app.UseHsts();
 }
 
-app.UseCors("AllowFrontend");
 app.UseDefaultFiles();
 app.UseStaticFiles();
 app.UseRouting();

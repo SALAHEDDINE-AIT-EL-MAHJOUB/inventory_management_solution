@@ -10,10 +10,14 @@ namespace Domain.Entities
         public string ZoneNom { get; set; }
         public bool? IsDeleted { get; set; }
         public int? ZoneSiteId { get; set; }
-        public virtual Site? ZoneSite { get; set; }
-        public virtual ICollection<Allee>? Allee { get; set; }
+        public int? SocieteId { get; set; } 
+        public string? SocieteNom { get; set; } 
 
-        // Add these navigation properties:
+        public virtual Site? ZoneSite { get; set; }
+        public virtual Societe? Societe { get; set; } 
+
+        public virtual ICollection<Allee>? Allee { get; set; }
+        public virtual ICollection<Rangee> Rangees { get; set; } = new List<Rangee>();
         public virtual ICollection<CodeBarreZone>? CodeBarreZones { get; set; }
         public virtual ICollection<OperationInventaire>? OperationInventaires { get; set; }
     }

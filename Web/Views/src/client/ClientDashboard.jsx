@@ -7,21 +7,24 @@ import RegionVille from "./RegionVille";
 import Site from "./site";
 import "./ClientDashboard.css";
 import Zone from "../emplacement/zone";
+import Navbar from "./Navbar";
+import Region from "./Region";
+import Allee from "../emplacement/allee";
+import Rangee from "../emplacement/Rangee";
+
+import { FaTachometerAlt, FaUser, FaShoppingCart, FaBuilding, FaMapMarkerAlt, FaUserCircle } from "react-icons/fa";
 
 const ClientDashboard = ({ clientInfo, onLogout }) => {
   const [orders, setOrders] = useState([]);
   const [profile, setProfile] = useState(clientInfo?.Client || {});
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [emplacementTab, setEmplacementTab] = useState("societes"); // Ajout pour la sous-navbar
   const [error, setError] = useState("");
 
   useEffect(() => {
-    // Vérifier si on a des données client au démarrage
-    if (clientInfo?.Client) {
-      setProfile(clientInfo.Client);
-    }
     loadClientData();
-  }, [clientInfo]);
+  }, []);
 
   const loadClientData = async () => {
     setLoading(true);
@@ -29,8 +32,9 @@ const ClientDashboard = ({ clientInfo, onLogout }) => {
     try {
       // Charger le profil client à jour - utiliser le nouveau endpoint
       const response = await axios.get("/api/Profil/me");
-      if (response.data && response.data.Client) {
-        setProfile(response.data.Client);
+      // Correction ici : utiliser directement response.data
+      if (response.data && (response.data.clientNom || response.data.ClientNom)) {
+        setProfile(response.data);
       }
       
       // Charger les commandes (à implémenter selon votre logique)
@@ -122,11 +126,11 @@ const ClientDashboard = ({ clientInfo, onLogout }) => {
   );
 
   const renderSocietes = () => (
-    <GestionSocietes clientId={profile.id || profile.clientId} />
+    <GestionSocietes clientId={profile.clientId} />
   );
 
   const renderVilles = () => (
-    <Ville clientId={profile.id || profile.clientId} />
+    <Ville clientId={profile.clientId} />
   );
 
   const handleAddVille = async (newVille) => {
@@ -149,11 +153,16 @@ const ClientDashboard = ({ clientInfo, onLogout }) => {
 
   return (
     <div className="client-dashboard">
-      <header className="dashboard-header">
-        <div className="header-content">
-          <h1> </h1>
-          <div className="header-user">
-            <span>Bonjour, {profile.clientNom || 'Client'}</span>
+      {/* Navbar horizontale */}
+      <header className="dashboard-topbar">
+        <div className="topbar-content">
+          <span className="topbar-title">{""}</span>
+          <div className="topbar-user">
+            <FaUserCircle
+              size={24}
+              style={{ marginRight: 6, cursor: "pointer" }}
+              onClick={() => setActiveTab("profile")}
+            />
             <button onClick={handleLogout} className="logout-btn">
               Déconnexion
             </button>
@@ -162,43 +171,22 @@ const ClientDashboard = ({ clientInfo, onLogout }) => {
       </header>
 
       <div className="dashboard-container">
+        {/* Sidebar verticale */}
         <nav className="dashboard-sidebar">
           <ul className="nav-menu">
-            <li className={activeTab === "dashboard" ? "active" : ""}>
-              <button onClick={() => setActiveTab("dashboard")}>
-                📊 Tableau de bord
-              </button>
-            </li>
-            <li className={activeTab === "profile" ? "active" : ""}>
-              <button onClick={() => setActiveTab("profile")}>
-                👤 Mon Profil
-              </button>
-            </li>
-            <li className={activeTab === "orders" ? "active" : ""}>
-              <button onClick={() => setActiveTab("orders")}>
-                📦 Mes Commandes
-              </button>
-            </li>
-            <li className={activeTab === "societes" ? "active" : ""}>
-              <button onClick={() => setActiveTab("societes")}>
-                🏢 Mes Sociétés
-              </button>
-            </li>
-            <li className={activeTab === "regionville" ? "active" : ""}>
-              <button onClick={() => setActiveTab("regionville")}>
-                🌍 Régions & Villes
-              </button>
-            </li>
-            <li className={activeTab === "sites" ? "active" : ""}>
-              <button onClick={() => setActiveTab("sites")}>
-                🏭 Mes Sites
-              </button>
-            </li>
-            <li className={activeTab === "zone" ? "active" : ""}>
-              <button onClick={() => setActiveTab("zone")}>
-                📍 Zones
-              </button>
+            {[
+              { key: "dashboard", label: "Tableau de bord", icon: <FaTachometerAlt /> },
+              { key: "orders", label: "Commandes", icon: <FaShoppingCart /> },
+              { key: "societes", label: "Sociétés", icon: <FaBuilding /> },
+              { key: "emplacement", label: "Emplacement", icon: <FaMapMarkerAlt /> }
+            ].map(page => (
+              <li key={page.key} className={activeTab === page.key ? "active" : ""}>
+                <button onClick={() => setActiveTab(page.key)}>
+                  {page.icon}
+                  {page.label}
+                </button>
               </li>
+            ))}
           </ul>
         </nav>
 
@@ -207,9 +195,20 @@ const ClientDashboard = ({ clientInfo, onLogout }) => {
           {activeTab === "profile" && renderProfile()}
           {activeTab === "orders" && renderOrders()}
           {activeTab === "societes" && renderSocietes()}
-          {activeTab === "regionville" && <RegionVille onAddVille={handleAddVille} />}
-          {activeTab === "sites" && <Site clientId={profile.id || profile.clientId} />}
-          {activeTab === "zone" && <Zone />}
+
+          {/* Affichage de la navbar d'emplacement et des composants associés */}
+          {activeTab === "emplacement" && (
+            <>
+              <Navbar active={emplacementTab} onNavigate={setEmplacementTab} />
+              {emplacementTab === "villes" && <Ville />}
+              {emplacementTab === "societes" && renderSocietes()}
+               {emplacementTab === "regions" && <Region />}
+              {emplacementTab === "sites" && <Site />}
+              {emplacementTab === "zones" && <Zone />}
+              {emplacementTab === "allees" && <Allee />}
+              {emplacementTab === "rangees" && <Rangee />}
+            </>
+          )}
         </main>
       </div>
     </div>

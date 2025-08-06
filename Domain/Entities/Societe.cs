@@ -19,8 +19,8 @@ namespace Domain.Entities
      public bool IsDeleted { get; set; }
      [JsonIgnore]
      public virtual ICollection<Site> Sites { get; set; }
-
-   
+public virtual ICollection<Zone> Zones { get; set; } = new List<Zone>();
+    public virtual ICollection<Rangee> Rangees { get; set; } = new List<Rangee>();
     public virtual Ville? SocietéVille { get; set; }
 }
        

@@ -6,15 +6,17 @@ using System.Threading.Tasks;
 
 namespace Web.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class AlleeController : ControllerBase
     {
         private readonly IAlleeService _alleeService;
+        private readonly IZoneService _zoneService;
 
-        public AlleeController(IAlleeService alleeService)
+        public AlleeController(IAlleeService alleeService, IZoneService zoneService)
         {
             _alleeService = alleeService;
+            _zoneService = zoneService;
         }
 
         [HttpGet]
@@ -34,45 +36,67 @@ namespace Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add([FromBody] Allee allee)
+        public async Task<ActionResult<Allee>> Create([FromBody] Allee allee)
         {
-            await _alleeService.AddAsync(allee);
-            return Ok(allee);
+            try
+            {
+                if (allee.AlleeZoneId == null)
+                    return BadRequest("ZoneId is required.");
+
+                var zone = await _zoneService.GetByIdAsync(allee.AlleeZoneId.Value);
+                if (zone == null)
+                    return BadRequest("Zone not found.");
+
+                // Ensure navigation properties are not set to avoid EF tracking issues
+                allee.AlleeZone = null;
+                allee.CodeBarreAllee = null;
+
+                await _alleeService.AddAsync(allee);
+                return CreatedAtAction(nameof(GetById), new { id = allee.AlleeId }, allee);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
-        [HttpGet("client/{clientId}")]
-        public async Task<ActionResult<List<Allee>>> GetByClientId(int clientId)
+        [HttpGet("by-client/{clientId}")]
+        public async Task<ActionResult<List<Allee>>> GetAlleeByClientId(int clientId)
         {
             var allees = await _alleeService.GetAlleeByClientId(clientId);
             return Ok(allees);
         }
 
-        [HttpGet("zone/{zoneId}")]
-        public async Task<ActionResult<List<Allee>>> GetByZoneId(int zoneId)
+        [HttpGet("by-zone/{zoneId}")]
+        public async Task<ActionResult<List<Allee>>> GetAlleeByZoneId(int zoneId)
         {
             var allees = await _alleeService.GetAlleeByZoneId(zoneId);
             return Ok(allees);
         }
 
-        [HttpPost("ids")]
-        public async Task<ActionResult<List<Allee>>> GetByIds([FromBody] List<int?> ids)
-        {
-            var allees = await _alleeService.GetByIds(ids);
-            return Ok(allees);
-        }
-
-        [HttpGet("search")]
-        public async Task<ActionResult<List<Allee>>> GetByName([FromQuery] int clientId, [FromQuery] string alleeNom)
+        [HttpGet("by-name")]
+        public async Task<ActionResult<List<Allee>>> GetAlleeByName([FromQuery] int clientId, [FromQuery] string alleeNom)
         {
             var allees = await _alleeService.GetAlleeByName(clientId, alleeNom);
             return Ok(allees);
         }
 
-        [HttpGet("zone-names")]
+        [HttpGet("names-by-zone")]
         public async Task<ActionResult<List<string>>> GetAlleeNamesByZoneName([FromQuery] int clientId, [FromQuery] string zoneName)
         {
             var names = await _alleeService.GetAlleeNamesByZoneName(clientId, zoneName);
             return Ok(names);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var allee = await _alleeService.GetByIdAsync(id);
+            if (allee == null)
+                return NotFound();
+
+            await _alleeService.DeleteAsync(id);
+            return NoContent();
         }
     }
 }

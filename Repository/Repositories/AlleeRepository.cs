@@ -27,7 +27,7 @@ namespace Repository.Repositories
 public async Task<IEnumerable<Allee>> GetAllAsync()
 {
     return await _context.Allees
-        .Where(a => a.IsDeleted == false || a.IsDeleted == null)
+        .Include(a => a.AlleeZone) // Assure l'inclusion de la zone
         .ToListAsync();
 }
 
@@ -38,8 +38,8 @@ public async Task<Allee?> GetByIdAsync(int id)
 }
         public async Task AddAsync(Allee entity)
         {
-            await AddAsync(entity); // méthode du GenericRepository
-            await SaveChangesAsync();
+            await base.AddAsync(entity); 
+            await base.SaveChangesAsync();
 }
 
 
@@ -49,15 +49,30 @@ public async Task<Allee?> GetByIdAsync(int id)
             try
             {
                 var res = await _context.Allees
+                    .Include(a => a.AlleeZone)
+                        .ThenInclude(z => z.ZoneSite)
+                            .ThenInclude(s => s.Societe)
                     .Where(a => a.AlleeZone != null && a.AlleeZone.ZoneSite != null && a.AlleeZone.ZoneSite.Societe.SocietéClient.ClientId == id)
-                    .Where(a => a.IsDeleted == false || a.IsDeleted == null) // <-- AJOUTEZ CE FILTRE
+                    .Where(a => a.IsDeleted == false || a.IsDeleted == null)
+                    .Select(a => new Allee
+                    {
+                        AlleeId = a.AlleeId,
+                        AlleeNom = a.AlleeNom,
+                        AlleeZoneId = a.AlleeZoneId,
+                        zoneNom = a.AlleeZone.ZoneNom,
+                        societeNom = a.AlleeZone.ZoneSite.Societe.Nom,
+                        siteNom = a.AlleeZone.ZoneSite.SiteNom, // <-- Ajouté ici
+                        IsDeleted = a.IsDeleted,
+                        AlleeZone = a.AlleeZone,
+                        CodeBarreAllee = a.CodeBarreAllee,
+                        Rangees = a.Rangees
+                    })
                     .ToListAsync();
                 return res;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting alleys by client ID."); // Log the error
-                // Il est préférable de renvoyer une liste vide plutôt que de lancer une NotImplementedException ou de retourner null.
                 return new List<Allee>();
             }
         }
@@ -66,8 +81,25 @@ public async Task<Allee?> GetByIdAsync(int id)
         {
             try
             {
-                var res = await _context.Allees.Where(a => a.AlleeZoneId == id)
-                    .Where(a => a.IsDeleted == false || a.IsDeleted == null) // <-- AJOUTEZ CE FILTRE
+                var res = await _context.Allees
+                    .Include(a => a.AlleeZone)
+                        .ThenInclude(z => z.ZoneSite)
+                            .ThenInclude(s => s.Societe)
+                    .Where(a => a.AlleeZoneId == id)
+                    .Where(a => a.IsDeleted == false || a.IsDeleted == null)
+                    .Select(a => new Allee
+                    {
+                        AlleeId = a.AlleeId,
+                        AlleeNom = a.AlleeNom,
+                        AlleeZoneId = a.AlleeZoneId,
+                        zoneNom = a.AlleeZone.ZoneNom,
+                        societeNom = a.AlleeZone.ZoneSite.Societe.Nom,
+                        siteNom = a.AlleeZone.ZoneSite.SiteNom, // Ajout du nom du site
+                        IsDeleted = a.IsDeleted,
+                        AlleeZone = a.AlleeZone,
+                        CodeBarreAllee = a.CodeBarreAllee,
+                        Rangees = a.Rangees
+                    })
                     .ToListAsync();
                 return res;
             }
@@ -136,6 +168,15 @@ public async Task<Allee?> GetByIdAsync(int id)
             {
                 _logger.LogError(ex, $"Error getting allée names for zone '{zoneName}'.");
                 throw;
+            }
+        }
+        public async Task DeleteAsync(int id)
+        {
+            var allee = await _context.Allees.FindAsync(id);
+            if (allee != null)
+            {
+                _context.Allees.Remove(allee);
+                await _context.SaveChangesAsync();
             }
         }
     }
