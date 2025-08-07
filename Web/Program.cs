@@ -98,6 +98,17 @@ builder.Services.AddScoped<IAlleeRepository, AlleeRepository>();
 builder.Services.AddScoped<IAlleeService, AlleeService>();
 builder.Services.AddScoped<IRangeeRepository, RangeeRepository>();
 builder.Services.AddScoped<IRangeeService, RangeeService>();
+builder.Services.AddScoped<IEtageRepository, EtageRepository>();
+builder.Services.AddScoped<IEtageService, EtageService>();
+builder.Services.AddScoped<IOperateurAuthService, OperateurAuthService>();
+builder.Services.AddScoped<IOperateurRepository, OperateurRepository>();
+
+builder.Services.AddScoped<IOperateurService, OperateurService>();
+builder.Services.AddScoped<IEquipeService, EquipeService>();
+builder.Services.AddScoped<IEquipeRepository, EquipeRepository>();
+builder.Services.AddScoped<IEquipeOperateurService, EquipeOperateurService>();
+builder.Services.AddScoped<IEquipeOperateurRepository, EquipeOperateurRepository>();
+
 
 var app = builder.Build();
 

@@ -11,7 +11,10 @@ import Navbar from "./Navbar";
 import Region from "./Region";
 import Allee from "../emplacement/allee";
 import Rangee from "../emplacement/Rangee";
-
+import Etage from "../emplacement/etage";
+import RegisterOperateur from "./gestionOperateur/registerOperateur";
+import ListeOperateurs from "./gestionOperateur/ListeOperateurs";
+import CreeEquipe from "./gestionEquipe/creeEquipe"; // Ajoutez cet import
 import { FaTachometerAlt, FaUser, FaShoppingCart, FaBuilding, FaMapMarkerAlt, FaUserCircle } from "react-icons/fa";
 
 const ClientDashboard = ({ clientInfo, onLogout }) => {
@@ -172,13 +175,15 @@ const ClientDashboard = ({ clientInfo, onLogout }) => {
 
       <div className="dashboard-container">
         {/* Sidebar verticale */}
-        <nav className="dashboard-sidebar">
+         <nav className="dashboard-sidebar">
           <ul className="nav-menu">
             {[
               { key: "dashboard", label: "Tableau de bord", icon: <FaTachometerAlt /> },
               { key: "orders", label: "Commandes", icon: <FaShoppingCart /> },
               { key: "societes", label: "Sociétés", icon: <FaBuilding /> },
-              { key: "emplacement", label: "Emplacement", icon: <FaMapMarkerAlt /> }
+              { key: "emplacement", label: "Emplacement", icon: <FaMapMarkerAlt /> },
+              { key: "operateur", label: "Ajouter Opérateur", icon: <FaUser /> },
+              { key: "equipe", label: "Équipe", icon: <FaUserCircle /> } // Ajoutez cette ligne
             ].map(page => (
               <li key={page.key} className={activeTab === page.key ? "active" : ""}>
                 <button onClick={() => setActiveTab(page.key)}>
@@ -195,6 +200,8 @@ const ClientDashboard = ({ clientInfo, onLogout }) => {
           {activeTab === "profile" && renderProfile()}
           {activeTab === "orders" && renderOrders()}
           {activeTab === "societes" && renderSocietes()}
+          {activeTab === "operateur" && <RegisterOperateur />}
+          {activeTab === "equipe" && <CreeEquipe />} {/* Ajoutez cette ligne */}
 
           {/* Affichage de la navbar d'emplacement et des composants associés */}
           {activeTab === "emplacement" && (
@@ -207,6 +214,7 @@ const ClientDashboard = ({ clientInfo, onLogout }) => {
               {emplacementTab === "zones" && <Zone />}
               {emplacementTab === "allees" && <Allee />}
               {emplacementTab === "rangees" && <Rangee />}
+              {emplacementTab === "etages" && <Etage />}
             </>
           )}
         </main>

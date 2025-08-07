@@ -408,7 +408,7 @@ namespace Repository.Data
                 entity.Property(e => e.Id)
                     .HasComment("Identifiant unique pour chaque opérateur.")
                     .HasColumnName("Operateur_Id");
-                entity.Property(e => e.cin)
+                entity.Property(e => e.Cin)
                     .HasMaxLength(50)
                     .IsUnicode(false)
                     .HasComment("Numéro de carte d'identité nationale de l'opérateur.")
@@ -426,7 +426,7 @@ namespace Repository.Data
                 entity.Property(e => e.SiteId)
                     .HasComment("Référence à l'identifiant du site où l'opérateur travaille. C'est une clé étrangère qui fait référence à la table Site.")
                     .HasColumnName("Operateur_SiteId");
-                entity.HasOne(d => d.OperateurSite).WithMany(p => p.Operateurs)
+                entity.HasOne(d => d.Site).WithMany(p => p.Operateurs)
                     .HasForeignKey(d => d.SiteId)
                     .OnDelete(DeleteBehavior.Restrict) 
                     .HasConstraintName("Operateur_SiteId");

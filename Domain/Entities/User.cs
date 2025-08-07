@@ -15,7 +15,7 @@ public class User :  IdentityUser<string>
     public ICollection<Admin>? Admins { get; set; }   
 
     public bool IsClient { get; set; } = false;
-
+public bool IsOperateur { get; set; } = false;
     
     public IList<string> GetRoleNames() =>
         UserRoles != null && UserRoles.Count != 0

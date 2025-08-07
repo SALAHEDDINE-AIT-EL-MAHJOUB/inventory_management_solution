@@ -22,7 +22,7 @@ namespace Domain.Entities
         public virtual ICollection<CodeBarreAllee>? CodeBarreAllees { get; set; }
         public virtual ICollection<Rangee> Rangees { get; set; } = new List<Rangee>();
  public virtual ICollection<CodeBarreAllee>? CodeBarreAllee { get; set; }
-        // Soft delete
+         public virtual ICollection<Etage>? Etages { get; set; } = new List<Etage>();
         public bool IsDeleted { get; set; }
     }
 }

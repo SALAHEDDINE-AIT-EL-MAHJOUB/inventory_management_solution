@@ -10,7 +10,8 @@ namespace Repository.IRepositories
     public interface IOperateurRepository : IGenericRepository<Operateur>
     {
         public Task<Operateur?> GetOperateurByUserId(string id);
-
+ Task AddAsync(Operateur operateur);
+      
         public Task<List<Operateur>> GetOperateurBySiteId(int siteId);
     }
 }

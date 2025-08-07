@@ -1,3 +1,4 @@
+using Service.Dtos.Operateur;
 using Domain.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -8,10 +9,8 @@ namespace Service.IServices
     {
         Task<IEnumerable<Operateur>> GetAllAsync();
         Task<Operateur?> GetByIdAsync(int id);
-        Task<Operateur?> GetByUserIdAsync(string userId);
-        Task<List<Operateur>> GetBySiteIdAsync(int siteId);
-        Task AddAsync(Operateur entity);
-        Task UpdateAsync(Operateur entity);
-        Task DeleteAsync(Operateur entity);
+        Task<Operateur?> CreateAsync(OperateurCreateDto dto);
+        Task<bool> UpdateAsync(int id, OperateurUpdateDto dto);
+        Task<bool> DeleteAsync(int id);
     }
 }

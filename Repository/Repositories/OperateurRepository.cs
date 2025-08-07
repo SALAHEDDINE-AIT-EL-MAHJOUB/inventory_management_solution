@@ -6,8 +6,8 @@ using Domain.Entities;
 using Repository.IRepositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Repository;
 using Repository.Data;
+
 namespace Repository.Repositories
 {
     public class OperateurRepository : GenericRepository<Operateur>, IOperateurRepository
@@ -25,50 +25,39 @@ namespace Repository.Repositories
         {
             try
             {
-                var res = await _context.Operateurs
-                    .Include(o => o.User) // Charge la relation User avec UserName
+                return await _context.Operateurs
+                    .Include(o => o.User)
+                    .Include(o => o.Site)
                     .FirstOrDefaultAsync(o => o.UserId == id);
-                return res;
             }
-            catch
+            catch (Exception ex)
             {
-                throw new NotImplementedException();
+                _logger.LogError(ex, "Error while getting operator by user ID");
+                throw;
             }
         }
-
-        //public async Task<List<Operateur>> GetOperateurBySiteId(int siteId)
-        //{
-        //    try
-        //    {
-        //        var res = await _context.Operateurs
-        //            .Include(o => o.User) // Charge la relation User avec UserName
-        //            .Where(o => o.OperateurSiteId == siteId)
-        //            .ToListAsync();
-        //        return res;
-        //    }
-        //    catch
-        //    {
-        //        throw new NotImplementedException();
-        //    }
-        //}
 
         public async Task<List<Operateur>> GetOperateurBySiteId(int siteId)
         {
             try
             {
-                var res = await _context.Operateurs
-                    .Include(o => o.User) // Charge la relation User
+                return await _context.Operateurs
+                    .Include(o => o.User)
+                    .Include(o => o.Site)
                     .Where(o => o.SiteId == siteId)
                     .ToListAsync();
-
-                return res;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error while getting operators by site ID");
-                throw; // Il vaut mieux propager l'exception originale que de lancer NotImplementedException
+                throw;
             }
         }
-
+        
+        public async Task AddAsync(Operateur operateur)
+        {
+            _context.Operateurs.Add(operateur);
+            await _context.SaveChangesAsync();
+        }
     }
 }

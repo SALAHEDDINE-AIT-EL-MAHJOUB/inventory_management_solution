@@ -15,7 +15,7 @@ namespace Domain.Entities
 
         public virtual Site? ZoneSite { get; set; }
         public virtual Societe? Societe { get; set; } 
-
+ public virtual ICollection<Etage>? Etages { get; set; } = new List<Etage>();
         public virtual ICollection<Allee>? Allee { get; set; }
         public virtual ICollection<Rangee> Rangees { get; set; } = new List<Rangee>();
         public virtual ICollection<CodeBarreZone>? CodeBarreZones { get; set; }

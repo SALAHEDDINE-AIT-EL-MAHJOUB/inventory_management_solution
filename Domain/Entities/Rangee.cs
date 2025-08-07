@@ -17,7 +17,8 @@ public int? SiteId { get; set; }
         public virtual Allee? Allee { get; set; }
         public bool IsDeleted { get; set; } = false;
 public virtual Site? Site { get; set; }
+
         public virtual ICollection<CodeBarreRangee>? CodeBarreRangees { get; set; }
-        public virtual ICollection<Etage>? Etages { get; set; }
+      public virtual ICollection<Etage>? Etages { get; set; } = new List<Etage>();
     }
 }

@@ -13,6 +13,7 @@ function Rangee() {
     alleeId: ""
   });
   const [editing, setEditing] = useState(false);
+  const [showForm, setShowForm] = useState(false);
 
   // Pour listes déroulantes hiérarchiques
   const [societes, setSocietes] = useState([]);
@@ -137,6 +138,7 @@ function Rangee() {
       alleeId: ""
     });
     setEditing(false);
+    setShowForm(false);
     fetchRangees();
   };
 
@@ -150,6 +152,7 @@ function Rangee() {
       alleeId: rangee.alleeId || ""
     });
     setEditing(true);
+    setShowForm(true);
     if (rangee.societeId) fetchSites(rangee.societeId);
     if (rangee.siteId) fetchZones(rangee.siteId);
     if (rangee.zoneId) fetchAllees(rangee.zoneId);
@@ -160,80 +163,148 @@ function Rangee() {
     fetchRangees();
   };
 
-  console.log(societes);
-
   return (
-    <div>
-      <h2>Gestion des Rangées</h2>
-      <form onSubmit={handleSubmit}>
-        <select
-          name="societeId"
-          value={form.societeId}
-          onChange={handleChange}
-          required
+    <div style={{ maxWidth: 900, margin: "30px auto", background: "#e3f0fa", padding: 24, borderRadius: 12 }}>
+      <h2 style={{ color: "#357ab7", marginBottom: 24 }}>Gestion des Rangées</h2>
+      {!showForm && (
+        <button
+          style={{
+            marginBottom: 20,
+            padding: "10px 24px",
+            background: "#357ab7",
+            color: "#fff",
+            border: "none",
+            borderRadius: 6,
+            fontWeight: "bold",
+            cursor: "pointer"
+          }}
+          onClick={() => {
+            setShowForm(true);
+            setEditing(false);
+            setForm({
+              rangeeId: 0,
+              rangeeNom: "",
+              societeId: "",
+              siteId: "",
+              zoneId: "",
+              alleeId: ""
+            });
+          }}
         >
-          <option value="">Sélectionner une société</option>
-          {societes.map((s) => (
-            <option key={s.id} value={s.id}>
-              {s.raisonSociale}
-            </option>
-          ))}
-        </select>
-        <select
-          name="siteId"
-          value={form.siteId}
-          onChange={handleChange}
-          required
-          disabled={!form.societeId}
+          Ajouter une rangée
+        </button>
+      )}
+
+      {showForm && (
+        <form
+          onSubmit={handleSubmit}
+          style={{
+            background: "#fff",
+            padding: 20,
+            borderRadius: 8,
+            marginBottom: 30,
+            boxShadow: "0 2px 8px #0001",
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 16,
+            alignItems: "center"
+          }}
         >
-          <option value="">Sélectionner un site</option>
-          {sites.map((s) => (
-            <option key={s.siteId || s.id} value={s.siteId || s.id}>
-              {s.siteNom}
-            </option>
-          ))}
-        </select>
-        <select
-          name="zoneId"
-          value={form.zoneId}
-          onChange={handleChange}
-          required
-          disabled={!form.siteId}
-        >
-          <option value="">Sélectionner une zone</option>
-          {zones.map((z) => (
-            <option key={z.zoneId} value={z.zoneId}>
-              {z.zoneNom}
-            </option>
-          ))}
-        </select>
-        <select
-          name="alleeId"
-          value={form.alleeId}
-          onChange={handleChange}
-          required
-          disabled={!form.zoneId}
-        >
-          <option value="">Sélectionner une allée</option>
-          {allees.map((a) => (
-            <option key={a.alleeId} value={a.alleeId}>
-              {a.alleeNom}
-            </option>
-          ))}
-        </select>
-        <input
-          name="rangeeNom"
-          placeholder="Nom de la rangée"
-          value={form.rangeeNom}
-          onChange={handleChange}
-          required
-        />
-        <button type="submit">{editing ? "Modifier" : "Ajouter"}</button>
-        {editing && (
+          <select
+            name="societeId"
+            value={form.societeId}
+            onChange={handleChange}
+            required
+            style={{ flex: "1 1 180px", padding: 8, borderRadius: 4, border: "1px solid #ccc" }}
+          >
+            <option value="">Sélectionner une société</option>
+            {societes.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.raisonSociale}
+              </option>
+            ))}
+          </select>
+          <select
+            name="siteId"
+            value={form.siteId}
+            onChange={handleChange}
+            required
+            disabled={!form.societeId}
+            style={{ flex: "1 1 160px", padding: 8, borderRadius: 4, border: "1px solid #ccc" }}
+          >
+            <option value="">Sélectionner un site</option>
+            {sites.map((s) => (
+              <option key={s.siteId || s.id} value={s.siteId || s.id}>
+                {s.siteNom}
+              </option>
+            ))}
+          </select>
+          <select
+            name="zoneId"
+            value={form.zoneId}
+            onChange={handleChange}
+            required
+            disabled={!form.siteId}
+            style={{ flex: "1 1 160px", padding: 8, borderRadius: 4, border: "1px solid #ccc" }}
+          >
+            <option value="">Sélectionner une zone</option>
+            {zones.map((z) => (
+              <option key={z.zoneId} value={z.zoneId}>
+                {z.zoneNom}
+              </option>
+            ))}
+          </select>
+          <select
+            name="alleeId"
+            value={form.alleeId}
+            onChange={handleChange}
+            required
+            disabled={!form.zoneId}
+            style={{ flex: "1 1 160px", padding: 8, borderRadius: 4, border: "1px solid #ccc" }}
+          >
+            <option value="">Sélectionner une allée</option>
+            {allees.map((a) => (
+              <option key={a.alleeId} value={a.alleeId}>
+                {a.alleeNom}
+              </option>
+            ))}
+          </select>
+          <input
+            name="rangeeNom"
+            placeholder="Nom de la rangée"
+            value={form.rangeeNom}
+            onChange={handleChange}
+            required
+            style={{ flex: "1 1 180px", padding: 8, borderRadius: 4, border: "1px solid #ccc" }}
+          />
+          <button
+            type="submit"
+            style={{
+              background: "#357ab7",
+              color: "#fff",
+              border: "none",
+              borderRadius: 6,
+              padding: "10px 20px",
+              fontWeight: "bold",
+              cursor: "pointer"
+            }}
+          >
+            {editing ? "Modifier" : "Ajouter"}
+          </button>
           <button
             type="button"
+            style={{
+              background: "#eee",
+              color: "#357ab7",
+              border: "1px solid #357ab7",
+              borderRadius: 6,
+              padding: "10px 20px",
+              fontWeight: "bold",
+              cursor: "pointer"
+            }}
             onClick={() => {
               setEditing(false);
+              setShowForm(false);
               setForm({
                 rangeeId: 0,
                 rangeeNom: "",
@@ -246,32 +317,67 @@ function Rangee() {
           >
             Annuler
           </button>
-        )}
-      </form>
-      <table>
-        <thead>
+        </form>
+      )}
+
+      <table
+        style={{
+          width: "100%",
+          borderCollapse: "collapse",
+          background: "#fff",
+          borderRadius: 8,
+          overflow: "hidden",
+          boxShadow: "0 2px 8px #0001"
+        }}
+      >
+        <thead style={{ background: "#357ab7", color: "#fff" }}>
           <tr>
-            <th>ID</th>
-            <th>Société</th>
-            <th>Site</th>
-            <th>Zone</th>
-            <th>Allée</th>
-            <th>Nom</th>
-            <th>Actions</th>
+            <th style={{ padding: 10 }}>ID</th>
+            <th style={{ padding: 10 }}>Société</th>
+            <th style={{ padding: 10 }}>Site</th>
+            <th style={{ padding: 10 }}>Zone</th>
+            <th style={{ padding: 10 }}>Allée</th>
+            <th style={{ padding: 10 }}>Nom</th>
+            <th style={{ padding: 10 }}>Actions</th>
           </tr>
         </thead>
         <tbody>
           {rangees.map((r) => (
-            <tr key={r.rangeeId}>
-              <td>{r.rangeeId}</td>
-              <td>{r.societeId}</td>
-              <td>{r.siteId}</td>
-              <td>{r.zoneId}</td>
-              <td>{r.alleeId}</td>
-              <td>{r.rangeeNom}</td>
-              <td>
-                <button onClick={() => handleEdit(r)}>Modifier</button>
-                <button onClick={() => handleDelete(r.rangeeId)}>Supprimer</button>
+            <tr key={r.rangeeId} style={{ borderBottom: "1px solid #eee" }}>
+              <td style={{ padding: 8 }}>{r.rangeeId}</td>
+              <td style={{ padding: 8 }}>{r.societeId}</td>
+              <td style={{ padding: 8 }}>{r.siteId}</td>
+              <td style={{ padding: 8 }}>{r.zoneId}</td>
+              <td style={{ padding: 8 }}>{r.alleeId}</td>
+              <td style={{ padding: 8 }}>{r.rangeeNom}</td>
+              <td style={{ padding: 8 }}>
+                <button
+                  onClick={() => handleEdit(r)}
+                  style={{
+                    marginRight: 8,
+                    background: "#ffb300",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: 4,
+                    padding: "6px 12px",
+                    cursor: "pointer"
+                  }}
+                >
+                  Modifier
+                </button>
+                <button
+                  onClick={() => handleDelete(r.rangeeId)}
+                  style={{
+                    background: "#e53935",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: 4,
+                    padding: "6px 12px",
+                    cursor: "pointer"
+                  }}
+                >
+                  Supprimer
+                </button>
               </td>
             </tr>
           ))}

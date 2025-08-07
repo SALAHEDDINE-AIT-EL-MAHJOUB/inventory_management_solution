@@ -19,9 +19,16 @@ namespace Repository.Repositories
         public async Task<IEnumerable<Etage>> GetAllAsync()
         {
             return await _context.Etages
+                .Where(e => !e.IsDeleted)
                 .Include(e => e.CodeBarreEtages)
                 .Include(e => e.EtageRangee)
                 .Include(e => e.Produits)
+                .Include(e => e.Zone)
+                .Include(e => e.Societe)
+                .Include(e => e.Allee)
+                .Include(e => e.Site)
+                .Include(e => e.CodeBarreetage)
+                .AsNoTracking()
                 .ToListAsync();
         }
 
@@ -31,7 +38,13 @@ namespace Repository.Repositories
                 .Include(e => e.CodeBarreEtages)
                 .Include(e => e.EtageRangee)
                 .Include(e => e.Produits)
-                .FirstOrDefaultAsync(e => e.Id == id);
+                .Include(e => e.Zone)
+                .Include(e => e.Societe)
+                .Include(e => e.Allee)
+                .Include(e => e.Site)
+                .Include(e => e.CodeBarreetage)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted);
         }
 
         public async Task AddAsync(Etage entity)
@@ -42,13 +55,21 @@ namespace Repository.Repositories
 
         public async Task UpdateAsync(Etage entity)
         {
-            _context.Etages.Update(entity);
+            var existing = await _context.Etages.FindAsync(entity.Id);
+            if (existing == null || existing.IsDeleted)
+                return;
+
+            _context.Entry(existing).CurrentValues.SetValues(entity);
             await _context.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(Etage entity)
         {
-            _context.Etages.Remove(entity);
+            var existing = await _context.Etages.FindAsync(entity.Id);
+            if (existing == null || existing.IsDeleted)
+                return;
+
+            existing.IsDeleted = true;
             await _context.SaveChangesAsync();
         }
 

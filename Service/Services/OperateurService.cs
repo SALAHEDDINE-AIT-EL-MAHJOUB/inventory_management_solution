@@ -1,6 +1,7 @@
 using Domain.Entities;
 using Repository.IRepositories;
 using Service.IServices;
+using Service.Dtos.Operateur;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -40,14 +41,44 @@ namespace Service.Services
             await _operateurRepository.AddAsync(entity);
         }
 
-        public async Task UpdateAsync(Operateur entity)
+        public async Task<Operateur?> CreateAsync(OperateurCreateDto dto)
         {
-            await _operateurRepository.UpdateAsync(entity);
+            var operateur = new Operateur
+            {
+                Nom = dto.Nom,
+                Prenom = dto.Prenom,
+                Cin = dto.Cin,
+                Email = dto.Email,
+                Telephone = dto.Telephone,
+                SiteId = dto.SiteId,
+            };
+            await _operateurRepository.AddAsync(operateur);
+            return operateur;
         }
 
-        public async Task DeleteAsync(Operateur entity)
+        public async Task<bool> UpdateAsync(int id, OperateurUpdateDto dto)
         {
-            await _operateurRepository.DeleteAsync(entity);
+            var operateur = await _operateurRepository.GetByIdAsync(id);
+            if (operateur == null) return false;
+
+            operateur.Nom = dto.Nom;
+            operateur.Prenom = dto.Prenom;
+            // operateur.Cin = dto.Cin; // Only if Cin exists in OperateurUpdateDto
+            operateur.Email = dto.Email;
+            operateur.Telephone = dto.Telephone;
+            operateur.SiteId = dto.SiteId;
+
+            await _operateurRepository.UpdateAsync(operateur);
+            return true;
+        }
+
+        public async Task<bool> DeleteAsync(int id)
+        {
+            var operateur = await _operateurRepository.GetByIdAsync(id);
+            if (operateur == null) return false;
+
+            await _operateurRepository.DeleteAsync(operateur);
+            return true;
         }
     }
 }

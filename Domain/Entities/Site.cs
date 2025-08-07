@@ -27,7 +27,7 @@ namespace Domain.Entities
         public int? SiteSocieteId { get; set; }
 public virtual Allee? Allees { get; set; }
         public virtual ICollection<Rangee>? Rangees { get; set; } = new List<Rangee>();
-        
+        public virtual ICollection<Etage>? Etages { get; set; } = new List<Etage>();
         public virtual ICollection<Inventaire>? Inventaires { get; set; }
         public virtual ICollection<Operateur>? Operateurs { get; set; }
         public virtual ICollection<CodeBarreOperateur>? CodeBarreOperateurs { get; set; }
