@@ -1,18 +1,22 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Service.IServices;
 using Service.Dtos.Operateur;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
+using Domain.Entities;
 
 [ApiController]
 [Route("api/[controller]")]
 public class OperateurController : ControllerBase
 {
+    private readonly UserManager<User> _userManager;
     private readonly IOperateurService _operateurService;
 
-    public OperateurController(IOperateurService operateurService)
+    public OperateurController(UserManager<User> userManager, IOperateurService operateurService)
     {
+        _userManager = userManager;
         _operateurService = operateurService;
     }
 
@@ -60,16 +64,17 @@ public class OperateurController : ControllerBase
         return NoContent();
     }
 
-    [Authorize]
     [HttpGet("me")]
-    public async Task<IActionResult> GetMyProfile()
+    [Authorize]
+    public async Task<IActionResult> GetCurrentOperateur()
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userId))
             return Unauthorized();
 
         var operateur = await _operateurService.GetByUserIdAsync(userId);
-        if (operateur == null) return NotFound();
+        if (operateur == null)
+            return NotFound();
 
         return Ok(operateur);
     }

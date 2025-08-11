@@ -6,7 +6,7 @@ const OperateurDashboard = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/Operateur/me", { withCredentials: true })
+      .get("/api/Operateur/me", { withCredentials: true })
       .then(response => setOperateur(response.data))
       .catch(() => setOperateur(null));
   }, []);

@@ -83,7 +83,23 @@ namespace Web.Controllers
             }
             else if (isOperateur)
             {
-                // Ajoutez ici la logique opérateur si besoin
+                // Authentification opérateur (username ou email + mot de passe hashé)
+                var passwordOk = await _userManager.CheckPasswordAsync(user, dto.Password);
+                if (!passwordOk)
+                    return Unauthorized("Mot de passe incorrect.");
+
+                // Création des claims pour l'opérateur
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.NameIdentifier, user.Id),
+                    new Claim(ClaimTypes.Name, user.UserName)
+                };
+                var claimsIdentity = new ClaimsIdentity(claims, "Identity.Application");
+                await HttpContext.SignInAsync("Identity.Application", new ClaimsPrincipal(claimsIdentity));
+
+                // Tu peux aussi récupérer le profil opérateur ici si tu veux le renvoyer
+                // var operateur = await _operateurService.GetByUserIdAsync(user.Id);
+
                 return Ok(new { type = "operateur", redirect = "operateurDashboard" });
             }
 
