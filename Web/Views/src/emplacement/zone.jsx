@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import "./emplacement.css";
 
 const Zone = () => {
   const [societes, setSocietes] = useState([]);
@@ -129,31 +130,16 @@ const Zone = () => {
   };
 
   return (
-    <div style={{ maxWidth: 800, margin: "auto", padding: 20 }}>
-      <button
-        onClick={() => setShowForm(f => !f)}
-        style={{
-          marginBottom: 24,
-          padding: "8px 20px",
-          background: "#1976d2",
-          color: "#fff",
-          border: "none",
-          borderRadius: 4,
-          fontWeight: "bold"
-        }}
-      >
+    <div className="emp">
+      <button className="btn-primary mb-16" onClick={() => setShowForm(f => !f)}>
         {showForm ? "Masquer le formulaire" : "Créer une zone"}
       </button>
 
       {showForm && (
-        <form onSubmit={handleSubmit} style={{ marginBottom: 30, background: "#f5f5f5", padding: 20, borderRadius: 8 }}>
-          <div style={{ marginBottom: 10 }}>
+        <form onSubmit={handleSubmit} className="card form-grid mb-24">
+          <div>
             <label>Société:</label>
-            <select
-              value={societeId}
-              onChange={e => setSocieteId(e.target.value)}
-              style={{ marginLeft: 10, padding: 5 }}
-            >
+            <select value={societeId} onChange={e => setSocieteId(e.target.value)}>
               <option value="">-- Choisir une société --</option>
               {societes.map(soc => (
                 <option key={soc.id} value={soc.id}>
@@ -162,14 +148,9 @@ const Zone = () => {
               ))}
             </select>
           </div>
-          <div style={{ marginBottom: 10 }}>
+          <div>
             <label>Site:</label>
-            <select
-              value={zoneSiteId}
-              onChange={e => setZoneSiteId(e.target.value)}
-              style={{ marginLeft: 10, padding: 5 }}
-              disabled={!societeId}
-            >
+            <select value={zoneSiteId} onChange={e => setZoneSiteId(e.target.value)} disabled={!societeId}>
               <option value="">-- Choisir un site --</option>
               {sites.map(site => (
                 <option key={site.id} value={site.id}>
@@ -178,21 +159,11 @@ const Zone = () => {
               ))}
             </select>
           </div>
-          <div style={{ marginBottom: 10 }}>
+          <div>
             <label>Nom de la zone:</label>
-            <input
-              type="text"
-              value={zoneNom}
-              onChange={e => setZoneNom(e.target.value)}
-              style={{ marginLeft: 10, padding: 5 }}
-              disabled={!zoneSiteId}
-            />
+            <input type="text" value={zoneNom} onChange={e => setZoneNom(e.target.value)} disabled={!zoneSiteId} />
           </div>
-          <button
-            type="submit"
-            style={{ padding: "6px 16px", background: "#43a047", color: "#fff", border: "none", borderRadius: 4 }}
-            disabled={!zoneSiteId || !zoneNom}
-          >
+          <button type="submit" className="btn-primary" disabled={!zoneSiteId || !zoneNom}>
             Créer
           </button>
         </form>
@@ -201,20 +172,13 @@ const Zone = () => {
       {message && <p>{message}</p>}
 
       <div style={{ overflowX: "auto" }}>
-        <table style={{
-          width: "100%",
-          borderCollapse: "collapse",
-          background: "#fff",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.07)",
-          borderRadius: "8px",
-          overflow: "hidden"
-        }}>
+        <table>
           <thead>
             <tr>
-              <th style={{ background: "#1976d2", color: "#fff", padding: "12px", fontWeight: "bold" }}>ID</th>
-              <th style={{ background: "#1976d2", color: "#fff", padding: "12px", fontWeight: "bold" }}>Nom</th>
-              <th style={{ background: "#1976d2", color: "#fff", padding: "12px", fontWeight: "bold" }}>Site</th>
-              <th style={{ background: "#1976d2", color: "#fff", padding: "12px", fontWeight: "bold" }}>Actions</th>
+              <th style={{ padding: 8, border: "1px solid #ddd" }}>ID</th>
+              <th style={{ padding: 8, border: "1px solid #ddd" }}>Nom</th>
+              <th style={{ padding: 8, border: "1px solid #ddd" }}>Site</th>
+              <th style={{ padding: 8, border: "1px solid #ddd" }}>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -239,35 +203,19 @@ const Zone = () => {
                 <td style={{ padding: "10px", borderBottom: "1px solid #e0e0e0" }}>
                   {editZoneId === zone.zoneId ? (
                     <>
-                      <button
-                        style={{ marginRight: 8, background: "#43a047", color: "#fff", border: "none", borderRadius: 4, padding: "6px 14px" }}
-                        onClick={() => handleEditSave(zone)}
-                        type="button"
-                      >
+                      <button className="btn-primary mr-8" onClick={() => handleEditSave(zone)} type="button">
                         Enregistrer
                       </button>
-                      <button
-                        style={{ background: "#e53935", color: "#fff", border: "none", borderRadius: 4, padding: "6px 14px" }}
-                        onClick={handleEditCancel}
-                        type="button"
-                      >
+                      <button className="btn-secondary" onClick={handleEditCancel} type="button">
                         Annuler
                       </button>
                     </>
                   ) : (
                     <>
-                      <button
-                        style={{ marginRight: 8, background: "#1976d2", color: "#fff", border: "none", borderRadius: 4, padding: "6px 14px" }}
-                        onClick={() => handleEditClick(zone)}
-                        type="button"
-                      >
+                      <button className="btn-secondary mr-8" onClick={() => handleEditClick(zone)} type="button">
                         Modifier
                       </button>
-                      <button
-                        style={{ background: "#e53935", color: "#fff", border: "none", borderRadius: 4, padding: "6px 14px" }}
-                        onClick={() => handleDelete(zone.zoneId)}
-                        type="button"
-                      >
+                      <button className="btn-danger" onClick={() => handleDelete(zone.zoneId)} type="button">
                         Supprimer
                       </button>
                     </>
@@ -284,36 +232,20 @@ const Zone = () => {
         </table>
         {/* Pagination Controls */}
         {totalPages > 1 && (
-          <div style={{ marginTop: 16, textAlign: "center" }}>
-            <button
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-              style={{ marginRight: 8, padding: "6px 12px", borderRadius: 4, border: "1px solid #1976d2", background: "#fff", color: "#1976d2", fontWeight: "bold" }}
-            >
+          <div className="pagination">
+            <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
               Précédent
             </button>
             {[...Array(totalPages)].map((_, idx) => (
               <button
                 key={idx + 1}
                 onClick={() => handlePageChange(idx + 1)}
-                style={{
-                  margin: "0 2px",
-                  padding: "6px 12px",
-                  borderRadius: 4,
-                  border: "1px solid #1976d2",
-                  background: currentPage === idx + 1 ? "#1976d2" : "#fff",
-                  color: currentPage === idx + 1 ? "#fff" : "#1976d2",
-                  fontWeight: "bold"
-                }}
+                className={currentPage === idx + 1 ? "active" : undefined}
               >
                 {idx + 1}
               </button>
             ))}
-            <button
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              style={{ marginLeft: 8, padding: "6px 12px", borderRadius: 4, border: "1px solid #1976d2", background: "#fff", color: "#1976d2", fontWeight: "bold" }}
-            >
+            <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
               Suivant
             </button>
           </div>

@@ -9,6 +9,7 @@ namespace Repository.IRepositories
 {
     public interface ISocieteRepository : IGenericRepository<Societe>
     {
+        Task<int> CountAsync();
         public Task<List<Societe>> GetSocieteByClientId(int id);
         public Task<List<Societe>> GetByIds(List<int?> ids);
         public Task<List<Societe>> GetSocieteByClientIdFilter(int id,string? societers);

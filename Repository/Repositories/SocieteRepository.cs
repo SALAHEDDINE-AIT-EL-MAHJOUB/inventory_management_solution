@@ -108,7 +108,10 @@ namespace Repository.Repositories
                 .Where(s => !s.IsDeleted)
                 .ToListAsync();
         }
-
+public async Task<int> CountAsync()
+{
+    return await _context.Societes.CountAsync();
+}
         public async Task<bool> IsUniqueSocieteAsync(string ifValue, string nom, string email, int? excludeId = null)
         {
             var query = _context.Societes.AsQueryable();

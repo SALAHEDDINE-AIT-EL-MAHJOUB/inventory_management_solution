@@ -11,7 +11,7 @@ namespace Repository.IRepositories
         Task AddAsync(Produit produit);
         Task UpdateAsync(Produit produit);
         Task DeleteAsync(int id);
-
+Task<int> CountAsync();
         Task AjouterQuantiteAsync(int produitId, int quantite);
 
         // Recherche par code produit (CodeBarre)

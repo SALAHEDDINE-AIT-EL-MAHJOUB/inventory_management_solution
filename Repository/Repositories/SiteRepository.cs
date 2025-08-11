@@ -183,5 +183,9 @@ namespace Repository.Repositories
                 .Include(s => s.SiteVille)
                 .ToListAsync();
         }
+        public async Task<int> CountAsync()
+{
+    return await _context.Sites.CountAsync();
+}
     }
 }

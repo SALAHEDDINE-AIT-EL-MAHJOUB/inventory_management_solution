@@ -23,19 +23,43 @@ import Fournisseur from "./gestionProduit/fournisseur";
 import ListProduit from "./gestionProduit/listProduit"; 
 
 import CreeInventaire from "./inventaire/creeInventaire";
-import { FaTachometerAlt, FaUser, FaShoppingCart, FaBuilding, FaMapMarkerAlt, FaUserCircle } from "react-icons/fa";
+import { FaTachometerAlt, FaUser, FaShoppingCart, FaBuilding, FaMapMarkerAlt, FaUserCircle, FaWarehouse, FaBoxes, FaUsers } from "react-icons/fa";
+import { Bar, Pie } from "react-chartjs-2";
+import "chart.js/auto";
 
-const ClientDashboard = ({ clientInfo, onLogout }) => {
+const ClientDashboard = ({ onLogout }) => {
   const [orders, setOrders] = useState([]);
-  const [profile, setProfile] = useState(clientInfo?.Client || {});
+  const [profile, setProfile] = useState(() => {
+    const info = localStorage.getItem("clientInfo");
+    return info ? JSON.parse(info).client : {};
+  });
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("dashboard");
   const [emplacementTab, setEmplacementTab] = useState("societes"); // Ajout pour la sous-navbar
   const [produitTab, setProduitTab] = useState("creeProduit"); // Ajoutez ce state
   const [error, setError] = useState("");
+  const [stats, setStats] = useState({
+    societes: 0,
+    sites: 0,
+    villes: 0,
+    operateurs: 0,
+    produits: 0,
+    inventaires: 0,
+  });
+  const [inventaireStatutData, setInventaireStatutData] = useState({});
+  const [inventaireTypeData, setInventaireTypeData] = useState({});
+  const [ruptureData, setRuptureData] = useState({}); // Ajout pour les produits en rupture de stock
+  const [stockBarData, setStockBarData] = useState({});
+  const [ruptureListData, setRuptureListData] = useState({});
 
   useEffect(() => {
     loadClientData();
+    loadStats();
+    loadInventaireStatuts();
+    loadInventaireTypes();
+    loadRuptureData(); // Chargement des données de rupture de stock
+    loadStockBarData(); // Chargement des données pour le graphique des stocks
+    loadRuptureListData(); // Chargement des données pour la liste des produits en rupture
   }, []);
 
   const loadClientData = async () => {
@@ -68,46 +92,225 @@ const ClientDashboard = ({ clientInfo, onLogout }) => {
     }
   };
 
+  const loadStats = async () => {
+    try {
+      const res = await axios.get("/api/stats");
+      setStats(res.data);
+    } catch (e) {
+      setStats({
+        societes: 0,
+        sites: 0,
+        villes: 0,
+        operateurs: 0,
+        produits: 0,
+        inventaires: 0,
+      });
+    }
+  };
+
+  // Nouvelle fonction pour charger la répartition des statuts d'inventaire
+  const loadInventaireStatuts = async () => {
+    try {
+      const res = await axios.get("/api/inventaire/statut-counts");
+      const counts = res.data;
+      setInventaireStatutData({
+        labels: Object.keys(counts),
+        datasets: [
+          {
+            data: Object.values(counts),
+            backgroundColor: [
+              "#1976d2", "#43a047", "#ffa726", "#e53935", "#8e24aa", "#00838f", "#bdbdbd"
+            ],
+          },
+        ],
+      });
+    } catch (e) {
+      setInventaireStatutData({});
+    }
+  };
+
+  // Nouvelle fonction pour charger la répartition par type d'inventaire
+  const loadInventaireTypes = async () => {
+    try {
+      // Utilise le nouvel endpoint simplifié
+      const res = await axios.get("/api/inventaire/type-counts");
+      const counts = res.data;
+      setInventaireTypeData({
+        labels: Object.keys(counts),
+        datasets: [
+          {
+            data: Object.values(counts),
+            backgroundColor: [
+              "#1976d2",
+              "#43a047",
+              "#ffa726",
+              "#e53935",
+              "#8e24aa",
+              "#00838f",
+              "#bdbdbd",
+            ],
+          },
+        ],
+      });
+    } catch (e) {
+      setInventaireTypeData({});
+    }
+  };
+
+  // Nouvelle fonction pour charger les produits en rupture de stock
+  const loadRuptureData = async () => {
+    try {
+      const res = await axios.get("/api/Produit/rupture-count");
+      const counts = res.data;
+      setRuptureData({
+        labels: ["Rupture", "Stock faible (<10)", "En stock (≥10)"],
+        datasets: [
+          {
+            data: [
+              counts.Rupture ?? 0,
+              counts.Faible ?? 0,
+              counts.EnStock ?? 0
+            ],
+            backgroundColor: ["#e53935", "#ffa726", "#43a047"],
+          },
+        ],
+      });
+    } catch (e) {
+      setRuptureData({});
+    }
+  };
+
+  // Nouvelle fonction pour charger les données du graphique des stocks
+  const loadStockBarData = async () => {
+    try {
+      const res = await axios.get("/api/Produit/stock-bar");
+      const produits = res.data;
+      setStockBarData({
+        labels: produits.map(p => p.nom || p.Nom),
+        datasets: [
+          {
+            label: "Quantité en stock",
+            data: produits.map(p => p.quantite ?? p.Quantite),
+            backgroundColor: "#1976d2",
+          },
+        ],
+      });
+    } catch (e) {
+      setStockBarData({});
+    }
+  };
+
+  // Nouvelle fonction pour charger la liste des produits en rupture
+  const loadRuptureListData = async () => {
+    try {
+      const res = await axios.get("/api/Produit/rupture-list");
+      setRuptureListData({
+        labels: res.data.map(p => p.nom || p.Nom),
+        datasets: [{
+          // Correction ici : on utilise la quantité réelle
+          data: res.data.map(p => p.quantite ?? p.Quantite ?? 0),
+          backgroundColor: [
+            "#e53935", "#ffa726", "#43a047", "#8e24aa", "#00838f", "#bdbdbd"
+          ],
+        }]
+      });
+    } catch (e) {
+      setRuptureListData({});
+    }
+  };
+
   const handleLogout = async () => {
     try {
       await axios.post("/api/ClientAuth/logout");
       localStorage.removeItem("clientInfo");
       if (onLogout) onLogout();
+      window.location.href = "/login"; // <-- Redirection vers la page login
     } catch (error) {
       console.error("Erreur lors de la déconnexion:", error);
       // Déconnexion locale même en cas d'erreur
       localStorage.removeItem("clientInfo");
       if (onLogout) onLogout();
+      window.location.href = "/login"; // <-- Redirection même en cas d'erreur
     }
   };
 
   const renderDashboard = () => (
     <div className="dashboard-content">
-      <h3>Tableau de bord</h3>
-      {error && <div className="error-message">{error}</div>}
-      <div className="dashboard-cards">
-        <div className="dashboard-card">
-          <h4>Mes Commandes</h4>
-          <div className="card-value">{orders.length}</div>
-          <p>Commandes totales</p>
+      <h3 style={{ color: "#1976d2", marginBottom: 24 }}>Tableau de bord</h3>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 32, justifyContent: "center" }}>
+        {/* Statut des inventaires */}
+        <div style={{ flex: "1 1 350px", background: "#fff", borderRadius: 12, boxShadow: "0 2px 12px #1976d211", padding: 24 }}>
+          <h4 style={{ color: "#1976d2", marginBottom: 16 }}>Statut des inventaires</h4>
+          {inventaireStatutData.labels && inventaireStatutData.labels.length > 0 ? (
+            <Pie
+              data={inventaireStatutData}
+              width={220}
+              height={220}
+              options={{
+                plugins: { legend: { position: "bottom" } },
+                responsive: false,
+              }}
+            />
+          ) : (
+            <div style={{ color: "#888" }}>Aucune donnée de statut d'inventaire.</div>
+          )}
         </div>
-        <div className="dashboard-card">
-          <h4>Statut du Compte</h4>
-          <div className={`card-value ${profile.IsActive ? 'active' : 'inactive'}`}>
-            {profile.IsActive ? 'Actif' : 'Inactif'}
-          </div>
-          <p>Statut actuel</p>
+        {/* Répartition par type d'inventaire */}
+        <div style={{ flex: "1 1 350px", background: "#fff", borderRadius: 12, boxShadow: "0 2px 12px #1976d211", padding: 24 }}>
+          <h4 style={{ color: "#1976d2", marginBottom: 16 }}>Répartition par type d'inventaire</h4>
+          {inventaireTypeData.labels && inventaireTypeData.labels.length > 0 ? (
+            <Pie
+              data={inventaireTypeData}
+              width={220}
+              height={220}
+              options={{
+                plugins: { legend: { position: "bottom" } },
+                responsive: false,
+              }}
+            />
+          ) : (
+            <div style={{ color: "#888" }}>Aucune donnée de type d'inventaire.</div>
+          )}
         </div>
-        <div className="dashboard-card">
-          <h4>Profil</h4>
-          <div className="card-value">✓</div>
-          <p>Profil complet</p>
+        {/* Diagramme de quantité en stock */}
+        <div style={{ flex: "1 1 500px", background: "#fff", borderRadius: 12, boxShadow: "0 2px 12px #1976d211", padding: 24 }}>
+          <h4 style={{ color: "#1976d2", marginBottom: 16 }}>Quantité en stock par produit</h4>
+          {stockBarData.labels && stockBarData.labels.length > 0 ? (
+            <Bar
+              data={stockBarData}
+              width={400}
+              height={220}
+              options={{
+                plugins: { legend: { display: false } },
+                responsive: false,
+                scales: {
+                  x: { title: { display: true, text: "Produit" } },
+                  y: { title: { display: true, text: "Quantité" }, beginAtZero: true }
+                }
+              }}
+            />
+          ) : (
+            <div style={{ color: "#888" }}>Aucune donnée de stock disponible.</div>
+          )}
         </div>
       </div>
-      
-      
     </div>
   );
+
+  const cardStyle = {
+    background: "#f5faff",
+    borderRadius: 10,
+    boxShadow: "0 2px 8px #1976d211",
+    padding: "18px 24px",
+    minWidth: 120,
+    textAlign: "center",
+    fontWeight: 600,
+    fontSize: 18,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: 6,
+  };
 
   const renderProfile = () => <Profile profile={profile} setProfile={setProfile} />;
 

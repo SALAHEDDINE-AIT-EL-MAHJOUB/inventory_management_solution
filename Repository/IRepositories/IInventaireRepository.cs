@@ -11,6 +11,7 @@ namespace Repository.IRepositories
         Task<Inventaire?> GetWithDetailsByIdAsync(int inventaireId);
         Task<Inventaire?> GetByIdAsync(int id);
         Task SaveAsync();
+        Task<int> CountAsync();
         Task<Inventaire?> GetInventaireActifPourOperateur(int operateurId);
         Task<List<Inventaire>> GetInventairesParOperateurIdAsync(int operateurId);
         Task<bool> UpdateTypeAsync(int inventaireId, int typeInventaireId);

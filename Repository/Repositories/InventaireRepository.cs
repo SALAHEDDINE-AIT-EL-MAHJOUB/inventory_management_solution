@@ -129,6 +129,9 @@ namespace Repository.Repositories
         {
             return await _context.Statut.ToListAsync();
         }
-
+public async Task<int> CountAsync()
+{
+    return await _context.Sites.CountAsync();
+}
     }
 }

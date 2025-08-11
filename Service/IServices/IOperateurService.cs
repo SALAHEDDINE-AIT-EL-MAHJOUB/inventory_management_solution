@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 namespace Service.IServices
 {
     public interface IOperateurService
-    {
+    {Task<Operateur?> GetByUserIdAsync(string userId);
+
         Task<IEnumerable<Operateur>> GetAllAsync();
         Task<Operateur?> GetByIdAsync(int id);
         Task<Operateur?> CreateAsync(OperateurCreateDto dto);

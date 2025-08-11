@@ -125,5 +125,9 @@ namespace Repository.Repositories
                 await _context.SaveChangesAsync();
             }
         }
+        public async Task<int> CountAsync()
+{
+    return await _context.Produits.CountAsync();
+}
     }
 }

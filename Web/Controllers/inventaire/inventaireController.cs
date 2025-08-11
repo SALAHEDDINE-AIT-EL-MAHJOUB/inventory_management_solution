@@ -3,6 +3,7 @@ using Service.IServices;
 using Domain.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace Web.Controllers.inventaire
 {
@@ -23,6 +24,28 @@ namespace Web.Controllers.inventaire
         {
             var inventaires = await _inventaireService.GetAllAsync();
             return Ok(inventaires);
+        }
+
+        // GET: api/inventaire/statut-counts
+        [HttpGet("statut-counts")]
+        public async Task<ActionResult<Dictionary<string, int>>> GetInventaireStatutCounts()
+        {
+            var inventaires = await _inventaireService.GetAllAsync();
+            var counts = inventaires
+                .GroupBy(i => i.InventaireStatut?.StatutNom ?? "Inconnu") // <-- Utilise StatutNom
+                .ToDictionary(g => g.Key, g => g.Count());
+            return Ok(counts);
+        }
+
+        // GET: api/inventaire/type-counts
+        [HttpGet("type-counts")]
+        public async Task<ActionResult<Dictionary<string, int>>> GetInventaireTypeCounts()
+        {
+            var inventaires = await _inventaireService.GetAllAsync();
+            var counts = inventaires
+                .GroupBy(i => i.InventaireTypeInventaire?.TypeInventaireLibelle ?? "Inconnu")
+                .ToDictionary(g => g.Key, g => g.Count());
+            return Ok(counts);
         }
 
         // PUT: api/inventaire/{id}/statut

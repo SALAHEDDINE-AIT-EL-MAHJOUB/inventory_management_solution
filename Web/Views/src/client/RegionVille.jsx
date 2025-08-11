@@ -25,6 +25,22 @@ const RegionVille = () => {
   // Ajoute l'état pour la navigation
   const [activeTab, setActiveTab] = useState("sites");
 
+  // Pagination pour les régions
+  const [currentRegionPage, setCurrentRegionPage] = useState(1);
+  const regionsPerPage = 10;
+  const indexOfLastRegion = currentRegionPage * regionsPerPage;
+  const indexOfFirstRegion = indexOfLastRegion - regionsPerPage;
+  const currentRegions = regions.slice(indexOfFirstRegion, indexOfLastRegion);
+  const totalRegionPages = Math.ceil(regions.length / regionsPerPage);
+
+  // Pagination pour les villes
+  const [currentVillePage, setCurrentVillePage] = useState(1);
+  const villesPerPage = 10;
+  const indexOfLastVille = currentVillePage * villesPerPage;
+  const indexOfFirstVille = indexOfLastVille - villesPerPage;
+  const currentVilles = villes.slice(indexOfFirstVille, indexOfLastVille);
+  const totalVillePages = Math.ceil(villes.length / villesPerPage);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -140,7 +156,6 @@ const RegionVille = () => {
   return (
     <div style={{ maxWidth: 900, margin: "0 auto", padding: 20 }}>
       <Navbar active={activeTab} onNavigate={setActiveTab} />
-      {/* Affiche le composant selon l'onglet actif */}
       {activeTab === "sites" && (
         <>
           <h2 style={{ color: "#1976d2" }}>Régions</h2>
@@ -158,10 +173,10 @@ const RegionVille = () => {
               </tr>
             </thead>
             <tbody>
-              {regions.length === 0 ? (
+              {currentRegions.length === 0 ? (
                 <tr><td colSpan={2} style={{ padding: 8, border: "1px solid #ddd" }}>Aucune région trouvée.</td></tr>
               ) : (
-                regions.map((region) => (
+                currentRegions.map((region) => (
                   <tr key={region.id}>
                     <td style={{ padding: 8, border: "1px solid #ddd" }}>{region.name ?? region.Name}</td>
                     <td style={{ padding: 8, border: "1px solid #ddd" }}>
@@ -185,6 +200,58 @@ const RegionVille = () => {
               )}
             </tbody>
           </table>
+          {/* Pagination pour les régions */}
+          {totalRegionPages > 1 && (
+            <div style={{ marginTop: 16, textAlign: "center" }}>
+              <button
+                onClick={() => setCurrentRegionPage(currentRegionPage - 1)}
+                disabled={currentRegionPage === 1}
+                style={{
+                  marginRight: 8,
+                  padding: "6px 12px",
+                  borderRadius: 4,
+                  border: "1px solid #1976d2",
+                  background: "#fff",
+                  color: "#1976d2",
+                  fontWeight: "bold",
+                }}
+              >
+                Précédent
+              </button>
+              {[...Array(totalRegionPages)].map((_, idx) => (
+                <button
+                  key={idx + 1}
+                  onClick={() => setCurrentRegionPage(idx + 1)}
+                  style={{
+                    margin: "0 2px",
+                    padding: "6px 12px",
+                    borderRadius: 4,
+                    border: "1px solid #1976d2",
+                    background: currentRegionPage === idx + 1 ? "#1976d2" : "#fff",
+                    color: currentRegionPage === idx + 1 ? "#fff" : "#1976d2",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {idx + 1}
+                </button>
+              ))}
+              <button
+                onClick={() => setCurrentRegionPage(currentRegionPage + 1)}
+                disabled={currentRegionPage === totalRegionPages}
+                style={{
+                  marginLeft: 8,
+                  padding: "6px 12px",
+                  borderRadius: 4,
+                  border: "1px solid #1976d2",
+                  background: "#fff",
+                  color: "#1976d2",
+                  fontWeight: "bold",
+                }}
+              >
+                Suivant
+              </button>
+            </div>
+          )}
 
           <h3 style={{ color: "#1976d2" }}>Ajouter une région</h3>
           <form onSubmit={handleCreateRegion} style={{
@@ -240,10 +307,10 @@ const RegionVille = () => {
               </tr>
             </thead>
             <tbody>
-              {villes.length === 0 ? (
+              {currentVilles.length === 0 ? (
                 <tr><td colSpan={3} style={{ padding: 8, border: "1px solid #ddd" }}>Aucune ville trouvée.</td></tr>
               ) : (
-                villes.map((ville) => (
+                currentVilles.map((ville) => (
                   <tr key={ville.id}>
                     <td style={{ padding: 8, border: "1px solid #ddd" }}>
                       {ville.nom ?? ville.Nom ?? "Nom inconnu"}
@@ -272,6 +339,58 @@ const RegionVille = () => {
               )}
             </tbody>
           </table>
+          {/* Pagination pour les villes */}
+          {totalVillePages > 1 && (
+            <div style={{ marginTop: 16, textAlign: "center" }}>
+              <button
+                onClick={() => setCurrentVillePage(currentVillePage - 1)}
+                disabled={currentVillePage === 1}
+                style={{
+                  marginRight: 8,
+                  padding: "6px 12px",
+                  borderRadius: 4,
+                  border: "1px solid #1976d2",
+                  background: "#fff",
+                  color: "#1976d2",
+                  fontWeight: "bold",
+                }}
+              >
+                Précédent
+              </button>
+              {[...Array(totalVillePages)].map((_, idx) => (
+                <button
+                  key={idx + 1}
+                  onClick={() => setCurrentVillePage(idx + 1)}
+                  style={{
+                    margin: "0 2px",
+                    padding: "6px 12px",
+                    borderRadius: 4,
+                    border: "1px solid #1976d2",
+                    background: currentVillePage === idx + 1 ? "#1976d2" : "#fff",
+                    color: currentVillePage === idx + 1 ? "#fff" : "#1976d2",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {idx + 1}
+                </button>
+              ))}
+              <button
+                onClick={() => setCurrentVillePage(currentVillePage + 1)}
+                disabled={currentVillePage === totalVillePages}
+                style={{
+                  marginLeft: 8,
+                  padding: "6px 12px",
+                  borderRadius: 4,
+                  border: "1px solid #1976d2",
+                  background: "#fff",
+                  color: "#1976d2",
+                  fontWeight: "bold",
+                }}
+              >
+                Suivant
+              </button>
+            </div>
+          )}
 
           <h3 style={{ color: "#1976d2" }}>Ajouter une ville</h3>
           <form onSubmit={handleCreateVille} style={{
@@ -328,7 +447,6 @@ const RegionVille = () => {
               {creatingVille ? "Création..." : "Créer la ville"}
             </button>
           </form>
-
           <hr style={{ margin: "40px 0" }} />
         </>
       )}

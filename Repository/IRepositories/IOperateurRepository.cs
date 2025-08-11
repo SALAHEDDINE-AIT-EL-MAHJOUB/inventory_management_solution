@@ -11,7 +11,7 @@ namespace Repository.IRepositories
     {
         public Task<Operateur?> GetOperateurByUserId(string id);
  Task AddAsync(Operateur operateur);
-      
+      Task<int> CountAsync();
         public Task<List<Operateur>> GetOperateurBySiteId(int siteId);
     }
 }

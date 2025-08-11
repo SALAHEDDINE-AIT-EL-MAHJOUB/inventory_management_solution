@@ -1,0 +1,145 @@
+/* Unified styles for emplacement pages */
+.emp {
+  --primary: #1976d2;
+  --primary-dark: #155fa8;
+  --accent: #357ab7;
+  --success: #2e7d32;
+  --danger: #d32f2f;
+  --border: #e0e6ef;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --bg: #f6f8fb;
+
+  font-family: Inter, Segoe UI, Roboto, Arial, sans-serif;
+  color: var(--text);
+}
+
+.emp {
+  max-width: 1100px;
+  margin: 32px auto;
+  padding: 0 16px;
+}
+
+.emp h2, .emp h3 {
+  color: var(--text);
+  letter-spacing: .2px;
+  margin: 0 0 16px 0;
+}
+
+/* Card */
+.emp .card {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 24px rgba(16, 24, 40, 0.06);
+  padding: 20px;
+}
+
+/* Buttons */
+.emp button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .2s ease;
+}
+
+.emp button:hover { transform: translateY(-1px); }
+.emp button:active { transform: translateY(0); }
+
+.emp .btn-primary {
+  background: linear-gradient(180deg, var(--primary), var(--primary-dark));
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(25, 118, 210, .25);
+}
+
+.emp .btn-secondary {
+  background: #fff;
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+.emp .btn-danger {
+  background: var(--danger);
+  color: #fff;
+}
+
+/* Inputs */
+.emp input,
+.emp select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #fff;
+  outline: none;
+  transition: border-color .2s ease, box-shadow .2s ease;
+  font-size: 14px;
+}
+
+.emp input:focus,
+.emp select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(25,118,210,.12);
+}
+
+/* Grid form */
+.emp .form-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 14px;
+}
+
+/* Tables */
+.emp table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff !important;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(16, 24, 40, 0.06);
+}
+
+.emp thead {
+  background: var(--primary) !important;
+  color: #fff !important;
+}
+
+.emp th,
+.emp td {
+  padding: 12px !important;
+  border-bottom: 1px solid var(--border) !important;
+  text-align: left;
+}
+
+.emp tbody tr:hover { background: #f9fbff; }
+
+/* Pagination */
+.emp .pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.emp .pagination button {
+  background: #fff;
+  color: var(--primary);
+  border: 1px solid var(--primary);
+}
+
+.emp .pagination button.active {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* Helper spacing */
+.emp .mt-16 { margin-top: 16px; }
+.emp .mb-16 { margin-bottom: 16px; }
+.emp .mb-24 { margin-bottom: 24px; }
+.emp .mb-32 { margin-bottom: 32px; }

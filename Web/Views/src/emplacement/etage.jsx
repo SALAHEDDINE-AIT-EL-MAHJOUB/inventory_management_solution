@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import "./emplacement.css";
 
 const Etage = () => {
   const [etages, setEtages] = useState([]);
@@ -133,37 +134,13 @@ const Etage = () => {
   };
 
   return (
-    <div style={{ maxWidth: 900, margin: "30px auto", fontFamily: "Arial" }}>
+    <div className="emp">
       <h2>Liste des étages</h2>
-      <button
-        style={{
-          background: "#1976d2",
-          color: "#fff",
-          border: "none",
-          padding: "8px 18px",
-          borderRadius: 4,
-          marginBottom: 18,
-          cursor: "pointer"
-        }}
-        onClick={() => setShowForm(!showForm)}
-      >
+      <button className="btn-primary mb-16" onClick={() => setShowForm(!showForm)}>
         {showForm ? "Fermer le formulaire" : "Ajouter un étage"}
       </button>
       {showForm && (
-        <form
-          onSubmit={handleAdd}
-          style={{
-            background: "#f5f5f5",
-            padding: 18,
-            borderRadius: 6,
-            marginBottom: 25,
-            boxShadow: "0 2px 8px #0001",
-            display: "flex",
-            flexWrap: "wrap",
-            gap: 12,
-            alignItems: "center"
-          }}
-        >
+        <form onSubmit={handleAdd} className="card form-grid mb-24">
           <input
             type="text"
             placeholder="Nom de l'étage"
@@ -191,17 +168,7 @@ const Etage = () => {
             <option value="">Choisir rangée</option>
             {rangees.map(r => <option key={r.rangeeId} value={r.rangeeId}>{r.rangeeNom}</option>)}
           </select>
-          <button
-            type="submit"
-            style={{
-              background: "#388e3c",
-              color: "#fff",
-              border: "none",
-              padding: "8px 18px",
-              borderRadius: 4,
-              cursor: "pointer"
-            }}
-          >
+          <button type="submit" className="btn-primary">
             Ajouter
           </button>
         </form>
@@ -210,9 +177,9 @@ const Etage = () => {
         <p>Chargement...</p>
       ) : (
         <>
-          <table style={{ width: "100%", borderCollapse: "collapse", background: "#fff" }}>
+          <table>
             <thead>
-              <tr style={{ background: "#1976d2", color: "#fff" }}>
+              <tr>
                 <th style={{ padding: 8, border: "1px solid #ddd" }}>Nom</th>
                 <th style={{ padding: 8, border: "1px solid #ddd" }}>Société</th>
                 <th style={{ padding: 8, border: "1px solid #ddd" }}>Site</th>
@@ -232,17 +199,7 @@ const Etage = () => {
                   <td style={{ padding: 8, border: "1px solid #ddd" }}>{etage.allee?.alleeNom || ""}</td>
                   <td style={{ padding: 8, border: "1px solid #ddd" }}>{etage.etageRangee?.rangeeNom || ""}</td>
                   <td style={{ padding: 8, border: "1px solid #ddd" }}>
-                    <button
-                      onClick={() => handleDelete(etage.id)}
-                      style={{
-                        background: "#d32f2f",
-                        color: "#fff",
-                        border: "none",
-                        padding: "5px 12px",
-                        borderRadius: 4,
-                        cursor: "pointer"
-                      }}
-                    >
+                    <button onClick={() => handleDelete(etage.id)} className="btn-danger">
                       Supprimer
                     </button>
                   </td>
@@ -259,52 +216,20 @@ const Etage = () => {
           </table>
           {/* Pagination Controls */}
           {totalPages > 1 && (
-            <div style={{ marginTop: 16, textAlign: "center" }}>
-              <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                style={{
-                  marginRight: 8,
-                  padding: "6px 12px",
-                  borderRadius: 4,
-                  border: "1px solid #1976d2",
-                  background: "#fff",
-                  color: "#1976d2",
-                  fontWeight: "bold"
-                }}
-              >
+            <div className="pagination">
+              <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
                 Précédent
               </button>
               {[...Array(totalPages)].map((_, idx) => (
                 <button
                   key={idx + 1}
                   onClick={() => handlePageChange(idx + 1)}
-                  style={{
-                    margin: "0 2px",
-                    padding: "6px 12px",
-                    borderRadius: 4,
-                    border: "1px solid #1976d2",
-                    background: currentPage === idx + 1 ? "#1976d2" : "#fff",
-                    color: currentPage === idx + 1 ? "#fff" : "#1976d2",
-                    fontWeight: "bold"
-                  }}
+                  className={currentPage === idx + 1 ? "active" : undefined}
                 >
                   {idx + 1}
                 </button>
               ))}
-              <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                style={{
-                  marginLeft: 8,
-                  padding: "6px 12px",
-                  borderRadius: 4,
-                  border: "1px solid #1976d2",
-                  background: "#fff",
-                  color: "#1976d2",
-                  fontWeight: "bold"
-                }}
-              >
+              <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
                 Suivant
               </button>
             </div>

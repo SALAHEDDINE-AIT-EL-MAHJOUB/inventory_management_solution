@@ -53,11 +53,15 @@ namespace Repository.Repositories
                 throw;
             }
         }
-        
+
         public async Task AddAsync(Operateur operateur)
         {
             _context.Operateurs.Add(operateur);
             await _context.SaveChangesAsync();
         }
+        public async Task<int> CountAsync()
+{
+    return await _context.Operateurs.CountAsync();
+}
     }
 }

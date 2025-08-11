@@ -141,7 +141,12 @@ export default function CreeProduit() {
     <div className="cree-produit-container">
       <form onSubmit={handleSubmit} className="cree-produit-form">
         <div className="cree-produit-header">
-          <h2>Créer un produit</h2>
+          <h2>
+            <svg className="cree-produit-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="currentColor" d="M19 7h-4V3H9v4H5v4h4v4h6v-4h4V7zm-6 4H11V9h2v2z"/>
+            </svg>
+            Créer un produit
+          </h2>
         </div>
         {message && <div className="cree-produit-message">{message}</div>}
         <div>

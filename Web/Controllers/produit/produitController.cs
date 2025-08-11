@@ -3,6 +3,7 @@ using Service.IServices;
 using Domain.Entities;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Web.Controllers.produit
 {
@@ -136,6 +137,52 @@ namespace Web.Controllers.produit
             return Ok(produits);
         }
 
+        // GET: api/Produit/rupture-count
+        [HttpGet("rupture-count")]
+        public async Task<ActionResult<object>> GetRuptureCount()
+        {
+            var produits = await _produitService.GetAllAsync();
+            var rupture = produits.Count(p => p.Quantite == 0);
+            var faible = produits.Count(p => p.Quantite > 0 && p.Quantite < 10);
+            var enStock = produits.Count(p => p.Quantite >= 10);
+
+            return Ok(new
+            {
+                Rupture = rupture,
+                Faible = faible,
+                EnStock = enStock
+            });
+        }
+
+        // GET: api/Produit/stock-bar
+        [HttpGet("stock-bar")]
+        public async Task<ActionResult<IEnumerable<object>>> GetStockBar()
+        {
+            try
+            {
+                var produits = await _produitService.GetAllAsync();
+                if (produits == null)
+                    return BadRequest("Aucun produit trouvé.");
+                var result = produits.Select(p => new { p.Nom, p.Quantite }).ToList();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Erreur serveur : " + ex.Message);
+            }
+        }
+
+        // GET: api/Produit/rupture-list
+        [HttpGet("rupture-list")]
+        public async Task<ActionResult<IEnumerable<object>>> GetProduitsEnRupture()
+        {
+            var produits = await _produitService.GetAllAsync();
+            var rupture = produits.Where(p => p.Quantite == 0)
+                                  .Select(p => new { p.Nom })
+                                  .ToList();
+            return Ok(rupture);
+        }
+
         // PUT: api/Produit/{id}
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] ProduitCreateRequest request)
@@ -161,6 +208,7 @@ namespace Web.Controllers.produit
             produit.Nom = request.Nom;
             produit.CodeBarre = request.CodeBarre;
             produit.Prix = request.Prix;
+            produit.Quantite = request.Quantite; 
             produit.SocieteId = request.SocieteId;
             produit.SiteId = request.SiteId;
             produit.ZoneId = request.ZoneId;

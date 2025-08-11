@@ -14,7 +14,8 @@ public class User :  IdentityUser<string>
     public ICollection<Operateur>? Operateurs { get; set; }
     public ICollection<Admin>? Admins { get; set; }   
 
-    public bool IsClient { get; set; } = false;
+    public bool IsAdmin { get; set; }
+public bool IsClient { get; set; }
 public bool IsOperateur { get; set; } = false;
     
     public IList<string> GetRoleNames() =>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import "./emplacement.css";
 
 const AlleeForm = () => {
   const [societes, setSocietes] = useState([]);
@@ -14,7 +15,7 @@ const AlleeForm = () => {
   const [showForm, setShowForm] = useState(false);
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const alleesPerPage = 10;
+  const alleesPerPage = 7;
 
   // Charger les sociétés au montage
   useEffect(() => {
@@ -115,47 +116,17 @@ const AlleeForm = () => {
   };
 
   return (
-    <div
-      style={{
-        maxWidth: 600,
-        margin: "40px auto",
-      }}
-    >
-      <button
-        onClick={handleShowForm}
-        style={{
-          background: "#2980d9",
-          color: "#fff",
-          border: "none",
-          padding: "10px 24px",
-          borderRadius: 4,
-          fontSize: 16,
-          cursor: "pointer",
-          marginBottom: 24,
-        }}
-      >
+    <div className="emp">
+      <button onClick={handleShowForm} className="btn-primary mb-24">
         {showForm ? "Fermer le formulaire" : "Créer une allée"}
       </button>
 
       {showForm && (
-        <form
-          onSubmit={handleSubmit}
-          style={{
-            background: "#f8f9fa",
-            padding: 24,
-            borderRadius: 8,
-            boxShadow: "0 2px 8px #0001",
-            marginBottom: 32,
-          }}
-        >
-          <div style={{ marginBottom: 16 }}>
+        <form onSubmit={handleSubmit} className="card mb-32">
+          <div className="mb-16">
             <label
               htmlFor="societeSelect"
-              style={{
-                display: "block",
-                marginBottom: 6,
-                fontWeight: 500,
-              }}
+              className="block mb-6 font-bold"
             >
               Société :
             </label>
@@ -168,13 +139,7 @@ const AlleeForm = () => {
                 setSelectedZoneId("");
                 setMessage("");
               }}
-              style={{
-                width: "100%",
-                padding: 8,
-                borderRadius: 4,
-                border: "1px solid #ccc",
-                fontSize: 16,
-              }}
+              className="w-full p-8 rounded border border-gray-300 font-16"
               required
             >
               <option value="">Sélectionnez une société</option>
@@ -185,14 +150,10 @@ const AlleeForm = () => {
               ))}
             </select>
           </div>
-          <div style={{ marginBottom: 16 }}>
+          <div className="mb-16">
             <label
               htmlFor="siteSelect"
-              style={{
-                display: "block",
-                marginBottom: 6,
-                fontWeight: 500,
-              }}
+              className="block mb-6 font-bold"
             >
               Site :
             </label>
@@ -204,13 +165,7 @@ const AlleeForm = () => {
                 setSelectedZoneId("");
                 setMessage("");
               }}
-              style={{
-                width: "100%",
-                padding: 8,
-                borderRadius: 4,
-                border: "1px solid #ccc",
-                fontSize: 16,
-              }}
+              className="w-full p-8 rounded border border-gray-300 font-16"
               required
               disabled={!selectedSocieteId}
             >
@@ -222,14 +177,10 @@ const AlleeForm = () => {
               ))}
             </select>
           </div>
-          <div style={{ marginBottom: 16 }}>
+          <div className="mb-16">
             <label
               htmlFor="zoneSelect"
-              style={{
-                display: "block",
-                marginBottom: 6,
-                fontWeight: 500,
-              }}
+              className="block mb-6 font-bold"
             >
               Zone :
             </label>
@@ -240,13 +191,7 @@ const AlleeForm = () => {
                 setSelectedZoneId(e.target.value);
                 setMessage("");
               }}
-              style={{
-                width: "100%",
-                padding: 8,
-                borderRadius: 4,
-                border: "1px solid #ccc",
-                fontSize: 16,
-              }}
+              className="w-full p-8 rounded border border-gray-300 font-16"
               required
               disabled={!selectedSiteId}
             >
@@ -258,14 +203,10 @@ const AlleeForm = () => {
               ))}
             </select>
           </div>
-          <div style={{ marginBottom: 16 }}>
+          <div className="mb-16">
             <label
               htmlFor="alleeNom"
-              style={{
-                display: "block",
-                marginBottom: 6,
-                fontWeight: 500,
-              }}
+              className="block mb-6 font-bold"
             >
               Nom de l'allée :
             </label>
@@ -277,34 +218,17 @@ const AlleeForm = () => {
                 setAlleeNom(e.target.value);
                 setMessage("");
               }}
-              style={{
-                width: "100%",
-                padding: 8,
-                borderRadius: 4,
-                border: "1px solid #ccc",
-                fontSize: 16,
-              }}
+              className="w-full p-8 rounded border border-gray-300 font-16"
               required
             />
           </div>
-          <button
-            type="submit"
-            style={{
-              background: "#2980d9",
-              color: "#fff",
-              border: "none",
-              padding: "10px 24px",
-              borderRadius: 4,
-              fontSize: 16,
-              cursor: "pointer",
-            }}
-          >
+          <button type="submit" className="btn-primary">
             Créer
           </button>
           {message && (
             <p
+              className="mt-16"
               style={{
-                marginTop: 16,
                 color:
                   message.includes("ajoutée") || message.includes("supprimée")
                     ? "green"
@@ -319,58 +243,30 @@ const AlleeForm = () => {
 
       {allees.length > 0 && (
         <div>
-          <h3 style={{ color: "#2c3e50" }}>Liste des allées</h3>
-          <table
-            style={{
-              width: "100%",
-              borderCollapse: "collapse",
-              background: "#fff",
-            }}
-          >
+          <h3 className="text-gray-700">Liste des allées</h3>
+          <table className="w-full border-collapse">
             <thead>
-              <tr style={{ background: "#e9ecef" }}>
-                <th style={{ padding: 10, border: "1px solid #ddd" }}>ID</th>
-                <th style={{ padding: 10, border: "1px solid #ddd" }}>Nom</th>
-                <th style={{ padding: 10, border: "1px solid #ddd" }}>Zone ID</th>
-                <th style={{ padding: 10, border: "1px solid #ddd" }}>Nom de la zone</th>
-                <th style={{ padding: 10, border: "1px solid #ddd" }}>Nom du site</th>
-                <th style={{ padding: 10, border: "1px solid #ddd" }}>Nom société</th>
-                <th style={{ padding: 10, border: "1px solid #ddd" }}>Actions</th>
+              <tr className="bg-gray-100">
+                <th className="p-10 border border-gray-300">ID</th>
+                <th className="p-10 border border-gray-300">Nom</th>
+                <th className="p-10 border border-gray-300">Zone ID</th>
+                <th className="p-10 border border-gray-300">Nom de la zone</th>
+                <th className="p-10 border border-gray-300">Nom du site</th>
+                <th className="p-10 border border-gray-300">Nom société</th>
+                <th className="p-10 border border-gray-300">Actions</th>
               </tr>
             </thead>
             <tbody>
               {currentAllees.map((allee) => (
                 <tr key={allee.alleeId}>
-                  <td style={{ padding: 10, border: "1px solid #eee" }}>
-                    {allee.alleeId}
-                  </td>
-                  <td style={{ padding: 10, border: "1px solid #eee" }}>
-                    {allee.alleeNom}
-                  </td>
-                  <td style={{ padding: 10, border: "1px solid #eee" }}>
-                    {allee.alleeZoneId}
-                  </td>
-                  <td style={{ padding: 10, border: "1px solid #eee" }}>
-                    {allee.zoneNom || "—"}
-                  </td>
-                  <td style={{ padding: 10, border: "1px solid #eee" }}>
-                    {allee.siteNom || "—"}
-                  </td>
-                  <td style={{ padding: 10, border: "1px solid #eee" }}>
-                    {allee.societeNom || "—"}
-                  </td>
-                  <td style={{ padding: 10, border: "1px solid #eee" }}>
-                    <button
-                      style={{
-                        background: "#e74c3c",
-                        color: "#fff",
-                        border: "none",
-                        borderRadius: 4,
-                        padding: "6px 12px",
-                        cursor: "pointer",
-                      }}
-                      onClick={() => handleDelete(allee.alleeId)}
-                    >
+                  <td className="p-10 border border-gray-200">{allee.alleeId}</td>
+                  <td className="p-10 border border-gray-200">{allee.alleeNom}</td>
+                  <td className="p-10 border border-gray-200">{allee.alleeZoneId}</td>
+                  <td className="p-10 border border-gray-200">{allee.zoneNom || "—"}</td>
+                  <td className="p-10 border border-gray-200">{allee.siteNom || "—"}</td>
+                  <td className="p-10 border border-gray-200">{allee.societeNom || "—"}</td>
+                  <td className="p-10 border border-gray-200">
+                    <button className="btn-danger" onClick={() => handleDelete(allee.alleeId)}>
                       Supprimer
                     </button>
                   </td>
@@ -380,52 +276,20 @@ const AlleeForm = () => {
           </table>
           {/* Pagination Controls */}
           {totalPages > 1 && (
-            <div style={{ marginTop: 16, textAlign: "center" }}>
-              <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                style={{
-                  marginRight: 8,
-                  padding: "6px 12px",
-                  borderRadius: 4,
-                  border: "1px solid #2980d9",
-                  background: "#fff",
-                  color: "#2980d9",
-                  fontWeight: "bold",
-                }}
-              >
+            <div className="pagination">
+              <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
                 Précédent
               </button>
               {[...Array(totalPages)].map((_, idx) => (
                 <button
                   key={idx + 1}
                   onClick={() => handlePageChange(idx + 1)}
-                  style={{
-                    margin: "0 2px",
-                    padding: "6px 12px",
-                    borderRadius: 4,
-                    border: "1px solid #2980d9",
-                    background: currentPage === idx + 1 ? "#2980d9" : "#fff",
-                    color: currentPage === idx + 1 ? "#fff" : "#2980d9",
-                    fontWeight: "bold",
-                  }}
+                  className={currentPage === idx + 1 ? "active" : undefined}
                 >
                   {idx + 1}
                 </button>
               ))}
-              <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                style={{
-                  marginLeft: 8,
-                  padding: "6px 12px",
-                  borderRadius: 4,
-                  border: "1px solid #2980d9",
-                  background: "#fff",
-                  color: "#2980d9",
-                  fontWeight: "bold",
-                }}
-              >
+              <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
                 Suivant
               </button>
             </div>

@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using Service.IServices;
 using Service.Dtos.Operateur;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -56,5 +58,19 @@ public class OperateurController : ControllerBase
         var deleted = await _operateurService.DeleteAsync(id);
         if (!deleted) return NotFound();
         return NoContent();
+    }
+
+    [Authorize]
+    [HttpGet("me")]
+    public async Task<IActionResult> GetMyProfile()
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized();
+
+        var operateur = await _operateurService.GetByUserIdAsync(userId);
+        if (operateur == null) return NotFound();
+
+        return Ok(operateur);
     }
 }

@@ -37,5 +37,20 @@ namespace Web.Controllers.inventaire
         {
             return Ok("Statut API OK");
         }
+
+        [HttpGet("count")]
+        public async Task<ActionResult<Dictionary<string, int>>> GetStatutCounts()
+        {
+            try
+            {
+                var counts = await _statutService.GetStatutCountsAsync();
+                return Ok(counts);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Erreur StatutController : " + ex.ToString());
+                return StatusCode(500, $"Erreur serveur : {ex.Message}");
+            }
+        }
     }
 }

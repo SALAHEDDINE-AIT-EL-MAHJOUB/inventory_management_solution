@@ -387,13 +387,75 @@ const SiteList = () => {
               <td style={{ padding: 8, border: "1px solid #ddd" }}>
                 {editId === site.id ? (
                   <>
-                    <button onClick={() => handleEditSave(site.id)}>Enregistrer</button>
-                    <button onClick={handleEditCancel}>Annuler</button>
+                    <button
+                      onClick={() => handleEditSave(site.id)}
+                      style={{
+                        background: "linear-gradient(90deg, #43a047 0%, #66bb6a 100%)",
+                        color: "#fff",
+                        border: "none",
+                        borderRadius: 5,
+                        padding: "7px 16px",
+                        fontWeight: 600,
+                        marginRight: 6,
+                        boxShadow: "0 2px 6px #43a04722",
+                        transition: "background 0.2s",
+                        cursor: "pointer"
+                      }}
+                    >
+                      Enregistrer
+                    </button>
+                    <button
+                      onClick={handleEditCancel}
+                      style={{
+                        background: "linear-gradient(90deg, #e53935 0%, #ff7043 100%)",
+                        color: "#fff",
+                        border: "none",
+                        borderRadius: 5,
+                        padding: "7px 16px",
+                        fontWeight: 600,
+                        boxShadow: "0 2px 6px #e5393522",
+                        transition: "background 0.2s",
+                        cursor: "pointer"
+                      }}
+                    >
+                      Annuler
+                    </button>
                   </>
                 ) : (
                   <>
-                    <button onClick={() => handleEdit(site)}>Modifier</button>
-                    <button onClick={() => handleDelete(site.id)}>Supprimer</button>
+                    <button
+                      onClick={() => handleEdit(site)}
+                      style={{
+                        background: "linear-gradient(90deg, #1976d2 0%, #64b5f6 100%)",
+                        color: "#fff",
+                        border: "none",
+                        borderRadius: 5,
+                        padding: "7px 16px",
+                        fontWeight: 600,
+                        marginRight: 6,
+                        boxShadow: "0 2px 6px #1976d222",
+                        transition: "background 0.2s",
+                        cursor: "pointer"
+                      }}
+                    >
+                      Modifier
+                    </button>
+                    <button
+                      onClick={() => handleDelete(site.id)}
+                      style={{
+                        background: "linear-gradient(90deg, #e53935 0%, #ff7043 100%)",
+                        color: "#fff",
+                        border: "none",
+                        borderRadius: 5,
+                        padding: "7px 16px",
+                        fontWeight: 600,
+                        boxShadow: "0 2px 6px #e5393522",
+                        transition: "background 0.2s",
+                        cursor: "pointer"
+                      }}
+                    >
+                      Supprimer
+                    </button>
                   </>
                 )}
               </td>
@@ -409,12 +471,15 @@ const SiteList = () => {
             disabled={currentPage === 1}
             style={{
               marginRight: 8,
-              padding: "6px 12px",
-              borderRadius: 4,
+              padding: "7px 16px",
+              borderRadius: 5,
               border: "1px solid #1976d2",
               background: "#fff",
               color: "#1976d2",
-              fontWeight: "bold"
+              fontWeight: "bold",
+              boxShadow: "0 2px 6px #1976d222",
+              cursor: currentPage === 1 ? "not-allowed" : "pointer",
+              transition: "background 0.2s"
             }}
           >
             Précédent
@@ -425,12 +490,15 @@ const SiteList = () => {
               onClick={() => handlePageChange(idx + 1)}
               style={{
                 margin: "0 2px",
-                padding: "6px 12px",
-                borderRadius: 4,
+                padding: "7px 16px",
+                borderRadius: 5,
                 border: "1px solid #1976d2",
-                background: currentPage === idx + 1 ? "#1976d2" : "#fff",
+                background: currentPage === idx + 1 ? "linear-gradient(90deg, #1976d2 0%, #64b5f6 100%)" : "#fff",
                 color: currentPage === idx + 1 ? "#fff" : "#1976d2",
-                fontWeight: "bold"
+                fontWeight: "bold",
+                boxShadow: currentPage === idx + 1 ? "0 2px 6px #1976d222" : "none",
+                cursor: "pointer",
+                transition: "background 0.2s"
               }}
             >
               {idx + 1}
@@ -441,12 +509,15 @@ const SiteList = () => {
             disabled={currentPage === totalPages}
             style={{
               marginLeft: 8,
-              padding: "6px 12px",
-              borderRadius: 4,
+              padding: "7px 16px",
+              borderRadius: 5,
               border: "1px solid #1976d2",
               background: "#fff",
               color: "#1976d2",
-              fontWeight: "bold"
+              fontWeight: "bold",
+              boxShadow: "0 2px 6px #1976d222",
+              cursor: currentPage === totalPages ? "not-allowed" : "pointer",
+              transition: "background 0.2s"
             }}
           >
             Suivant
@@ -469,20 +540,23 @@ const SitePage = () => {
       <button
         onClick={handleShowForm}
         style={{
-          background: "#1976d2",
+          background: "linear-gradient(90deg, #1976d2 0%, #64b5f6 100%)",
           color: "#fff",
           border: "none",
-          borderRadius: 4,
-          padding: "10px 20px",
+          borderRadius: 5,
+          padding: "12px 28px",
           marginBottom: 20,
           cursor: "pointer",
-          fontSize: 16
+          fontSize: 17,
+          fontWeight: 700,
+          boxShadow: "0 2px 8px #1976d222",
+          transition: "background 0.2s"
         }}
       >
         Ajouter un site
       </button>
       {showForm && <SiteForm onClose={handleCloseForm} />}
-      <SiteList /> {/* Utilise le vrai composant avec boutons */}
+      <SiteList />
     </div>
   );
 };

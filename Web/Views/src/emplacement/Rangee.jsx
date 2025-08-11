@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import "./emplacement.css";
 
 const API_URL = "/api/rangee";
 
@@ -217,20 +218,10 @@ function Rangee() {
   };
 
   return (
-    <div style={{ maxWidth: 900, margin: "30px auto", background: "#e3f0fa", padding: 24, borderRadius: 12 }}>
-      <h2 style={{ color: "#357ab7", marginBottom: 24 }}>Gestion des Rangées</h2>
+    <div className="emp">
+      <h2>Gestion des Rangées</h2>
       {!showForm && (
-        <button
-          style={{
-            marginBottom: 20,
-            padding: "10px 24px",
-            background: "#357ab7",
-            color: "#fff",
-            border: "none",
-            borderRadius: 6,
-            fontWeight: "bold",
-            cursor: "pointer"
-          }}
+        <button className="btn-primary" style={{ marginBottom: 20 }}
           onClick={() => {
             setShowForm(true);
             setEditing(false);
@@ -249,20 +240,7 @@ function Rangee() {
       )}
 
       {showForm && (
-        <form
-          onSubmit={handleSubmit}
-          style={{
-            background: "#fff",
-            padding: 20,
-            borderRadius: 8,
-            marginBottom: 30,
-            boxShadow: "0 2px 8px #0001",
-            display: "flex",
-            flexWrap: "wrap",
-            gap: 16,
-            alignItems: "center"
-          }}
-        >
+        <form onSubmit={handleSubmit} className="card form-grid mb-24">
           <select
             name="societeId"
             value={form.societeId}
@@ -330,31 +308,10 @@ function Rangee() {
             required
             style={{ flex: "1 1 180px", padding: 8, borderRadius: 4, border: "1px solid #ccc" }}
           />
-          <button
-            type="submit"
-            style={{
-              background: "#357ab7",
-              color: "#fff",
-              border: "none",
-              borderRadius: 6,
-              padding: "10px 20px",
-              fontWeight: "bold",
-              cursor: "pointer"
-            }}
-          >
+          <button type="submit" className="btn-primary">
             {editing ? "Modifier" : "Ajouter"}
           </button>
-          <button
-            type="button"
-            style={{
-              background: "#eee",
-              color: "#357ab7",
-              border: "1px solid #357ab7",
-              borderRadius: 6,
-              padding: "10px 20px",
-              fontWeight: "bold",
-              cursor: "pointer"
-            }}
+          <button type="button" className="btn-secondary"
             onClick={() => {
               setEditing(false);
               setShowForm(false);
@@ -373,17 +330,8 @@ function Rangee() {
         </form>
       )}
 
-      <table
-        style={{
-          width: "100%",
-          borderCollapse: "collapse",
-          background: "#fff",
-          borderRadius: 8,
-          overflow: "hidden",
-          boxShadow: "0 2px 8px #0001"
-        }}
-      >
-        <thead style={{ background: "#357ab7", color: "#fff" }}>
+      <table>
+        <thead>
           <tr>
             <th style={{ padding: 10 }}>ID</th>
             <th style={{ padding: 10 }}>Société</th>
@@ -396,7 +344,7 @@ function Rangee() {
         </thead>
         <tbody>
           {currentRangees.map((r) => (
-            <tr key={r.rangeeId} style={{ borderBottom: "1px solid #eee" }}>
+            <tr key={r.rangeeId}>
               <td style={{ padding: 8 }}>{r.rangeeId}</td>
               <td style={{ padding: 8 }}>{getSocieteNom(r.societeId)}</td>
               <td style={{ padding: 8 }}>{getSiteNom(r.siteId)}</td>
@@ -404,31 +352,10 @@ function Rangee() {
               <td style={{ padding: 8 }}>{getAlleeNom(r.alleeId)}</td>
               <td style={{ padding: 8 }}>{r.rangeeNom}</td>
               <td style={{ padding: 8 }}>
-                <button
-                  onClick={() => handleEdit(r)}
-                  style={{
-                    marginRight: 8,
-                    background: "#ffb300",
-                    color: "#fff",
-                    border: "none",
-                    borderRadius: 4,
-                    padding: "6px 12px",
-                    cursor: "pointer"
-                  }}
-                >
+                <button onClick={() => handleEdit(r)} className="btn-secondary" style={{ marginRight: 8 }}>
                   Modifier
                 </button>
-                <button
-                  onClick={() => handleDelete(r.rangeeId)}
-                  style={{
-                    background: "#e53935",
-                    color: "#fff",
-                    border: "none",
-                    borderRadius: 4,
-                    padding: "6px 12px",
-                    cursor: "pointer"
-                  }}
-                >
+                <button onClick={() => handleDelete(r.rangeeId)} className="btn-danger">
                   Supprimer
                 </button>
               </td>
@@ -438,36 +365,20 @@ function Rangee() {
       </table>
       {/* Pagination Controls */}
       {totalPages > 1 && (
-        <div style={{ marginTop: 16, textAlign: "center" }}>
-          <button
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-            style={{ marginRight: 8, padding: "6px 12px", borderRadius: 4, border: "1px solid #357ab7", background: "#fff", color: "#357ab7", fontWeight: "bold" }}
-          >
+        <div className="pagination">
+          <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
             Précédent
           </button>
           {[...Array(totalPages)].map((_, idx) => (
             <button
               key={idx + 1}
               onClick={() => handlePageChange(idx + 1)}
-              style={{
-                margin: "0 2px",
-                padding: "6px 12px",
-                borderRadius: 4,
-                border: "1px solid #357ab7",
-                background: currentPage === idx + 1 ? "#357ab7" : "#fff",
-                color: currentPage === idx + 1 ? "#fff" : "#357ab7",
-                fontWeight: "bold"
-              }}
+              className={currentPage === idx + 1 ? "active" : undefined}
             >
               {idx + 1}
             </button>
           ))}
-          <button
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-            style={{ marginLeft: 8, padding: "6px 12px", borderRadius: 4, border: "1px solid #357ab7", background: "#fff", color: "#357ab7", fontWeight: "bold" }}
-          >
+          <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
             Suivant
           </button>
         </div>

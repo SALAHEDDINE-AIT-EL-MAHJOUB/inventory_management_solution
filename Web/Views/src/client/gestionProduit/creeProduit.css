@@ -6,6 +6,8 @@
   padding: 32px 24px 24px 24px;
   max-width: 1100px;
   margin: 32px auto;
+  animation: fadeInUp 320ms ease both;
+  transition: box-shadow 200ms ease, transform 200ms ease;
 }
 
 .cree-produit-header {
@@ -21,10 +23,30 @@
   margin-left: 8px;
 }
 
+.cree-produit-header h2 {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cree-produit-icon {
+  width: 22px;
+  height: 22px;
+  color: #6c63ff;
+}
+
 .cree-produit-form {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 24px 32px;
+}
+
+.cree-produit-form > div {
+  transition: transform 180ms ease, background 180ms ease;
+}
+
+.cree-produit-form > div:focus-within {
+  transform: translateY(-2px);
 }
 
 .cree-produit-form label {
@@ -42,13 +64,15 @@
   background: #fafbfc;
   font-size: 1rem;
   margin-bottom: 2px;
-  transition: border 0.2s;
+  transition: border 0.2s, box-shadow 0.2s, background 0.2s;
 }
 
 .cree-produit-form input:focus,
 .cree-produit-form select:focus {
   border: 1.5px solid #6c63ff;
   outline: none;
+  box-shadow: 0 0 0 3px rgba(108,99,255,0.15);
+  background: #fff;
 }
 
 .cree-produit-footer {
@@ -67,7 +91,7 @@
   padding: 12px 32px;
   font-size: 1.1rem;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -75,6 +99,12 @@
 
 .cree-produit-btn:active {
   background: linear-gradient(90deg, #3b82f6 0%, #6c63ff 100%);
+  transform: translateY(1px);
+}
+
+.cree-produit-btn:hover {
+  box-shadow: 0 6px 18px rgba(108,99,255,0.25);
+  transform: translateY(-1px);
 }
 
 .cree-produit-message {
@@ -83,6 +113,17 @@
   color: #e53e3e;
   font-weight: 500;
   text-align: center;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (max-width: 900px) {

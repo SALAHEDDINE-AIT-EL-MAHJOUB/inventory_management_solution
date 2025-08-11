@@ -106,14 +106,15 @@ export default function PrimarySearchAppBar({ onSelectPage }: Props) {
 
   const handleLogout = () => {
     handleMenuClose();
-    // Si tu as une API de logout, appelle-la ici
+    // Appelle l'API de logout si elle existe
     fetch("/api/logout", { method: "POST", credentials: "include" })
       .finally(() => {
-        // Nettoie le localStorage/sessionStorage si besoin
+        // Nettoie le localStorage/sessionStorage et oublie le profil
         localStorage.clear();
         sessionStorage.clear();
+        setAdminName(""); // <-- Oublie le nom affiché dans la navbar
         // Redirige vers la page de login
-        navigate("/login");
+        window.location.href = "/login"; // <-- Redirection immédiate
       });
   };
 
@@ -255,6 +256,16 @@ export default function PrimarySearchAppBar({ onSelectPage }: Props) {
   >
     <i data-feather="user-plus"></i>
     <span>Créer Client</span>
+  </button>
+</li>
+          <li className="navbar__item">
+  <button
+    className="navbar__link"
+    style={{ background: "none", border: "none", color: "#fff", width: "100%", textAlign: "left", padding: "0.5rem 1.5rem", cursor: "pointer" }}
+    onClick={() => onSelectPage("dashboard")}
+  >
+    <i data-feather="home"></i>
+    <span style={{ marginLeft: 8 }}>Dashboard</span>
   </button>
 </li>
           {/* ...autres liens... */}

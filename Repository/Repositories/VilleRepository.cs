@@ -25,8 +25,12 @@ namespace Repository.Repositories
         public async Task<List<Ville>> GetByIds(List<int?> ids)
         {
             return await _context.Villes
-                .Where(v=>ids.Contains(v.Id))
+                .Where(v => ids.Contains(v.Id))
                 .ToListAsync();
         }
+        public async Task<int> CountAsync()
+{
+    return await _context.Sites.CountAsync();
+}
     }
 }

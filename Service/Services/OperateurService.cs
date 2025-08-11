@@ -80,5 +80,6 @@ namespace Service.Services
             await _operateurRepository.DeleteAsync(operateur);
             return true;
         }
+   
     }
 }

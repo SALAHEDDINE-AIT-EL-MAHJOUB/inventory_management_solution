@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Repository.IRepositories
 {
     public interface IVilleRepository : IGenericRepository<Ville>
-    {
+    {Task<int> CountAsync();
        public Task<List<Ville>> GetByIds(List<int?> ids);
     }
 }

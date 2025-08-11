@@ -4,11 +4,12 @@ import AdminRegisterView from "../admin/AdminRegisterView";
 import Login from "../admin/Login";
 import PrimarySearchAppBar from "../admin/Navbar/navbar";
 import UpdateProfile from "../admin/updateprofile";
-import ClientProfile from "../admin/client/ClientProfile"; // Ajoute cet import
+import ClientProfile from "../admin/client/ClientProfile";
 import CreateClientForm from "../admin/client/CreateClientForm";
+import AdminDashboard from "../admin/AdminDashboard";
 
 export default function AdminMainView() {
-  const [page, setPage] = useState("list");
+  const [page, setPage] = useState("dashboard");
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
   const adminUserId = "1"; // Remplace par l'ID utilisateur admin réel
 
@@ -20,9 +21,9 @@ export default function AdminMainView() {
   }, []);
 
   if (isLoggedIn === null) return <div>Chargement...</div>;
-  if (!isLoggedIn) {
-    return <Login onLoginSuccess={() => setIsLoggedIn(true)} />;
-  }
+ if (!isLoggedIn) {
+  return <Login onLoginSuccess={() => setIsLoggedIn(true)} onRedirect={() => {}} />;
+}
 
   return (
     <>
@@ -45,10 +46,11 @@ export default function AdminMainView() {
             minHeight: "calc(100vh - 120px)",
           }}
         >
+          {page === "dashboard" && <AdminDashboard />}
           {page === "list" && <AdminListView />}
           {page === "register" && <AdminRegisterView />}
           {page === "updateprofile" && <UpdateProfile onSelectPage={setPage} />}
-          {page === "client" && <ClientProfile  />} 
+          {page === "client" && <ClientProfile />}
           {page === "createclient" && (
             <CreateClientForm
               adminUserId={adminUserId}
