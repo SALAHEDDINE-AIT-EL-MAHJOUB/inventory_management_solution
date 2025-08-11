@@ -15,6 +15,10 @@ function Rangee() {
   const [editing, setEditing] = useState(false);
   const [showForm, setShowForm] = useState(false);
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const rangeesPerPage = 6;
+
   // Pour listes déroulantes hiérarchiques
   const [societes, setSocietes] = useState([]);
   const [sites, setSites] = useState([]);
@@ -24,6 +28,9 @@ function Rangee() {
   useEffect(() => {
     fetchRangees();
     fetchSocietes();
+    fetchAllSites();
+    fetchAllZones();
+    fetchAllAllees();
   }, []);
 
   const fetchRangees = async () => {
@@ -36,6 +43,24 @@ function Rangee() {
     const res = await fetch(`/api/client-societes`);
     const data = await res.json();
     setSocietes(data);
+  };
+
+  const fetchAllSites = async () => {
+    const res = await fetch(`/api/site`);
+    const data = await res.json();
+    setSites(data);
+  };
+
+  const fetchAllZones = async () => {
+    const res = await fetch(`/api/zone`);
+    const data = await res.json();
+    setZones(data);
+  };
+
+  const fetchAllAllees = async () => {
+    const res = await fetch(`/api/allee`);
+    const data = await res.json();
+    setAllees(data);
   };
 
   const fetchSites = async (societeId) => {
@@ -161,6 +186,34 @@ function Rangee() {
   const handleDelete = async (id) => {
     await fetch(`${API_URL}/${id}`, { method: "DELETE" });
     fetchRangees();
+  };
+
+  // Fonctions utilitaires pour trouver les noms
+  const getSocieteNom = (id) => {
+    const s = societes.find(x => x.id === id || x.Id === id);
+    return s ? (s.nom || s.Nom || s.raisonSociale || s.RaisonSociale) : id;
+  };
+  const getSiteNom = (id) => {
+    const s = sites.find(x => (x.siteId || x.id) === id);
+    return s ? (s.siteNom || s.nom || s.Nom) : id;
+  };
+  const getZoneNom = (id) => {
+    const z = zones.find(x => x.zoneId === id);
+    return z ? (z.zoneNom || z.nom || z.Nom) : id;
+  };
+  const getAlleeNom = (id) => {
+    const a = allees.find(x => x.alleeId === id);
+    return a ? (a.alleeNom || a.nom || a.Nom) : id;
+  };
+
+  // Pagination helpers
+  const indexOfLastRangee = currentPage * rangeesPerPage;
+  const indexOfFirstRangee = indexOfLastRangee - rangeesPerPage;
+  const currentRangees = rangees.slice(indexOfFirstRangee, indexOfLastRangee);
+  const totalPages = Math.ceil(rangees.length / rangeesPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
   };
 
   return (
@@ -342,13 +395,13 @@ function Rangee() {
           </tr>
         </thead>
         <tbody>
-          {rangees.map((r) => (
+          {currentRangees.map((r) => (
             <tr key={r.rangeeId} style={{ borderBottom: "1px solid #eee" }}>
               <td style={{ padding: 8 }}>{r.rangeeId}</td>
-              <td style={{ padding: 8 }}>{r.societeId}</td>
-              <td style={{ padding: 8 }}>{r.siteId}</td>
-              <td style={{ padding: 8 }}>{r.zoneId}</td>
-              <td style={{ padding: 8 }}>{r.alleeId}</td>
+              <td style={{ padding: 8 }}>{getSocieteNom(r.societeId)}</td>
+              <td style={{ padding: 8 }}>{getSiteNom(r.siteId)}</td>
+              <td style={{ padding: 8 }}>{getZoneNom(r.zoneId)}</td>
+              <td style={{ padding: 8 }}>{getAlleeNom(r.alleeId)}</td>
               <td style={{ padding: 8 }}>{r.rangeeNom}</td>
               <td style={{ padding: 8 }}>
                 <button
@@ -383,6 +436,42 @@ function Rangee() {
           ))}
         </tbody>
       </table>
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div style={{ marginTop: 16, textAlign: "center" }}>
+          <button
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            style={{ marginRight: 8, padding: "6px 12px", borderRadius: 4, border: "1px solid #357ab7", background: "#fff", color: "#357ab7", fontWeight: "bold" }}
+          >
+            Précédent
+          </button>
+          {[...Array(totalPages)].map((_, idx) => (
+            <button
+              key={idx + 1}
+              onClick={() => handlePageChange(idx + 1)}
+              style={{
+                margin: "0 2px",
+                padding: "6px 12px",
+                borderRadius: 4,
+                border: "1px solid #357ab7",
+                background: currentPage === idx + 1 ? "#357ab7" : "#fff",
+                color: currentPage === idx + 1 ? "#fff" : "#357ab7",
+                fontWeight: "bold"
+              }}
+            >
+              {idx + 1}
+            </button>
+          ))}
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            style={{ marginLeft: 8, padding: "6px 12px", borderRadius: 4, border: "1px solid #357ab7", background: "#fff", color: "#357ab7", fontWeight: "bold" }}
+          >
+            Suivant
+          </button>
+        </div>
+      )}
     </div>
   );
 }

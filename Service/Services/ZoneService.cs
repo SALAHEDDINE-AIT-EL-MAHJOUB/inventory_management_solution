@@ -68,5 +68,15 @@ namespace Service.Services
     {
         return await _zoneRepository.GetByIdWithSiteAndSocieteAsync(id);
     }
+
+        public async Task<Zone?> UpdateAsync(Zone zone)
+        {
+            return await _zoneRepository.UpdateAsync(zone);
+        }
+
+        public async Task<bool> DeleteAsync(int id)
+        {
+            return await _zoneRepository.DeleteAsync(id);
+        }
     }
 }

@@ -12,5 +12,6 @@ namespace Service.IServices
         Task<Operateur?> CreateAsync(OperateurCreateDto dto);
         Task<bool> UpdateAsync(int id, OperateurUpdateDto dto);
         Task<bool> DeleteAsync(int id);
+        Task<List<Operateur>> GetBySiteIdAsync(int siteId);
     }
 }

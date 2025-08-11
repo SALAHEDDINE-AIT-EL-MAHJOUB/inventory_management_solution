@@ -12,7 +12,7 @@ namespace Service.IServices
         Task UpdateAsync(Rangee rangee);
         Task DeleteAsync(int id);
 
-        // Ajout des méthodes pour la création hiérarchique
+        Task<IEnumerable<Rangee>> GetByAlleeIdAsync(int alleeId);
         Task<IEnumerable<Societe>> GetSocietesAsync();
         Task<IEnumerable<Site>> GetSitesBySocieteIdAsync(int societeId);
         Task<IEnumerable<Zone>> GetZonesBySiteIdAsync(int siteId);

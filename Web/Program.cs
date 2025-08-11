@@ -58,6 +58,7 @@ builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
     });
 
 builder.Services.AddCors(options =>
@@ -103,11 +104,25 @@ builder.Services.AddScoped<IEtageService, EtageService>();
 builder.Services.AddScoped<IOperateurAuthService, OperateurAuthService>();
 builder.Services.AddScoped<IOperateurRepository, OperateurRepository>();
 
+
 builder.Services.AddScoped<IOperateurService, OperateurService>();
 builder.Services.AddScoped<IEquipeService, EquipeService>();
 builder.Services.AddScoped<IEquipeRepository, EquipeRepository>();
 builder.Services.AddScoped<IEquipeOperateurService, EquipeOperateurService>();
 builder.Services.AddScoped<IEquipeOperateurRepository, EquipeOperateurRepository>();
+builder.Services.AddScoped<IInventaireService, InventaireService>();
+builder.Services.AddScoped<IInventaireRepository, InventaireRepository>();
+builder.Services.AddScoped<ICodebarreProduitRepository, CodebarreProduitRepository>();
+builder.Services.AddScoped<ICodebarreProduitService, CodebarreProduitService>();
+builder.Services.AddScoped<ISocieteService, SocieteService>();
+builder.Services.AddScoped<IProduitService, ProduitService>();
+builder.Services.AddScoped<IProduitRepository, ProduitRepository>();
+builder.Services.AddScoped<IFournisseurService, FournisseurService>();
+builder.Services.AddScoped<IFournisseurRepository, FournisseurRepository>();
+builder.Services.AddScoped<IStatutRepository, StatutRepository>();
+builder.Services.AddScoped<IStatutService, StatutService>();
+builder.Services.AddScoped<ITypeInventaireRepository, TypeInventaireRepository>();
+builder.Services.AddScoped<ITypeInventaireService, TypeInventaireService>();
 
 
 var app = builder.Build();
@@ -135,5 +150,9 @@ app.MapControllerRoute(
 
 app.MapControllers();
 app.MapFallbackToFile("index.html");
+
+var scope = app.Services.CreateScope();
+var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+StatutSeeder.SeedStatut(dbContext);
 
 app.Run();

@@ -12,5 +12,7 @@ namespace Service.IServices
         Task UpdateAsync(Etage entity);
         Task DeleteAsync(Etage entity);
         Task SaveAsync();
+        Task<IEnumerable<Etage>> GetByRangeeIdAsync(int rangeeId);
+
     }
 }

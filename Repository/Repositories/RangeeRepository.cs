@@ -93,5 +93,12 @@ namespace Repository.Repositories
             await _dbSet.AddAsync(rangee);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<IEnumerable<Rangee>> GetByAlleeIdAsync(int alleeId)
+        {
+            return await _dbSet
+                .Where(r => r.AlleeId == alleeId && !r.IsDeleted)
+                .ToListAsync();
+        }
     }
 }

@@ -12,6 +12,9 @@ const AlleeForm = () => {
   const [message, setMessage] = useState("");
   const [allees, setAllees] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const alleesPerPage = 10;
 
   // Charger les sociétés au montage
   useEffect(() => {
@@ -99,6 +102,16 @@ const AlleeForm = () => {
   const handleShowForm = () => {
     setShowForm((prev) => !prev);
     setMessage("");
+  };
+
+  // Pagination helpers
+  const indexOfLastAllee = currentPage * alleesPerPage;
+  const indexOfFirstAllee = indexOfLastAllee - alleesPerPage;
+  const currentAllees = allees.slice(indexOfFirstAllee, indexOfLastAllee);
+  const totalPages = Math.ceil(allees.length / alleesPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
   };
 
   return (
@@ -326,7 +339,7 @@ const AlleeForm = () => {
               </tr>
             </thead>
             <tbody>
-              {allees.map((allee) => (
+              {currentAllees.map((allee) => (
                 <tr key={allee.alleeId}>
                   <td style={{ padding: 10, border: "1px solid #eee" }}>
                     {allee.alleeId}
@@ -365,6 +378,58 @@ const AlleeForm = () => {
               ))}
             </tbody>
           </table>
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div style={{ marginTop: 16, textAlign: "center" }}>
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                style={{
+                  marginRight: 8,
+                  padding: "6px 12px",
+                  borderRadius: 4,
+                  border: "1px solid #2980d9",
+                  background: "#fff",
+                  color: "#2980d9",
+                  fontWeight: "bold",
+                }}
+              >
+                Précédent
+              </button>
+              {[...Array(totalPages)].map((_, idx) => (
+                <button
+                  key={idx + 1}
+                  onClick={() => handlePageChange(idx + 1)}
+                  style={{
+                    margin: "0 2px",
+                    padding: "6px 12px",
+                    borderRadius: 4,
+                    border: "1px solid #2980d9",
+                    background: currentPage === idx + 1 ? "#2980d9" : "#fff",
+                    color: currentPage === idx + 1 ? "#fff" : "#2980d9",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {idx + 1}
+                </button>
+              ))}
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                style={{
+                  marginLeft: 8,
+                  padding: "6px 12px",
+                  borderRadius: 4,
+                  border: "1px solid #2980d9",
+                  background: "#fff",
+                  color: "#2980d9",
+                  fontWeight: "bold",
+                }}
+              >
+                Suivant
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

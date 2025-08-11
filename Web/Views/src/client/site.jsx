@@ -26,7 +26,12 @@ const SiteForm = ({ onClose }) => {
 
   const handleChange = e => {
     const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
+    setForm(prev => ({
+      ...prev,
+      [name]: value,
+      // Si on change la ville, on réinitialise la société
+      ...(name === "siteVilleId" ? { societeId: "" } : {})
+    }));
   };
 
   const handleSubmit = async e => {
@@ -51,84 +56,138 @@ const SiteForm = ({ onClose }) => {
         siteVilleId: "",
         societeId: "",
       });
-      if (onClose) onClose(); // Fermer le formulaire après ajout
+      if (onClose) onClose();
     } catch (err) {
-      setMessage("Erreur lors de la création du site : " + JSON.stringify(err.response?.data || err.message));
+      setMessage("Erreur serveur : " + (err.response?.data || err.message));
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ margin: "20px 0", padding: 20, border: "1px solid #ccc", borderRadius: 8, background: "#f9f9f9" }}>
-      <h3>Créer un site</h3>
-      <div>
-        <label>Nom du site :</label>
-        <input
-          type="text"
-          name="siteNom"
-          value={form.siteNom}
-          onChange={handleChange}
-          required
-        />
+    <form
+      onSubmit={handleSubmit}
+      style={{
+        margin: "20px 0",
+        padding: 24,
+        border: "1px solid #1976d2",
+        borderRadius: 10,
+        background: "#f4f8fb",
+        boxShadow: "0 2px 8px #e3eaf2",
+        maxWidth: 500
+      }}
+    >
+      <h3 style={{ color: "#1976d2", marginBottom: 20 }}>Créer un site</h3>
+      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <label style={{ fontWeight: 500 }}>Nom du site :</label>
+          <input
+            type="text"
+            name="siteNom"
+            value={form.siteNom}
+            onChange={handleChange}
+            required
+            style={{ padding: 8, borderRadius: 5, border: "1px solid #b3c0d1" }}
+          />
+        </div>
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <label style={{ fontWeight: 500 }}>Adresse :</label>
+          <input
+            type="text"
+            name="adress"
+            value={form.adress}
+            onChange={handleChange}
+            required
+            style={{ padding: 8, borderRadius: 5, border: "1px solid #b3c0d1" }}
+          />
+        </div>
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <label style={{ fontWeight: 500 }}>Téléphone :</label>
+          <input
+            type="number"
+            name="siteTelephone"
+            value={form.siteTelephone}
+            onChange={handleChange}
+            style={{ padding: 8, borderRadius: 5, border: "1px solid #b3c0d1" }}
+          />
+        </div>
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <label style={{ fontWeight: 500 }}>Email :</label>
+          <input
+            type="email"
+            name="email"
+            value={form.email}
+            onChange={handleChange}
+            style={{ padding: 8, borderRadius: 5, border: "1px solid #b3c0d1" }}
+          />
+        </div>
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <label style={{ fontWeight: 500 }}>Ville :</label>
+          <select
+            name="siteVilleId"
+            value={form.siteVilleId}
+            onChange={handleChange}
+            required
+            style={{ padding: 8, borderRadius: 5, border: "1px solid #b3c0d1" }}
+          >
+            <option value="">Choisir une ville</option>
+            {villes.map(v => (
+              <option key={v.id} value={v.id}>{v.nom}</option>
+            ))}
+          </select>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <label style={{ fontWeight: 500 }}>Société :</label>
+          <select
+            name="societeId"
+            value={form.societeId}
+            onChange={handleChange}
+            required
+            disabled={!form.siteVilleId}
+            style={{
+              padding: 8,
+              borderRadius: 5,
+              border: "1px solid #b3c0d1",
+              background: !form.siteVilleId ? "#e0e0e0" : "#fff"
+            }}
+          >
+            <option value="">Choisir une société</option>
+            {societes.map(s => (
+              <option key={s.id} value={s.id}>{s.nom}</option>
+            ))}
+          </select>
+        </div>
       </div>
-      <div>
-        <label>Adresse :</label>
-        <input
-          type="text"
-          name="adress"
-          value={form.adress}
-          onChange={handleChange}
-          required
-        />
-      </div>
-      <div>
-        <label>Téléphone :</label>
-        <input
-          type="number"
-          name="siteTelephone"
-          value={form.siteTelephone}
-          onChange={handleChange}
-        />
-      </div>
-      <div>
-        <label>Email :</label>
-        <input
-          type="email"
-          name="email"
-          value={form.email}
-          onChange={handleChange}
-        />
-      </div>
-      <div>
-        <label>Ville :</label>
-        <select
-          name="siteVilleId"
-          value={form.siteVilleId}
-          onChange={handleChange}
-          required
+      <div style={{ marginTop: 18, display: "flex", gap: 10 }}>
+        <button
+          type="submit"
+          style={{
+            background: "#1976d2",
+            color: "#fff",
+            border: "none",
+            borderRadius: 5,
+            padding: "10px 20px",
+            fontWeight: 600,
+            cursor: "pointer"
+          }}
         >
-          <option value="">Choisir une ville</option>
-          {villes.map(v => (
-            <option key={v.id} value={v.id}>{v.nom}</option>
-          ))}
-        </select>
-      </div>
-      <div>
-        <label>Société :</label>
-        <select
-          name="societeId"
-          value={form.societeId}
-          onChange={handleChange}
-          required
+          Créer le site
+        </button>
+        <button
+          type="button"
+          style={{
+            background: "#e53935",
+            color: "#fff",
+            border: "none",
+            borderRadius: 5,
+            padding: "10px 20px",
+            fontWeight: 600,
+            cursor: "pointer"
+          }}
+          onClick={onClose}
         >
-          <option value="">Choisir une société</option>
-          {societes.map(s => (
-            <option key={s.id} value={s.id}>{s.raisonSociale || s.nom}</option>
-          ))}
-        </select>
+          Annuler
+        </button>
       </div>
-      <button type="submit" style={{ marginTop: 10 }}>Créer le site</button>
-      <button type="button" style={{ marginLeft: 10 }} onClick={onClose}>Annuler</button>
-      {message && <div style={{ marginTop: 10 }}>{message}</div>}
+      {message && <div style={{ marginTop: 14, color: "#1976d2" }}>{message}</div>}
     </form>
   );
 };
@@ -137,19 +196,104 @@ const SiteForm = ({ onClose }) => {
 const SiteList = () => {
   const [sites, setSites] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [editId, setEditId] = useState(null);
+  const [editValues, setEditValues] = useState({});
+  const [message, setMessage] = useState("");
+  const [villes, setVilles] = useState([]);
+  const [societes, setSocietes] = useState([]);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const sitesPerPage = 10;
 
   useEffect(() => {
+    fetchSites();
+    axios.get("/api/ville")
+      .then(res => setVilles(res.data))
+      .catch(() => setVilles([]));
+    axios.get("/api/client-societes")
+      .then(res => setSocietes(res.data))
+      .catch(() => setSocietes([]));
+  }, []);
+
+  const fetchSites = () => {
+    setLoading(true);
     axios.get("/api/site")
       .then(res => setSites(res.data))
       .catch(() => setSites([]))
       .finally(() => setLoading(false));
-  }, []);
+  };
+
+  const handleEdit = (site) => {
+    setEditId(site.id);
+    setEditValues({
+      siteNom: site.siteNom,
+      adress: site.adress,
+      siteTelephone: site.siteTelephone,
+      email: site.email,
+      siteVilleId: site.siteVilleId,
+      societeId: site.societeId
+    });
+  };
+
+  const handleEditChange = (field, value) => {
+    setEditValues(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleEditSave = async (id) => {
+    try {
+      await axios.put(`/api/site/${id}`, { id, ...editValues });
+      setEditId(null);
+      setEditValues({});
+      fetchSites();
+      setMessage("Site modifié !");
+    } catch (err) {
+      setMessage("Erreur lors de la modification.");
+    }
+  };
+
+  const handleEditCancel = () => {
+    setEditId(null);
+    setEditValues({});
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Voulez-vous vraiment supprimer ce site ?")) return;
+    try {
+      await axios.delete(`/api/site/${id}`);
+      setSites(sites.filter(s => s.id !== id));
+      setMessage("Site supprimé !");
+    } catch (err) {
+      setMessage("Erreur lors de la suppression.");
+    }
+  };
+
+  // Utilitaires pour trouver le nom à partir de l'id
+  const getVilleNom = (id) => {
+    const ville = villes.find(v => v.id === id);
+    return ville ? ville.nom : id;
+  };
+  const getSocieteNom = (id) => {
+    const soc = societes.find(s => s.id === id);
+    return soc ? soc.nom : id;
+  };
+
+  // Pagination helpers
+  const indexOfLastSite = currentPage * sitesPerPage;
+  const indexOfFirstSite = indexOfLastSite - sitesPerPage;
+  const currentSites = sites.slice(indexOfFirstSite, indexOfLastSite);
+  const totalPages = Math.ceil(sites.length / sitesPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
 
   if (loading) return <div>Chargement...</div>;
 
   return (
     <div>
       <h2>Liste des sites</h2>
+      {message && <div style={{ margin: "10px 0", color: "#1976d2" }}>{message}</div>}
       <table style={{
         borderCollapse: "collapse",
         width: "100%",
@@ -164,21 +308,151 @@ const SiteList = () => {
             <th style={{ padding: 8, border: "1px solid #ddd" }}>Email</th>
             <th style={{ padding: 8, border: "1px solid #ddd" }}>Ville</th>
             <th style={{ padding: 8, border: "1px solid #ddd" }}>Société</th>
+            <th style={{ padding: 8, border: "1px solid #ddd" }}>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {sites.map(site => (
+          {currentSites.map(site => (
             <tr key={site.id}>
-              <td style={{ padding: 8, border: "1px solid #ddd" }}>{site.siteNom}</td>
-              <td style={{ padding: 8, border: "1px solid #ddd" }}>{site.adress}</td>
-              <td style={{ padding: 8, border: "1px solid #ddd" }}>{site.siteTelephone}</td>
-              <td style={{ padding: 8, border: "1px solid #ddd" }}>{site.email}</td>
-              <td style={{ padding: 8, border: "1px solid #ddd" }}>{site.siteVilleId}</td>
-              <td style={{ padding: 8, border: "1px solid #ddd" }}>{site.societeId}</td>
+              <td style={{ padding: 8, border: "1px solid #ddd" }}>
+                {editId === site.id ? (
+                  <input
+                    value={editValues.siteNom}
+                    onChange={e => handleEditChange("siteNom", e.target.value)}
+                  />
+                ) : (
+                  site.siteNom
+                )}
+              </td>
+              <td style={{ padding: 8, border: "1px solid #ddd" }}>
+                {editId === site.id ? (
+                  <input
+                    value={editValues.adress}
+                    onChange={e => handleEditChange("adress", e.target.value)}
+                  />
+                ) : (
+                  site.adress
+                )}
+              </td>
+              <td style={{ padding: 8, border: "1px solid #ddd" }}>
+                {editId === site.id ? (
+                  <input
+                    value={editValues.siteTelephone}
+                    onChange={e => handleEditChange("siteTelephone", e.target.value)}
+                  />
+                ) : (
+                  site.siteTelephone
+                )}
+              </td>
+              <td style={{ padding: 8, border: "1px solid #ddd" }}>
+                {editId === site.id ? (
+                  <input
+                    value={editValues.email}
+                    onChange={e => handleEditChange("email", e.target.value)}
+                  />
+                ) : (
+                  site.email
+                )}
+              </td>
+              <td style={{ padding: 8, border: "1px solid #ddd" }}>
+                {editId === site.id ? (
+                  <select
+                    value={editValues.siteVilleId}
+                    onChange={e => handleEditChange("siteVilleId", e.target.value)}
+                  >
+                    <option value="">Choisir une ville</option>
+                    {villes.map(v => (
+                      <option key={v.id} value={v.id}>{v.nom}</option>
+                    ))}
+                  </select>
+                ) : (
+                  getVilleNom(site.siteVilleId)
+                )}
+              </td>
+              <td style={{ padding: 8, border: "1px solid #ddd" }}>
+                {editId === site.id ? (
+                  <select
+                    value={editValues.societeId}
+                    onChange={e => handleEditChange("societeId", e.target.value)}
+                  >
+                    <option value="">Choisir une société</option>
+                    {societes.map(s => (
+                      <option key={s.id} value={s.id}>{s.nom}</option>
+                    ))}
+                  </select>
+                ) : (
+                  getSocieteNom(site.societeId)
+                )}
+              </td>
+              <td style={{ padding: 8, border: "1px solid #ddd" }}>
+                {editId === site.id ? (
+                  <>
+                    <button onClick={() => handleEditSave(site.id)}>Enregistrer</button>
+                    <button onClick={handleEditCancel}>Annuler</button>
+                  </>
+                ) : (
+                  <>
+                    <button onClick={() => handleEdit(site)}>Modifier</button>
+                    <button onClick={() => handleDelete(site.id)}>Supprimer</button>
+                  </>
+                )}
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div style={{ marginTop: 16, textAlign: "center" }}>
+          <button
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            style={{
+              marginRight: 8,
+              padding: "6px 12px",
+              borderRadius: 4,
+              border: "1px solid #1976d2",
+              background: "#fff",
+              color: "#1976d2",
+              fontWeight: "bold"
+            }}
+          >
+            Précédent
+          </button>
+          {[...Array(totalPages)].map((_, idx) => (
+            <button
+              key={idx + 1}
+              onClick={() => handlePageChange(idx + 1)}
+              style={{
+                margin: "0 2px",
+                padding: "6px 12px",
+                borderRadius: 4,
+                border: "1px solid #1976d2",
+                background: currentPage === idx + 1 ? "#1976d2" : "#fff",
+                color: currentPage === idx + 1 ? "#fff" : "#1976d2",
+                fontWeight: "bold"
+              }}
+            >
+              {idx + 1}
+            </button>
+          ))}
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            style={{
+              marginLeft: 8,
+              padding: "6px 12px",
+              borderRadius: 4,
+              border: "1px solid #1976d2",
+              background: "#fff",
+              color: "#1976d2",
+              fontWeight: "bold"
+            }}
+          >
+            Suivant
+          </button>
+        </div>
+      )}
     </div>
   );
 };
@@ -208,7 +482,7 @@ const SitePage = () => {
         Ajouter un site
       </button>
       {showForm && <SiteForm onClose={handleCloseForm} />}
-      <SiteList />
+      <SiteList /> {/* Utilise le vrai composant avec boutons */}
     </div>
   );
 };

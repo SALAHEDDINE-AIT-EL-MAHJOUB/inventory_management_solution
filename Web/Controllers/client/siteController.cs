@@ -67,6 +67,10 @@ namespace Web.Controllers.client
             }
             try
             {
+                // SUPPRIME cette vérification pour autoriser les doublons d'adresse :
+                // if (_context.Sites.Any(s => s.Adress == site.Adress))
+                //     return BadRequest("Adresse déjà utilisée !");
+
                 var createdSite = await _siteService.AddAsync(site);
                 return Ok(createdSite);
             }

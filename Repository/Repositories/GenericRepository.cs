@@ -24,6 +24,7 @@ namespace Repository.Repositories
         public async Task AddAsync(TEntity entity)
         {
             await _context.Set<TEntity>().AddAsync(entity);
+            await _context.SaveChangesAsync(); // Cette ligne est indispensable !
         }
 
         public async Task AddAsync(IEnumerable<TEntity> entities)

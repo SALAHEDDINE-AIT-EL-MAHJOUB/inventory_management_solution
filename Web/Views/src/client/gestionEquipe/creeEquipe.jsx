@@ -1,132 +1,157 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
-const CreeEquipe = () => {
-  const [nom, setNom] = useState("");
-  const [description, setDescription] = useState("");
-  const [siteId, setSiteId] = useState("");
+const CreeEquipe = ({ equipe, onCreated, onCancel }) => {
   const [sites, setSites] = useState([]);
   const [operateurs, setOperateurs] = useState([]);
-  const [selectedOperateurs, setSelectedOperateurs] = useState([]);
+  const [selectedSite, setSelectedSite] = useState(equipe ? equipe.siteId : "");
+  const [selectedOperateurs, setSelectedOperateurs] = useState(equipe ? equipe.membres || [] : []);
+  const [nom, setNom] = useState(equipe ? equipe.nom : "");
+  const [description, setDescription] = useState(equipe ? equipe.description : "");
   const [message, setMessage] = useState("");
 
-  // Charger la liste des sites au chargement
+  // Charger les sites au montage
   useEffect(() => {
-    fetch("/api/Site")
+    fetch("/api/site")
       .then((res) => res.json())
       .then(setSites)
       .catch(() => setSites([]));
   }, []);
 
-  // Charger les opérateurs du site sélectionné
+  // Charger les opérateurs quand un site est sélectionné
   useEffect(() => {
-    if (siteId) {
-      fetch(`/api/Operateur?siteId=${siteId}`)
+    if (selectedSite) {
+      fetch(`/api/Operateur?siteId=${selectedSite}`)
         .then((res) => res.json())
         .then(setOperateurs)
         .catch(() => setOperateurs([]));
     } else {
       setOperateurs([]);
+      setSelectedOperateurs([]);
     }
-    setSelectedOperateurs([]);
-  }, [siteId]);
-
-  const handleOperateurChange = (id) => {
-    setSelectedOperateurs((prev) =>
-      prev.includes(id)
-        ? prev.filter((oid) => oid !== id)
-        : [...prev, id]
-    );
-  };
+  }, [selectedSite]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!siteId || selectedOperateurs.length === 0) {
-      setMessage("Veuillez choisir un site et au moins un opérateur.");
+    setMessage("");
+    if (!nom || !selectedSite || selectedOperateurs.length === 0) {
+      setMessage("Veuillez remplir tous les champs obligatoires.");
       return;
     }
-    const equipe = {
+    const dto = {
       nom,
       description,
-      siteId,
-      operateurIds: selectedOperateurs,
+      siteId: parseInt(selectedSite),
+      operateurIds: selectedOperateurs.map(Number),
     };
-    try {
-      const response = await fetch("/api/Equipe", {
+
+    let res;
+    if (equipe && equipe.equipeId) {
+      // Mode modification
+      res = await fetch(`/api/Equipe/${equipe.equipeId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dto),
+      });
+    } else {
+      // Mode création
+      res = await fetch("/api/Equipe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(equipe),
+        body: JSON.stringify(dto),
       });
-      if (response.ok) {
-        setMessage("Équipe créée avec succès !");
-        setNom("");
-        setDescription("");
-        setSiteId("");
-        setOperateurs([]);
-        setSelectedOperateurs([]);
-      } else {
-        setMessage("Erreur lors de la création.");
-      }
-    } catch {
-      setMessage("Erreur réseau.");
+    }
+
+    if (res.ok) {
+      setMessage(equipe ? "Équipe modifiée avec succès !" : "Équipe créée avec succès !");
+      setNom("");
+      setDescription("");
+      setSelectedSite("");
+      setSelectedOperateurs([]);
+      if (onCreated) onCreated();
+    } else {
+      const err = await res.text();
+      setMessage("Erreur: " + err);
     }
   };
 
   return (
-    <div>
+    <div style={{
+      maxWidth: 500,
+      margin: "40px auto",
+      background: "#fff",
+      borderRadius: 8,
+      boxShadow: "0 2px 8px #eee",
+      padding: 32
+    }}>
       <h2>Créer une équipe</h2>
+      {message && (
+        <div style={{ color: message.startsWith("Erreur") ? "red" : "green", marginBottom: 16 }}>
+          {message}
+        </div>
+      )}
       <form onSubmit={handleSubmit}>
         <div>
-          <label>Nom :</label>
-          <input
-            type="text"
-            value={nom}
-            onChange={(e) => setNom(e.target.value)}
-            required
-          />
+          <label>Nom de l'équipe *</label>
+          <input value={nom} onChange={e => setNom(e.target.value)} required />
         </div>
         <div>
-          <label>Description :</label>
-          <input
-            type="text"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
+          <label>Description</label>
+          <input value={description} onChange={e => setDescription(e.target.value)} />
         </div>
         <div>
-          <label>Site :</label>
+          <label>Site *</label>
+          <select value={selectedSite} onChange={e => setSelectedSite(e.target.value)} required>
+            <option value="">-- Sélectionner un site --</option>
+            {sites.map(site => (
+              <option key={site.id} value={site.id}>{site.siteNom}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label>Opérateurs *</label>
           <select
-            value={siteId}
-            onChange={(e) => setSiteId(e.target.value)}
+            multiple
+            value={selectedOperateurs}
+            onChange={e =>
+              setSelectedOperateurs(Array.from(e.target.selectedOptions, o => o.value))
+            }
             required
+            size={Math.max(3, operateurs.length)}
           >
-            <option value="">-- Choisir un site --</option>
-            {sites.map((site) => (
-              <option key={site.id} value={site.id}>
-                {site.siteNom}
+            {operateurs.map(op => (
+              <option key={op.id} value={String(op.id)}>
+                {op.nom} {op.prenom}
               </option>
             ))}
           </select>
         </div>
-        {operateurs.length > 0 && (
-          <div>
-            <label>Opérateurs disponibles :</label>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-              {operateurs.map((op) => (
-                <label key={op.id}>
-                  <input
-                    type="checkbox"
-                    checked={selectedOperateurs.includes(op.id)}
-                    onChange={() => handleOperateurChange(op.id)}
-                  />
-                  {op.nom} {op.prenom}
-                </label>
-              ))}
-            </div>
-          </div>
-        )}
-        <button type="submit">Créer</button>
+        <div style={{ display: "flex", gap: 16, marginTop: 24 }}>
+          <button type="submit" style={{
+            background: "#2563eb",
+            color: "#fff",
+            border: "none",
+            borderRadius: 4,
+            padding: "10px 32px",
+            fontWeight: 600,
+            fontSize: 16,
+            cursor: "pointer"
+          }}>
+            {equipe ? "Modifier" : "Créer"}
+          </button>
+          {onCancel && (
+            <button type="button" onClick={onCancel} style={{
+              background: "#eee",
+              color: "#333",
+              border: "none",
+              borderRadius: 4,
+              padding: "10px 32px",
+              fontWeight: 600,
+              fontSize: 16,
+              cursor: "pointer"
+            }}>Annuler</button>
+          )}
+        </div>
       </form>
-      {message && <p>{message}</p>}
     </div>
   );
 };

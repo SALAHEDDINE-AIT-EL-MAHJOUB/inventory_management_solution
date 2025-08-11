@@ -23,6 +23,7 @@ namespace Repository.Repositories
         {
             return await _context.Equipes
                 .Include(e => e.EquipeOperateurs)
+                    .ThenInclude(eo => eo.EquipeOperateurOperateur)
                 .Where(e => e.EquipeInventaireId == inventaireId)
                 .ToListAsync();
         }
@@ -31,6 +32,7 @@ namespace Repository.Repositories
         {
             return await _context.Equipes
                 .Include(e => e.EquipeOperateurs)
+                    .ThenInclude(eo => eo.EquipeOperateurOperateur)
                 .FirstOrDefaultAsync(e => e.EquipeId == equipeId);
         }
 

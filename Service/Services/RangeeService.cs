@@ -64,5 +64,10 @@ namespace Service.Services
         {
             await _rangeeRepository.AddRangeeAsync(rangeeNom, societeId, siteId, zoneId, alleeId);
         }
+
+        public async Task<IEnumerable<Rangee>> GetByAlleeIdAsync(int alleeId)
+        {
+            return await _rangeeRepository.GetByAlleeIdAsync(alleeId);
+        }
     }
 }

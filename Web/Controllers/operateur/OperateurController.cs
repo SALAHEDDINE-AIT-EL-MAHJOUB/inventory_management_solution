@@ -15,10 +15,15 @@ public class OperateurController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] int? siteId)
     {
-        var operateurs = await _operateurService.GetAllAsync();
-        return Ok(operateurs);
+        if (siteId.HasValue)
+        {
+            var operateurs = await _operateurService.GetBySiteIdAsync(siteId.Value);
+            return Ok(operateurs);
+        }
+        var allOperateurs = await _operateurService.GetAllAsync();
+        return Ok(allOperateurs);
     }
 
     [HttpGet("{id}")]

@@ -90,6 +90,45 @@ namespace Repository.Repositories
                 .ToListAsync();
         }
 
+        public async Task<bool> UpdateTypeAsync(int inventaireId, int typeInventaireId)
+        {
+            var inventaire = await _context.Inventaires.FindAsync(inventaireId);
+            if (inventaire == null)
+                return false;
+
+            inventaire.InventaireTypeInventaireId = typeInventaireId;
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> UpdateStatutAsync(int inventaireId, int statutId)
+        {
+            var inventaire = await _context.Inventaires.FindAsync(inventaireId);
+            if (inventaire == null)
+                return false;
+
+            inventaire.InventaireStatutId = statutId;
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<List<Inventaire>> GetAllAsync()
+        {
+            return await _context.Inventaires
+                .Include(i => i.InventaireStatut)
+                .Include(i => i.InventaireTypeInventaire)
+                .ToListAsync();
+        }
+
+        public async Task<List<TypeInventaire>> GetTypesAsync()
+        {
+            return await _context.TypeInventaires.ToListAsync();
+        }
+
+        public async Task<List<Statut>> GetStatutsAsync()
+        {
+            return await _context.Statut.ToListAsync();
+        }
 
     }
 }

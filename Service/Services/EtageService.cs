@@ -44,5 +44,10 @@ namespace Service.Services
         {
             await _repository.SaveAsync();
         }
+
+        public async Task<IEnumerable<Etage>> GetByRangeeIdAsync(int rangeeId)
+        {
+            return await _repository.GetByRangeeIdAsync(rangeeId);
+        }
     }
 }

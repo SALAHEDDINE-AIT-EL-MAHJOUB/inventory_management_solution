@@ -1,17 +1,21 @@
-using Domain.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Domain.Entities;
 
-namespace Service.IServices
+public interface IInventaireService
 {
-    public interface IInventaireService
-    {
-        Task<List<Inventaire>> GetByClientIdAsync(int clientId);
-        Task<List<Inventaire>> GetBySiteIdAsync(int siteId);
-        Task<Inventaire?> GetWithDetailsByIdAsync(int inventaireId);
-        Task<Inventaire?> GetByIdAsync(int id);
-        Task SaveAsync();
-        Task<Inventaire?> GetInventaireActifPourOperateur(int operateurId);
-        Task<List<Inventaire>> GetInventairesParOperateurIdAsync(int operateurId);
-    }
+    Task<List<Inventaire>> GetByClientIdAsync(int clientId);
+    Task<List<Inventaire>> GetBySiteIdAsync(int siteId);
+    Task<Inventaire?> GetWithDetailsByIdAsync(int inventaireId);
+    Task<Inventaire?> GetByIdAsync(int id);
+    Task SaveAsync();
+    Task<Inventaire?> GetInventaireActifPourOperateur(int operateurId);
+    Task<List<Inventaire>> GetInventairesParOperateurIdAsync(int operateurId);
+    Task AddAsync(Inventaire entity);
+    Task<bool> UpdateTypeAsync(int inventaireId, int typeInventaireId);
+    Task<bool> UpdateStatutAsync(int inventaireId, int statutId);
+    Task<List<Inventaire>> GetAllAsync();
+    Task<List<TypeInventaire>> GetTypesAsync();
+    Task<List<Statut>> GetStatutsAsync();
+
 }

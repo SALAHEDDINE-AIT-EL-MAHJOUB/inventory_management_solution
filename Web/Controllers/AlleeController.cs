@@ -97,10 +97,17 @@ namespace Web.Controllers
         }
 
         [HttpGet("by-zone/{zoneId}")]
-        public async Task<ActionResult<List<Allee>>> GetAlleeByZoneId(int zoneId)
+        public async Task<ActionResult<List<object>>> GetAlleeByZoneId(int zoneId)
         {
             var allees = await _alleeService.GetAlleeByZoneId(zoneId);
-            return Ok(allees);
+            var result = allees.Select(a => new {
+                alleeId = a.AlleeId,
+                alleeNom = a.AlleeNom,
+                zoneNom = a.AlleeZone?.ZoneNom ?? a.ZoneNom,
+                siteNom = a.AlleeZone?.ZoneSite?.SiteNom ?? a.SiteNom,
+                societeNom = a.AlleeZone?.ZoneSite?.Societe?.Nom ?? a.SocieteNom
+            }).ToList();
+            return Ok(result);
         }
 
         [HttpGet("by-name")]

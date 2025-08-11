@@ -77,5 +77,12 @@ namespace Repository.Repositories
         {
             await _context.SaveChangesAsync();
         }
+
+        public async Task<IEnumerable<Etage>> GetByRangeeIdAsync(int rangeeId)
+        {
+            return await _context.Etages
+                .Where(e => e.RangeeId == rangeeId && !e.IsDeleted)
+                .ToListAsync();
+        }
     }
 }

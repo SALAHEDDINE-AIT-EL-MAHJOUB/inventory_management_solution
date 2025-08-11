@@ -17,6 +17,8 @@ const Etage = () => {
   const [rangeeId, setRangeeId] = useState("");
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const etagesPerPage = 10;
 
   // Charger la liste des étages
   const fetchEtages = async () => {
@@ -120,6 +122,16 @@ const Etage = () => {
     }
   };
 
+  // Pagination helpers
+  const indexOfLastEtage = currentPage * etagesPerPage;
+  const indexOfFirstEtage = indexOfLastEtage - etagesPerPage;
+  const currentEtages = etages.slice(indexOfFirstEtage, indexOfLastEtage);
+  const totalPages = Math.ceil(etages.length / etagesPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
   return (
     <div style={{ maxWidth: 900, margin: "30px auto", fontFamily: "Arial" }}>
       <h2>Liste des étages</h2>
@@ -197,53 +209,107 @@ const Etage = () => {
       {loading ? (
         <p>Chargement...</p>
       ) : (
-        <table style={{ width: "100%", borderCollapse: "collapse", background: "#fff" }}>
-          <thead>
-            <tr style={{ background: "#1976d2", color: "#fff" }}>
-              <th style={{ padding: 8, border: "1px solid #ddd" }}>Nom</th>
-              <th style={{ padding: 8, border: "1px solid #ddd" }}>Société</th>
-              <th style={{ padding: 8, border: "1px solid #ddd" }}>Site</th>
-              <th style={{ padding: 8, border: "1px solid #ddd" }}>Zone</th>
-              <th style={{ padding: 8, border: "1px solid #ddd" }}>Allée</th>
-              <th style={{ padding: 8, border: "1px solid #ddd" }}>Rangée</th>
-              <th style={{ padding: 8, border: "1px solid #ddd" }}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {etages.map((etage) => (
-              <tr key={etage.id}>
-                <td style={{ padding: 8, border: "1px solid #ddd" }}>{etage.nom}</td>
-                <td style={{ padding: 8, border: "1px solid #ddd" }}>{etage.societe?.nom || ""}</td>
-                <td style={{ padding: 8, border: "1px solid #ddd" }}>{etage.site?.siteNom || ""}</td>
-                <td style={{ padding: 8, border: "1px solid #ddd" }}>{etage.zone?.zoneNom || ""}</td>
-                <td style={{ padding: 8, border: "1px solid #ddd" }}>{etage.allee?.alleeNom || ""}</td>
-                <td style={{ padding: 8, border: "1px solid #ddd" }}>{etage.etageRangee?.rangeeNom || ""}</td>
-                <td style={{ padding: 8, border: "1px solid #ddd" }}>
-                  <button
-                    onClick={() => handleDelete(etage.id)}
-                    style={{
-                      background: "#d32f2f",
-                      color: "#fff",
-                      border: "none",
-                      padding: "5px 12px",
-                      borderRadius: 4,
-                      cursor: "pointer"
-                    }}
-                  >
-                    Supprimer
-                  </button>
-                </td>
+        <>
+          <table style={{ width: "100%", borderCollapse: "collapse", background: "#fff" }}>
+            <thead>
+              <tr style={{ background: "#1976d2", color: "#fff" }}>
+                <th style={{ padding: 8, border: "1px solid #ddd" }}>Nom</th>
+                <th style={{ padding: 8, border: "1px solid #ddd" }}>Société</th>
+                <th style={{ padding: 8, border: "1px solid #ddd" }}>Site</th>
+                <th style={{ padding: 8, border: "1px solid #ddd" }}>Zone</th>
+                <th style={{ padding: 8, border: "1px solid #ddd" }}>Allée</th>
+                <th style={{ padding: 8, border: "1px solid #ddd" }}>Rangée</th>
+                <th style={{ padding: 8, border: "1px solid #ddd" }}>Actions</th>
               </tr>
-            ))}
-            {etages.length === 0 && (
-              <tr>
-                <td colSpan={7} style={{ textAlign: "center", padding: 12 }}>
-                  Aucun étage trouvé.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {currentEtages.map((etage) => (
+                <tr key={etage.id}>
+                  <td style={{ padding: 8, border: "1px solid #ddd" }}>{etage.nom}</td>
+                  <td style={{ padding: 8, border: "1px solid #ddd" }}>{etage.societe?.nom || ""}</td>
+                  <td style={{ padding: 8, border: "1px solid #ddd" }}>{etage.site?.siteNom || ""}</td>
+                  <td style={{ padding: 8, border: "1px solid #ddd" }}>{etage.zone?.zoneNom || ""}</td>
+                  <td style={{ padding: 8, border: "1px solid #ddd" }}>{etage.allee?.alleeNom || ""}</td>
+                  <td style={{ padding: 8, border: "1px solid #ddd" }}>{etage.etageRangee?.rangeeNom || ""}</td>
+                  <td style={{ padding: 8, border: "1px solid #ddd" }}>
+                    <button
+                      onClick={() => handleDelete(etage.id)}
+                      style={{
+                        background: "#d32f2f",
+                        color: "#fff",
+                        border: "none",
+                        padding: "5px 12px",
+                        borderRadius: 4,
+                        cursor: "pointer"
+                      }}
+                    >
+                      Supprimer
+                    </button>
+                  </td>
+                </tr>
+              ))}
+              {etages.length === 0 && (
+                <tr>
+                  <td colSpan={7} style={{ textAlign: "center", padding: 12 }}>
+                    Aucun étage trouvé.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div style={{ marginTop: 16, textAlign: "center" }}>
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                style={{
+                  marginRight: 8,
+                  padding: "6px 12px",
+                  borderRadius: 4,
+                  border: "1px solid #1976d2",
+                  background: "#fff",
+                  color: "#1976d2",
+                  fontWeight: "bold"
+                }}
+              >
+                Précédent
+              </button>
+              {[...Array(totalPages)].map((_, idx) => (
+                <button
+                  key={idx + 1}
+                  onClick={() => handlePageChange(idx + 1)}
+                  style={{
+                    margin: "0 2px",
+                    padding: "6px 12px",
+                    borderRadius: 4,
+                    border: "1px solid #1976d2",
+                    background: currentPage === idx + 1 ? "#1976d2" : "#fff",
+                    color: currentPage === idx + 1 ? "#fff" : "#1976d2",
+                    fontWeight: "bold"
+                  }}
+                >
+                  {idx + 1}
+                </button>
+              ))}
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                style={{
+                  marginLeft: 8,
+                  padding: "6px 12px",
+                  borderRadius: 4,
+                  border: "1px solid #1976d2",
+                  background: "#fff",
+                  color: "#1976d2",
+                  fontWeight: "bold"
+                }}
+              >
+                Suivant
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

@@ -50,7 +50,7 @@ namespace Repository.Repositories
 
         public async Task DeleteAsync(int id)
         {
-            var produit = await _context.Produits.FindAsync(id);
+            var produit = await _context.Produits.FirstOrDefaultAsync(p => p.Id == id && !p.IsDeleted);
             if (produit != null)
             {
                 produit.IsDeleted = true;
@@ -61,15 +61,20 @@ namespace Repository.Repositories
 
         public async Task<IEnumerable<Produit>> GetByCodeBarreAsync(string codeBarre)
         {
-              return await _context.Produits
-        .Include(p => p.GestionProduit)
-            .ThenInclude(gp => gp.CodebarreCommercial)
-        .Where(p => p.GestionProduit.Any(fp =>
-            fp.CodebarreCommercial != null &&
-            fp.CodebarreCommercial.Code == codeBarre
-        ) && !p.IsDeleted)
-        .ToListAsync();
-}
+            // Recherche par code-barres commercial ou code-barres produit
+            return await _context.Produits
+                .Include(p => p.GestionProduit)
+                .ThenInclude(gp => gp.CodebarreCommercial) // <-- use CodebarreCommercial (lowercase b)
+                .Include(p => p.CodebarreProduits)
+                .Where(p =>
+                    (!p.IsDeleted) &&
+                    (
+                        p.CodebarreProduits.Any(cb => cb.Code == codeBarre) ||
+                        p.GestionProduit.Any(gp => gp.CodebarreCommercial != null && gp.CodebarreCommercial.Code == codeBarre)
+                    )
+                )
+                .ToListAsync();
+        }
 
         public async Task<IEnumerable<Produit>> GetByFournisseurIdAsync(int fournisseurId)
         {
@@ -108,6 +113,17 @@ namespace Repository.Repositories
                 .Include(p => p.GestionProduit)
                 .Where(p => p.GestionProduit.Any(fp => fp.CodeBarreEtageId == etageId) && !p.IsDeleted)
                 .ToListAsync();
+        }
+
+        public async Task AjouterQuantiteAsync(int produitId, int quantite)
+        {
+            var produit = await _context.Produits.FirstOrDefaultAsync(p => p.Id == produitId && !p.IsDeleted);
+            if (produit != null)
+            {
+                produit.Quantite += quantite;
+                _context.Produits.Update(produit);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

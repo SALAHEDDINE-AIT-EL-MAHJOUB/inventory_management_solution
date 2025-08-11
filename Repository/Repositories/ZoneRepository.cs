@@ -169,5 +169,24 @@ namespace Repository.Repositories
                 .ThenInclude(s => s.Societe)
             .FirstOrDefaultAsync(z => z.ZoneId == id);
     }
+
+    public async Task<Zone?> UpdateAsync(Zone zone)
+    {
+        var existing = await _context.Zones.FindAsync(zone.ZoneId);
+        if (existing == null) return null;
+        existing.ZoneNom = zone.ZoneNom;
+        
+        await _context.SaveChangesAsync();
+        return existing;
+    }
+
+    public async Task<bool> DeleteAsync(int id)
+    {
+        var zone = await _context.Zones.FindAsync(id);
+        if (zone == null) return false;
+        zone.IsDeleted = true;
+        await _context.SaveChangesAsync();
+        return true;
+    }
     }
 }

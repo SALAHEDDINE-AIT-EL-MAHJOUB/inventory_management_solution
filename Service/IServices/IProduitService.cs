@@ -17,5 +17,8 @@ namespace Service.IServices
         Task<IEnumerable<Produit>> GetByFormProduitZoneIdAsync(int zoneId);
         Task<IEnumerable<Produit>> GetByFormProduitRangeeIdAsync(int rangeeId);
         Task<IEnumerable<Produit>>  GetByFormProduitEtageIdAsync(int etageId);
+
+       
+        Task AjouterQuantiteAsync(int produitId, int quantite);
     }
 }

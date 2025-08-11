@@ -16,7 +16,8 @@ namespace Service.IServices
     Task<List<Zone>> GetAllAsync();
     Task<List<Zone>> GetZoneBySocieteId(int societeId);
     Task<List<Zone>> GetZoneBySocieteName(string societeNom);
-            Task<Zone?> GetByIdWithSiteAndSocieteAsync(int id);
-
-    }
+    Task<Zone?> GetByIdWithSiteAndSocieteAsync(int id);
+    Task<Zone?> UpdateAsync(Zone zone);
+    Task<bool> DeleteAsync(int id);
+  }
 }

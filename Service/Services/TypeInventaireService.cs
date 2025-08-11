@@ -15,29 +15,14 @@ namespace Service.Services
             _repository = repository;
         }
 
-        public async Task<TypeInventaire?> GetByIdAsync(int id)
+        public async Task AjouterTypeInventaireAsync(string libelle)
         {
-            return await _repository.GetByIdAsync(id);
+            await _repository.AjouterTypeInventaireAsync(libelle);
         }
 
-        public async Task<TypeInventaire?> GetByLibelleAsync(string libelle)
+        public List<TypeInventaire> ObtenirTous()
         {
-            return await _repository.GetByLibelleAsync(libelle);
-        }
-
-        public async Task<IEnumerable<TypeInventaire>> GetAllAsync()
-        {
-            return await _repository.GetAllAsync();
-        }
-
-        public async Task AddAsync(TypeInventaire entity)
-        {
-            await _repository.AddAsync(entity);
-        }
-
-        public void Delete(TypeInventaire entity)
-        {
-            _repository.Delete(entity);
+            return _repository.ObtenirTous();
         }
     }
 }

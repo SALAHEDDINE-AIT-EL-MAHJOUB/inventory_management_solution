@@ -69,5 +69,10 @@ namespace Service.Services
         {
             return await _produitRepository.GetByFormProduitEtageIdAsync(etageId);
         }
+
+        public async Task AjouterQuantiteAsync(int produitId, int quantite)
+        {
+            await _produitRepository.AjouterQuantiteAsync(produitId, quantite);
+        }
     }
 }

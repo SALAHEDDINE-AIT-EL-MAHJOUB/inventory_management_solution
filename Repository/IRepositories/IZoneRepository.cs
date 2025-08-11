@@ -14,6 +14,8 @@ namespace Repository.IRepositories
         Task<List<string>> GetZoneNamesBySiteName(int clientId, string siteName);
         Task<List<Zone>> GetZoneBySocieteId(int societeId);
         Task<List<Zone>> GetZoneBySocieteName(string societeNom);
-            Task<Zone?> GetByIdWithSiteAndSocieteAsync(int id);
+        Task<Zone?> GetByIdWithSiteAndSocieteAsync(int id);
+        Task<Zone?> UpdateAsync(Zone zone);
+        Task<bool> DeleteAsync(int id);
     }
 }

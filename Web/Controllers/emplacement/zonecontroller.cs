@@ -78,5 +78,30 @@ namespace Web.Controllers.emplacement
             var zones = await _zoneService.GetZoneBySocieteName(societeNom);
             return Ok(zones);
         }
+
+        // Modifier une zone
+        [HttpPut("{id}")]
+        public async Task<ActionResult<Zone>> UpdateZone(int id, [FromBody] Zone zone)
+        {
+            if (id != zone.ZoneId)
+                return BadRequest();
+
+            var updated = await _zoneService.UpdateAsync(zone);
+            if (updated == null)
+                return NotFound();
+
+            return Ok(updated);
+        }
+
+        // Supprimer une zone
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteZone(int id)
+        {
+            var result = await _zoneService.DeleteAsync(id);
+            if (!result)
+                return NotFound();
+
+            return NoContent();
+        }
     }
 }

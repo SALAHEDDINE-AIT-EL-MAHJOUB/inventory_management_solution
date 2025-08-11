@@ -3,6 +3,9 @@ using Repository.IRepositories;
 using Service.IServices;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Domain.Models; 
+using Repository.Data; 
+
 
 namespace Service.Services
 {
@@ -48,6 +51,36 @@ namespace Service.Services
         public async Task<List<Inventaire>> GetInventairesParOperateurIdAsync(int operateurId)
         {
             return await _repository.GetInventairesParOperateurIdAsync(operateurId);
+        }
+
+        public async Task AddAsync(Inventaire entity)
+        {
+            await _repository.AddAsync(entity);
+        }
+
+        public async Task<bool> UpdateTypeAsync(int inventaireId, int typeInventaireId)
+        {
+            return await _repository.UpdateTypeAsync(inventaireId, typeInventaireId);
+        }
+
+        public async Task<bool> UpdateStatutAsync(int inventaireId, int statutId)
+        {
+            return await _repository.UpdateStatutAsync(inventaireId, statutId);
+        }
+
+        public async Task<List<Inventaire>> GetAllAsync()
+        {
+            return await _repository.GetAllAsync();
+        }
+
+        public async Task<List<TypeInventaire>> GetTypesAsync()
+        {
+            return await _repository.GetTypesAsync();
+        }
+
+        public async Task<List<Statut>> GetStatutsAsync()
+        {
+            return await _repository.GetStatutsAsync();
         }
     }
 }

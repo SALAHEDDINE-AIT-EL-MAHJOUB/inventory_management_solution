@@ -12,6 +12,8 @@ namespace Repository.IRepositories
         Task UpdateAsync(Produit produit);
         Task DeleteAsync(int id);
 
+        Task AjouterQuantiteAsync(int produitId, int quantite);
+
         // Recherche par code produit (CodeBarre)
         Task<IEnumerable<Produit>> GetByCodeBarreAsync(string codeBarre);
 

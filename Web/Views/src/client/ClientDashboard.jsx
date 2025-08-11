@@ -15,6 +15,14 @@ import Etage from "../emplacement/etage";
 import RegisterOperateur from "./gestionOperateur/registerOperateur";
 import ListeOperateurs from "./gestionOperateur/ListeOperateurs";
 import CreeEquipe from "./gestionEquipe/creeEquipe"; // Ajoutez cet import
+import EquipeManager from "./gestionEquipe/EquipeManager";
+import Produit from "./gestionProduit/creeProduit";
+import NavbarProduit from "./gestionProduit/navbarProduit";
+import CreeProduit from "./gestionProduit/creeProduit";
+import Fournisseur from "./gestionProduit/fournisseur";
+import ListProduit from "./gestionProduit/listProduit"; 
+
+import CreeInventaire from "./inventaire/creeInventaire";
 import { FaTachometerAlt, FaUser, FaShoppingCart, FaBuilding, FaMapMarkerAlt, FaUserCircle } from "react-icons/fa";
 
 const ClientDashboard = ({ clientInfo, onLogout }) => {
@@ -23,6 +31,7 @@ const ClientDashboard = ({ clientInfo, onLogout }) => {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("dashboard");
   const [emplacementTab, setEmplacementTab] = useState("societes"); // Ajout pour la sous-navbar
+  const [produitTab, setProduitTab] = useState("creeProduit"); // Ajoutez ce state
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -175,15 +184,16 @@ const ClientDashboard = ({ clientInfo, onLogout }) => {
 
       <div className="dashboard-container">
         {/* Sidebar verticale */}
-         <nav className="dashboard-sidebar">
+        <nav className="dashboard-sidebar">
           <ul className="nav-menu">
             {[
               { key: "dashboard", label: "Tableau de bord", icon: <FaTachometerAlt /> },
-              { key: "orders", label: "Commandes", icon: <FaShoppingCart /> },
               { key: "societes", label: "Sociétés", icon: <FaBuilding /> },
               { key: "emplacement", label: "Emplacement", icon: <FaMapMarkerAlt /> },
               { key: "operateur", label: "Ajouter Opérateur", icon: <FaUser /> },
-              { key: "equipe", label: "Équipe", icon: <FaUserCircle /> } // Ajoutez cette ligne
+              { key: "equipe", label: "Équipe", icon: <FaUserCircle /> },
+              { key: "produit", label: "Gestion de Produit", icon: <FaShoppingCart /> },
+              { key: "inventaire", label: "Inventaire", icon: <FaShoppingCart /> } // Ajout de l'onglet Inventaire
             ].map(page => (
               <li key={page.key} className={activeTab === page.key ? "active" : ""}>
                 <button onClick={() => setActiveTab(page.key)}>
@@ -201,8 +211,16 @@ const ClientDashboard = ({ clientInfo, onLogout }) => {
           {activeTab === "orders" && renderOrders()}
           {activeTab === "societes" && renderSocietes()}
           {activeTab === "operateur" && <RegisterOperateur />}
-          {activeTab === "equipe" && <CreeEquipe />} {/* Ajoutez cette ligne */}
-
+          {activeTab === "equipe" && <EquipeManager />}
+          {activeTab === "produit" && (
+            <>
+              <NavbarProduit active={produitTab} onNavigate={setProduitTab} />
+              {produitTab === "creeProduit" && <CreeProduit />}
+              {produitTab === "listeProduit" && <ListProduit />}
+              {produitTab === "fournisseur" && <Fournisseur />}
+            </>
+          )}
+          {activeTab === "inventaire" && <CreeInventaire />} {/* Affichage du composant */}
           {/* Affichage de la navbar d'emplacement et des composants associés */}
           {activeTab === "emplacement" && (
             <>

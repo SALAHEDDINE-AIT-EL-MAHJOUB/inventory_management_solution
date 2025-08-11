@@ -41,8 +41,8 @@ namespace Repository.Data
         public DbSet<CodeBarreOperateur> CodeBarreOperateurs { get; set; }
         public DbSet<CodeBarreZone> CodeBarreZones { get; set; }
         public DbSet<HistoriqueComptage> HistoriqueComptages { get; set; }
-        public DbSet<Statut> Statuts { get; set; }
         public DbSet<TypeInventaire> TypeInventaires { get; set; }
+        public DbSet<Statut> Statut { get; set; }
         public DbSet<OperationInventaire> OperationInventaires { get; set; }
         public DbSet<Ville> Villes { get; set; }
         public DbSet<Region> Regions { get; set; }
@@ -402,9 +402,7 @@ namespace Repository.Data
             modelBuilder.Entity<Operateur>(entity =>
             {
                 entity.HasKey(e => e.Id).HasName("PK__Operateu__DD6FAFB1471872AD");
-
                 entity.ToTable("Operateur");
-
                 entity.Property(e => e.Id)
                     .HasComment("Identifiant unique pour chaque opérateur.")
                     .HasColumnName("Operateur_Id");
@@ -496,6 +494,49 @@ namespace Repository.Data
 
                 entity.Property(p => p.IsDeleted)
                       .HasDefaultValue(false);
+
+                // Ajout des relations de navigation pour les clés étrangères supplémentaires
+                entity.Property(p => p.RangeeId).HasColumnName("RangeeId");
+                entity.HasOne(p => p.Rangee)
+                    .WithMany()
+                    .HasForeignKey(p => p.RangeeId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.Property(p => p.ZoneId)
+                    .HasColumnName("Produit_ZoneId");
+                entity.Property(p => p.SocieteId)
+                    .HasColumnName("Produit_SocieteId");
+                entity.Property(p => p.AlleeId)
+                    .HasColumnName("Produit_AlleeId");
+                entity.Property(p => p.SiteId)
+                    .HasColumnName("Produit_SiteId");
+                entity.Property(p => p.EtageId)
+                    .HasColumnName("Produit_EtageId");
+
+                entity.HasOne(p => p.Zone)
+                    .WithMany()
+                    .HasForeignKey(p => p.ZoneId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(p => p.Societe)
+                    .WithMany()
+                    .HasForeignKey(p => p.SocieteId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(p => p.Allee)
+                    .WithMany()
+                    .HasForeignKey(p => p.AlleeId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(p => p.Site)
+                    .WithMany()
+                    .HasForeignKey(p => p.SiteId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(p => p.Etage)
+                    .WithMany()
+                    .HasForeignKey(p => p.EtageId)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
 
             modelBuilder.Entity<Rangee>(entity =>
@@ -678,21 +719,24 @@ namespace Repository.Data
                     .HasConstraintName("Societé_VilleId");
             });
 
-            modelBuilder.Entity<Statut>(entity =>
-            {
-                entity.HasKey(e => e.StatutId).HasName("PK__Statut__C9A2F59F5987DD15");
-
-                entity.ToTable("Statut");
-
-                entity.Property(e => e.StatutId)
-                    .HasComment("Identifiant unique pour chaque statut.")
-                    .HasColumnName("Statut_Id");
-                entity.Property(e => e.StatutNom)
-                    .HasMaxLength(50)
-                    .IsUnicode(false)
-                    .HasComment("Nom du statut")
-                    .HasColumnName("Statut_Nom");
-            });
+          modelBuilder.Entity<Statut>(entity =>
+{
+    entity.HasKey(e => e.StatutId).HasName("PK__Statut__C9A2F59F5987DD15");
+    entity.ToTable("Statut");
+    entity.Property(e => e.StatutId)
+        .HasComment("Identifiant unique pour chaque statut.")
+        .HasColumnName("Statut_Id");
+    entity.Property(e => e.StatutNom)
+        .HasMaxLength(50)
+        .IsUnicode(false)
+        .HasComment("Nom du statut")
+        .HasColumnName("Statut_Nom");
+    entity.Property(e => e.StatutLibelle)
+        .HasMaxLength(100)
+        .IsUnicode(false)
+        .HasComment("Libellé du statut")
+        .HasColumnName("StatutLibelle"); 
+});
 
             modelBuilder.Entity<TypeInventaire>(entity =>
             {
