@@ -1,83 +1,27 @@
 import * as React from 'react';
-import { styled, alpha } from '@mui/material/styles';
+import { useEffect, useState } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-import InputBase from '@mui/material/InputBase';
-import Badge from '@mui/material/Badge';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
-import MenuIcon from '@mui/icons-material/Menu';
-import SearchIcon from '@mui/icons-material/Search';
 import AccountCircle from '@mui/icons-material/AccountCircle';
-import MailIcon from '@mui/icons-material/Mail';
-import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
-import { useEffect, useState } from 'react';
+import MenuIcon from '@mui/icons-material/Menu';
 import './navbar.css';
-import { useNavigate } from "react-router-dom";
-
-declare global {
-  interface Window {
-    feather?: {
-      replace: () => void;
-    };
-  }
-}
-
-const Search = styled('div')(({ theme }) => ({
-  position: 'relative',
-  borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.common.white, 0.15),
-  '&:hover': {
-    backgroundColor: alpha(theme.palette.common.white, 0.25),
-  },
-  marginRight: theme.spacing(2),
-  marginLeft: 0,
-  width: '100%',
-  [theme.breakpoints.up('sm')]: {
-    marginLeft: theme.spacing(3),
-    width: 'auto',
-  },
-}));
-
-const SearchIconWrapper = styled('div')(({ theme }) => ({
-  padding: theme.spacing(0, 2),
-  height: '100%',
-  position: 'absolute',
-  pointerEvents: 'none',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-}));
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: 'inherit',
-  '& .MuiInputBase-input': {
-    padding: theme.spacing(1, 1, 1, 0),
-    // vertical padding + font size from searchIcon
-    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-    transition: theme.transitions.create('width'),
-    width: '100%',
-    [theme.breakpoints.up('md')]: {
-      width: '20ch',
-    },
-  },
-}));
 
 type Props = {
   onSelectPage: (page: string) => void;
 };
 
-export default function PrimarySearchAppBar({ onSelectPage }: Props) {
+export default function UnifiedNavbar({ onSelectPage }: Props) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
-    React.useState<null | HTMLElement>(null);
+  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [adminName, setAdminName] = useState<string>("");
-
-  const navigate = useNavigate();
+  const [selectedPage, setSelectedPage] = useState("dashboard");
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -99,31 +43,57 @@ export default function PrimarySearchAppBar({ onSelectPage }: Props) {
     setMobileMoreAnchorEl(event.currentTarget);
   };
 
- const handleProfile = () => {
-  handleMenuClose();
-  onSelectPage("updateprofile");
-};
+  const toggleMobileNav = () => {
+    setMobileNavOpen(!mobileNavOpen);
+  };
+
+  const handleProfile = () => {
+    handleMenuClose();
+    onSelectPage("updateprofile");
+  };
 
   const handleLogout = () => {
     handleMenuClose();
-    // Appelle l'API de logout si elle existe
     fetch("/api/logout", { method: "POST", credentials: "include" })
       .finally(() => {
-        // Nettoie le localStorage/sessionStorage et oublie le profil
         localStorage.clear();
         sessionStorage.clear();
-        setAdminName(""); // <-- Oublie le nom affiché dans la navbar
-        // Redirige vers la page de login
-        window.location.href = "/login"; // <-- Redirection immédiate
+        setAdminName("");
+        window.location.href = "/login";
       });
   };
 
+  const handlePageSelect = (page: string) => {
+    setSelectedPage(page);
+    onSelectPage(page);
+    setMobileNavOpen(false); // Fermer le menu mobile après sélection
+  };
+
+  useEffect(() => {
+    fetch("/api/admin/me", {
+      credentials: "include"
+    })
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data && data.adminName) setAdminName(data.adminName);
+      })
+      .catch(() => setAdminName(""));
+  }, []);
+
+  const navigationItems = [
+    { id: "dashboard", label: "Dashboard", icon: "🏠" },
+    { id: "register", label: "Inscrire Admin", icon: "👤" },
+    { id: "client", label: "Clients", icon: "👥" },
+    { id: "createclient", label: "Créer Client", icon: "➕" }
+  ];
+
+  // Menu pour le profil
   const menuId = 'primary-search-account-menu';
   const renderMenu = (
     <Menu
       anchorEl={anchorEl}
       anchorOrigin={{
-        vertical: 'top',
+        vertical: 'bottom',
         horizontal: 'right',
       }}
       id={menuId}
@@ -134,9 +104,30 @@ export default function PrimarySearchAppBar({ onSelectPage }: Props) {
       }}
       open={isMenuOpen}
       onClose={handleMenuClose}
+      PaperProps={{
+        elevation: 8,
+        sx: {
+          borderRadius: 3,
+          mt: 1,
+          minWidth: 180,
+          '& .MuiMenuItem-root': {
+            fontSize: '0.95rem',
+            fontWeight: 500,
+            py: 1.5,
+            px: 2,
+            '&:hover': {
+              backgroundColor: '#e3f2fd',
+            }
+          }
+        }
+      }}
     >
-      <MenuItem onClick={handleProfile}>Profile</MenuItem>
-      <MenuItem onClick={handleLogout}>Logout</MenuItem>
+      <MenuItem onClick={handleProfile} sx={{ color: '#1565c0' }}>
+        👤 Profil
+      </MenuItem>
+      <MenuItem onClick={handleLogout} sx={{ color: '#d32f2f' }}>
+        🚪 Déconnexion
+      </MenuItem>
     </Menu>
   );
 
@@ -145,7 +136,7 @@ export default function PrimarySearchAppBar({ onSelectPage }: Props) {
     <Menu
       anchorEl={mobileMoreAnchorEl}
       anchorOrigin={{
-        vertical: 'top',
+        vertical: 'bottom',
         horizontal: 'right',
       }}
       id={mobileMenuId}
@@ -157,7 +148,22 @@ export default function PrimarySearchAppBar({ onSelectPage }: Props) {
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
-     
+      {navigationItems.map((item) => (
+        <MenuItem
+          key={item.id}
+          onClick={() => {
+            handlePageSelect(item.id);
+            handleMobileMenuClose();
+          }}
+          sx={{
+            backgroundColor: selectedPage === item.id ? '#e3f2fd' : 'transparent',
+            color: selectedPage === item.id ? '#1565c0' : '#333',
+            fontWeight: selectedPage === item.id ? 600 : 400,
+          }}
+        >
+          {item.icon} {item.label}
+        </MenuItem>
+      ))}
       <MenuItem onClick={handleProfileMenuOpen}>
         <IconButton
           size="large"
@@ -168,183 +174,227 @@ export default function PrimarySearchAppBar({ onSelectPage }: Props) {
         >
           <AccountCircle />
         </IconButton>
-        <p>Profile</p>
+        <p>Profil</p>
       </MenuItem>
     </Menu>
   );
 
-  useEffect(() => {
-    if (window.feather) {
-      window.feather.replace();
-    }
-  }, []);
-
-  React.useEffect(() => {
-    fetch("/api/admin/me", {
-      credentials: "include"
-    })
-      .then(res => res.ok ? res.json() : null)
-      .then(data => {
-        if (data && data.adminName) setAdminName(data.adminName);
-      })
-      .catch(() => setAdminName(""));
-  }, []);
-
   return (
-    <Box sx={{ display: 'flex', height: '10vh', bgcolor: '#eaeef6' }}>
-      {/* Sidebar verticale */}
-      <nav className="navbar" style={{
-        position: 'fixed',
-        top: 64,
-        left: 0,
-        height: 'calc(100vh - 64px)',
-        width: 260,
-        background: '#1976d2',
-        boxShadow: '0 4px 20px rgba(0,0,0,0.10)',
-        borderRadius: '0 16px 16px 0',
-        zIndex: 1200,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-start',
-        paddingTop: '2rem'
-      }}>
-        <div style={{
-          width: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          marginBottom: '2rem'
+    <Box sx={{ flexGrow: 1 }}>
+      <AppBar 
+        position="fixed" 
+        sx={{ 
+          background: 'linear-gradient(135deg, #1565c0 0%, #0d47a1 50%, #0277bd 100%)',
+          boxShadow: '0 4px 20px rgba(21, 101, 192, 0.3)',
+          backdropFilter: 'blur(10px)'
+        }}
+      >
+        <Toolbar sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between',
+          minHeight: '70px !important',
+          px: { xs: 2, md: 3 }
         }}>
-         </div>
-        <ul className="navbar__menu" style={{ width: '100%' }}>
-          <li className="navbar__item">
-            <button
-              className="navbar__link"
-              style={{ background: "none", border: "none", color: "#fff", width: "100%", textAlign: "left", padding: "0.5rem 1.5rem", cursor: "pointer" }}
-              onClick={() => onSelectPage("list")}
-            >
-              <i data-feather="users"></i>
-              <span>Liste des admins</span>
-            </button>
-          </li>
-          <li className="navbar__item">
-            <button
-              className="navbar__link"
-              style={{ background: "none", border: "none", color: "#fff", width: "100%", textAlign: "left", padding: "0.5rem 1.5rem", cursor: "pointer" }}
-              onClick={() => onSelectPage("register")}
-            >
-              <i data-feather="user-plus"></i>
-              <span>Inscrire un admin</span>
-            </button>
-          </li>
-          {/* Ajout du lien Client */}
-          <li className="navbar__item">
-            <button
-              className="navbar__link"
-              style={{ background: "none", border: "none", color: "#fff", width: "100%", textAlign: "left", padding: "0.5rem 1.5rem", cursor: "pointer" }}
-              onClick={() => onSelectPage("client")}
-            >
-              <i data-feather="user"></i>
-              <span>Client</span>
-            </button>
-          </li>
-          <li className="navbar__item">
-  <button
-    className="navbar__link"
-    style={{ background: "none", border: "none", color: "#fff", width: "100%", textAlign: "left", padding: "0.5rem 1.5rem", cursor: "pointer" }}
-    onClick={() => onSelectPage("createclient")}
-  >
-    <i data-feather="user-plus"></i>
-    <span>Créer Client</span>
-  </button>
-</li>
-          <li className="navbar__item">
-  <button
-    className="navbar__link"
-    style={{ background: "none", border: "none", color: "#fff", width: "100%", textAlign: "left", padding: "0.5rem 1.5rem", cursor: "pointer" }}
-    onClick={() => onSelectPage("dashboard")}
-  >
-    <i data-feather="home"></i>
-    <span style={{ marginLeft: 8 }}>Dashboard</span>
-  </button>
-</li>
-          {/* ...autres liens... */}
-        </ul>
-        <div style={{ flexGrow: 1 }} />
-        <div style={{ width: '100%', padding: '1rem 1.5rem', color: '#fff', fontSize: 13, opacity: 0.7 }}>
-          © {new Date().getFullYear()} Admin
-        </div>
-      </nav>
-
-      {/* AppBar horizontale */}
-      <Box sx={{ flexGrow: 1, ml: { xs: 0, md: '260px' } }}>
-        <AppBar position="fixed" sx={{ bgcolor: '#1976d2', color: '#fff', boxShadow: 3, zIndex: 1300 }}>
-          <Toolbar>
-            {/* Plus de bouton menu */}
-            <Typography
-              variant="h6"
-              noWrap
-              component="div"
+          {/* Logo et titre */}
+          <Box className="topbar-brand" sx={{ display: 'flex', alignItems: 'center' }}>
+            <Box
               sx={{
-                color: '#fff',
-                fontFamily: "'Open Sans', sans-serif",
-                fontWeight: 700,
-                fontSize: '1.3rem',
-                letterSpacing: '0.07em',
-                mr: 3
+                width: 50,
+                height: 50,
+                borderRadius: '12px',
+                background: 'linear-gradient(45deg, #ffffff20, #ffffff40)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                mr: 2,
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(255,255,255,0.2)'
               }}
             >
-              Admin Dashboard
-            </Typography>
-            <Search>
-              <SearchIconWrapper>
-                <SearchIcon />
-              </SearchIconWrapper>
-              <StyledInputBase
-                placeholder="Search…"
-                inputProps={{ 'aria-label': 'search' }}
-              />
-            </Search>
-            <Box sx={{ flexGrow: 1 }} />
-            {adminName && (
-              <Typography
-                variant="subtitle1"
-                sx={{ marginRight: 2, fontWeight: 500 }}
-              >
-                {adminName}
-              </Typography>
-            )}
-            <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-              <IconButton
-                size="large"
-                edge="end"
-                aria-label="account of current user"
-                aria-controls="primary-search-account-menu"
-                aria-haspopup="true"
-                onClick={handleProfileMenuOpen}
-                color="inherit"
-              >
-                <AccountCircle />
-              </IconButton>
+              📦
             </Box>
-            <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
+            <Typography
+              variant="h5"
+              sx={{
+                fontWeight: 700,
+                fontSize: '1.6rem',
+                color: '#fff',
+                letterSpacing: '0.5px',
+                textShadow: '0 2px 4px rgba(0,0,0,0.2)'
+              }}
+            >
+              StockPilot
+            </Typography>
+          </Box>
+
+          {/* Navigation desktop */}
+          <Box 
+            sx={{ 
+              display: { xs: 'none', lg: 'flex' }, 
+              gap: 1,
+              alignItems: 'center',
+              backgroundColor: 'rgba(255,255,255,0.1)',
+              borderRadius: '50px',
+              padding: '8px',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255,255,255,0.2)'
+            }}
+          >
+            {navigationItems.map((item) => (
+              <button
+                key={item.id}
+                className={`navbar__link${selectedPage === item.id ? " active-nav-link" : ""}`}
+                onClick={() => handlePageSelect(item.id)}
+                style={{
+                  background: selectedPage === item.id 
+                    ? 'rgba(255,255,255,0.25)' 
+                    : 'transparent',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '25px',
+                  padding: '10px 20px',
+                  fontWeight: selectedPage === item.id ? 600 : 500,
+                  fontSize: '0.95rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  fontFamily: 'Poppins, sans-serif',
+                  textShadow: '0 1px 2px rgba(0,0,0,0.2)',
+                  boxShadow: selectedPage === item.id 
+                    ? '0 2px 8px rgba(255,255,255,0.2)' 
+                    : 'none'
+                }}
+              >
+                <span>{item.icon}</span>
+                {item.label}
+              </button>
+            ))}
+          </Box>
+
+          {/* Bouton menu mobile */}
+          <IconButton
+            sx={{ 
+              display: { xs: 'flex', lg: 'none' },
+              color: '#fff',
+              backgroundColor: 'rgba(255,255,255,0.1)',
+              '&:hover': { backgroundColor: 'rgba(255,255,255,0.2)' }
+            }}
+            onClick={toggleMobileNav}
+          >
+            <MenuIcon />
+          </IconButton>
+
+          {/* Section profil */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            {adminName && (
+              <Box
+                sx={{
+                  display: { xs: 'none', md: 'flex' },
+                  alignItems: 'center',
+                  backgroundColor: 'rgba(255,255,255,0.15)',
+                  borderRadius: '25px',
+                  padding: '8px 16px',
+                  backdropFilter: 'blur(10px)',
+                  border: '1px solid rgba(255,255,255,0.2)'
+                }}
+              >
+                <Typography
+                  variant="subtitle1"
+                  sx={{
+                    fontWeight: 600,
+                    color: '#fff',
+                    fontSize: '0.95rem',
+                    textShadow: '0 1px 2px rgba(0,0,0,0.2)'
+                  }}
+                >
+                  👋 {adminName}
+                </Typography>
+              </Box>
+            )}
+            <IconButton
+              size="large"
+              edge="end"
+              aria-label="account of current user"
+              aria-controls={menuId}
+              aria-haspopup="true"
+              onClick={handleProfileMenuOpen}
+              sx={{
+                backgroundColor: 'rgba(255,255,255,0.15)',
+                color: '#fff',
+                width: 45,
+                height: 45,
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(255,255,255,0.2)',
+                '&:hover': { 
+                  backgroundColor: 'rgba(255,255,255,0.25)',
+                  transform: 'scale(1.05)'
+                },
+                transition: 'all 0.3s ease'
+              }}
+            >
+              <AccountCircle />
+            </IconButton>
+            <Box sx={{ display: { xs: 'flex', lg: 'none' } }}>
               <IconButton
                 size="large"
                 aria-label="show more"
-                aria-controls="primary-search-account-menu-mobile"
+                aria-controls={mobileMenuId}
                 aria-haspopup="true"
                 onClick={handleMobileMenuOpen}
-                color="inherit"
+                sx={{ color: '#fff' }}
               >
                 <MoreIcon />
               </IconButton>
             </Box>
-          </Toolbar>
-        </AppBar>
-       
-        
-     
-      </Box>
+          </Box>
+        </Toolbar>
+
+        {/* Menu mobile déroulant */}
+        {mobileNavOpen && (
+          <Box
+            sx={{
+              display: { xs: 'block', lg: 'none' },
+              backgroundColor: 'rgba(13, 71, 161, 0.95)',
+              backdropFilter: 'blur(10px)',
+              borderTop: '1px solid rgba(255,255,255,0.1)',
+              py: 2
+            }}
+          >
+            {navigationItems.map((item) => (
+              <Box
+                key={item.id}
+                onClick={() => handlePageSelect(item.id)}
+                sx={{
+                  py: 1.5,
+                  px: 3,
+                  cursor: 'pointer',
+                  backgroundColor: selectedPage === item.id ? 'rgba(255,255,255,0.1)' : 'transparent',
+                  '&:hover': { backgroundColor: 'rgba(255,255,255,0.05)' },
+                  borderLeft: selectedPage === item.id ? '4px solid #fff' : 'none'
+                }}
+              >
+                <Typography
+                  sx={{
+                    color: '#fff',
+                    fontWeight: selectedPage === item.id ? 600 : 500,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 2
+                  }}
+                >
+                  <span>{item.icon}</span>
+                  {item.label}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
+        )}
+      </AppBar>
+      
+      {/* Décalage pour le contenu principal */}
+      <Toolbar sx={{ minHeight: '70px !important' }} />
       {renderMobileMenu}
       {renderMenu}
     </Box>

@@ -82,5 +82,20 @@ namespace Service.Services
         {
             return await _repository.GetStatutsAsync();
         }
+
+        public async Task<bool> AffecterProduitAsync(int inventaireId, int produitId)
+        {
+            return await _repository.AffecterProduitAsync(inventaireId, produitId);
+        }
+
+        public async Task<bool> ProduitExisteAsync(int produitId)
+        {
+            return await _repository.ProduitExisteAsync(produitId);
+        }
+
+        public async Task<List<Inventaire>> GetByEquipeIdsAsync(List<int> equipeIds)
+        {
+            return await _repository.GetByEquipeIdsAsync(equipeIds);
+        }
     }
 }

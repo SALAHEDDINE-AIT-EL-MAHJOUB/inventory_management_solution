@@ -12,5 +12,6 @@ namespace Service.IServices
         Task UpdateAsync(EquipeOperateur entity);
         Task DeleteAsync(EquipeOperateur entity);
         Task<List<EquipeOperateur>> GetByEquipeIdAsync(int equipeId);
- }
+        Task<List<EquipeOperateur>> GetByOperateurIdAsync(int operateurId);
+    }
 }

@@ -3,65 +3,62 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Domain.Entities;
-using Repository.IRepositories;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Repository.Data;
 
-namespace Repository.Repositories
+public class OperateurRepository : IOperateurRepository
 {
-    public class OperateurRepository : GenericRepository<Operateur>, IOperateurRepository
+    private readonly ApplicationDbContext _context;
+    public OperateurRepository(ApplicationDbContext context)
     {
-        private readonly ApplicationDbContext _context;
-        private readonly ILogger<GenericRepository<Operateur>> _logger;
+        _context = context;
+    }
 
-        public OperateurRepository(ApplicationDbContext dbContext, ILogger<GenericRepository<Operateur>> logger) : base(dbContext, logger)
-        {
-            _context = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
+    public async Task<List<Operateur>> GetAllAsync()
+    {
+        return await _context.Operateurs.ToListAsync();
+    }
 
-        public async Task<Operateur?> GetOperateurByUserId(string id)
-        {
-            try
-            {
-                return await _context.Operateurs
-                    .Include(o => o.User)
-                    .Include(o => o.Site)
-                    .FirstOrDefaultAsync(o => o.UserId == id);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error while getting operator by user ID");
-                throw;
-            }
-        }
+    public async Task<Operateur?> GetByIdAsync(int id)
+    {
+        return await _context.Operateurs.FindAsync(id);
+    }
 
-        public async Task<List<Operateur>> GetOperateurBySiteId(int siteId)
-        {
-            try
-            {
-                return await _context.Operateurs
-                    .Include(o => o.User)
-                    .Include(o => o.Site)
-                    .Where(o => o.SiteId == siteId)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error while getting operators by site ID");
-                throw;
-            }
-        }
+    public async Task<Operateur?> GetOperateurByUserId(string userId)
+    {
+        return await _context.Operateurs.FirstOrDefaultAsync(o => o.UserId == userId);
+    }
 
-        public async Task AddAsync(Operateur operateur)
+    public async Task<List<Operateur>> GetOperateurBySiteId(int siteId)
+    {
+        return await _context.Operateurs.Where(o => o.SiteId == siteId).ToListAsync();
+    }
+
+    public async Task<Operateur> AddAsync(Operateur entity)
+    {
+        _context.Operateurs.Add(entity);
+        await _context.SaveChangesAsync();
+        return entity;
+    }
+
+    public async Task UpdateAsync(Operateur entity)
+    {
+        _context.Operateurs.Update(entity);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task DeleteAsync(int id)
+    {
+        var entity = await _context.Operateurs.FindAsync(id);
+        if (entity != null)
         {
-            _context.Operateurs.Add(operateur);
+            _context.Operateurs.Remove(entity);
             await _context.SaveChangesAsync();
         }
-        public async Task<int> CountAsync()
-{
-    return await _context.Operateurs.CountAsync();
-}
+    }
+
+    public async Task<int> CountAsync()
+    {
+        return await _context.Operateurs.CountAsync();
     }
 }

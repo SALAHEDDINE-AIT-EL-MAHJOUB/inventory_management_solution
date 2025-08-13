@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import OperateurNavbar from "./navbar";
+import GestionProduit from "./GestionProduit";
+
 
 const OperateurDashboard = () => {
   const [operateur, setOperateur] = useState(null);
+  const operateurId = operateur ? (operateur.id || operateur._id) : null;
 
   useEffect(() => {
     axios
@@ -15,10 +19,10 @@ const OperateurDashboard = () => {
 
   return (
     <div>
-      <h2>Compte de l'opérateur</h2>
-      <p><strong>Nom:</strong> {operateur.nom}</p>
-      <p><strong>Email:</strong> {operateur.email}</p>
-      {/* Ajoutez d'autres champs selon votre modèle */}
+      <OperateurNavbar />
+      <div style={{ padding: "20px" }}>
+        
+      </div>
     </div>
   );
 };

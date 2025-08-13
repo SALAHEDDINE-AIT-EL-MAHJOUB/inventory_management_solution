@@ -1,57 +1,78 @@
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
 body {
-  background: #eaeef6;
-  font-family: 'Open Sans', sans-serif;
+  background: #f5f7fa;
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
 }
+
 .navbar {
   position: fixed;
-  top: 1px; /* Hauteur de l'AppBar */
+  top: 64px; /* Hauteur de l'AppBar */
   left: 0;
   height: calc(100vh - 64px);
-  width: 300px;
-  background: #1976d2;
+  width: 260px;
+  background: linear-gradient(180deg, #1976d2 0%, #0d47a1 100%);
   padding: 1rem 0;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
   z-index: 1000;
   max-width: 90vw;
   margin-top: 0;
-  
   border-radius: 0 16px 16px 0;
+  transition: left 0.3s ease;
 }
+
+.navbar-collapsed {
+  left: -260px;
+}
+
 .navbar__menu {
   list-style: none;
   padding: 0;
   margin: 0;
 }
+
 .navbar__item {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
 }
+
 .navbar__link {
   display: flex;
   align-items: center;
   justify-content: flex-start;
   height: 3.5rem;
-  color: #fff;
+  color: #1976d2;
   text-decoration: none;
-  padding: 0 1.5rem;
-  border-radius: 0;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
   transition: background 0.2s, color 0.2s;
+  cursor: pointer;
   position: relative;
-  font-weight: 600;
-  font-family: 'Open Sans', sans-serif;
+  font-weight: 500;
+  font-family: 'Poppins', sans-serif;
   font-size: 1rem;
   outline: none;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
 }
+
 .navbar__link:hover,
 .navbar__link:focus {
-  background: #1565c0;
-  color: #fff;
-  outline: 2px solid #fff;
-  outline-offset: -2px;
-  box-shadow: 0 2px 8px rgba(21,101,192,0.12);
+  background: #e3f0fc;
+  color: #0d47a1;
 }
+
+.active-nav-link {
+  background: #e3f0fc !important;
+  color: #0d47a1 !important;
+  font-weight: 600 !important;
+}
+
 .navbar__link span {
-  margin-left: 1rem;
+  margin-left: 12px;
   color: #fff;
   background: transparent;
   padding: 0;
@@ -60,14 +81,75 @@ body {
   position: static;
   transform: none;
   pointer-events: auto;
-  font-weight: 600;
+  font-weight: inherit;
   transition: none;
 }
 
+.navbar__link i {
+  stroke-width: 2px;
+  width: 18px;
+  height: 18px;
+}
+
 /* Responsive : cache la navbar sur mobile si besoin */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .navbar {
-    width: 80vw;
-    max-width: 95vw;
+    width: 240px;
+    max-width: 85vw;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
   }
+  
+  .navbar.show {
+    transform: translateX(0);
+  }
+}
+
+.topbar-brand {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-logo {
+  height: 38px;
+  margin-right: 12px;
+}
+
+.topbar-title {
+  font-weight: 700;
+  font-size: 1.4rem;
+  background: linear-gradient(45deg, #1976d2 30%, #42a5f5 90%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 0.04em;
+}
+
+/* Animation pour les transitions */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Style pour les menus déroulants */
+.MuiMenu-paper {
+  border-radius: 12px !important;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.12) !important;
+  animation: fadeIn 0.2s ease;
+  border: 1px solid rgba(0,0,0,0.08);
+  overflow: hidden !important;
+}
+
+.MuiMenuItem-root {
+  min-height: 45px !important;
+  font-family: 'Poppins', sans-serif !important;
+  font-size: 0.9rem !important;
+}
+
+/* Effet de transition pour le contenu principal */
+.main-content {
+  transition: margin-left 0.3s ease;
 }

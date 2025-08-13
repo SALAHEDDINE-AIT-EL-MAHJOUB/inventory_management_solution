@@ -8,14 +8,22 @@ using System.Linq;
 namespace Web.Controllers.inventaire
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/inventaire")]
     public class InventaireController : ControllerBase
     {
         private readonly IInventaireService _inventaireService;
+        private readonly IGestionInventaireService _gestionInventaireService;
+        private readonly IProduitService _produitService; // Ajoutez cette ligne
 
-        public InventaireController(IInventaireService inventaireService)
+        public InventaireController(
+            IInventaireService inventaireService,
+            IGestionInventaireService gestionInventaireService,
+            IProduitService produitService // Ajoutez ce paramètre
+        )
         {
             _inventaireService = inventaireService;
+            _gestionInventaireService = gestionInventaireService;
+            _produitService = produitService; // Ajoutez cette ligne
         }
 
         // GET: api/inventaire
@@ -84,6 +92,83 @@ namespace Web.Controllers.inventaire
                 return NotFound("Inventaire non trouvé ou erreur de mise à jour.");
 
             return NoContent();
+        }
+ 
+        // PUT: api/inventaire/{id}/produit
+        public class AffecterProduitDto
+        {
+            public int ProduitId { get; set; }
+        }
+
+        [HttpPut("{id}/produit")]
+        public async Task<IActionResult> AffecterProduit(int id, [FromBody] AffecterProduitDto dto)
+        {
+            if (dto == null)
+                return BadRequest("Données manquantes.");
+
+            // 1. Affecter le produit à l'inventaire (logique existante)
+            var result = await _inventaireService.AffecterProduitAsync(id, dto.ProduitId);
+            if (!result)
+                return NotFound("Inventaire ou produit non trouvé.");
+
+            // 2. Vérifier si une entrée GestionInventaire existe déjà
+            var allGestion = await _gestionInventaireService.GetAllAsync();
+            var existant = allGestion.FirstOrDefault(g => g.InventaireId == id && g.ProduitId == dto.ProduitId);
+
+            // 3. Si non, créer l'entrée GestionInventaire
+            if (existant == null)
+            {
+                // Récupérer le produit pour obtenir le code-barres
+                var produit = await _produitService.GetByIdAsync(dto.ProduitId);
+                if (produit == null)
+                    return NotFound("Produit non trouvé.");
+
+                var gestionInventaire = new GestionInventaire
+                {
+                    InventaireId = id,
+                    ProduitId = dto.ProduitId,
+                    QuantiteInventaire = 0,
+                    Statut = false,
+                    CodeBarreProduit = produit.CodeBarre
+                };
+                await _gestionInventaireService.CreateAsync(gestionInventaire);
+            }
+
+            return NoContent();
+        }
+
+        // POST: api/inventaire
+        public class CreateInventaireDto
+        {
+
+            public int ProduitId { get; set; }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] CreateInventaireDto dto)
+        {
+           var produitExiste = await _inventaireService.ProduitExisteAsync(dto.ProduitId);
+            if (!produitExiste)
+                return BadRequest("Le produit spécifié n'existe pas.");
+
+            // 1. Créer l'inventaire
+            var inventaire = new Inventaire
+            {
+                ProduitId = dto.ProduitId
+               
+            };
+            await _inventaireService.AddAsync(inventaire);
+
+            var gestionInventaire = new GestionInventaire
+            {
+                InventaireId = inventaire.InventaireId,
+                ProduitId = dto.ProduitId,
+                QuantiteInventaire = 0,
+                Statut = false
+            };
+            await _gestionInventaireService.CreateAsync(gestionInventaire);
+
+            return CreatedAtAction(nameof(GetAll), new { id = inventaire.InventaireId }, inventaire);
         }
     }
 }

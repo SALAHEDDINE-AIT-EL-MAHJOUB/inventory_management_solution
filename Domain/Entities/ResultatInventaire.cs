@@ -15,7 +15,7 @@ namespace Domain.Entities
 
         public int? StockArbitre { get; set; }
 
-        public int? QuantiteScannee { get; set; } // 👈 quantité observée par l'opérateur
+        public int? QuantiteScannee { get; set; } 
 
         public virtual Equipe? ResultatInventaireEquipe { get; set; }
 
@@ -26,7 +26,7 @@ namespace Domain.Entities
         public virtual Operateur? ResultatInventaireOperateur { get; set; }
 
         public DateTime DateComptage { get; set; }
-        public int ÉtapeComptage { get; set; } // 1, 2 ou 3 (arbitrage)
+        public int ÉtapeComptage { get; set; } 
 
     }
 }

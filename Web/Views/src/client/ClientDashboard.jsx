@@ -14,18 +14,20 @@ import Rangee from "../emplacement/Rangee";
 import Etage from "../emplacement/etage";
 import RegisterOperateur from "./gestionOperateur/registerOperateur";
 import ListeOperateurs from "./gestionOperateur/ListeOperateurs";
-import CreeEquipe from "./gestionEquipe/creeEquipe"; // Ajoutez cet import
+import CreeEquipe from "./gestionEquipe/creeEquipe"; 
 import EquipeManager from "./gestionEquipe/EquipeManager";
 import Produit from "./gestionProduit/creeProduit";
 import NavbarProduit from "./gestionProduit/navbarProduit";
 import CreeProduit from "./gestionProduit/creeProduit";
 import Fournisseur from "./gestionProduit/fournisseur";
 import ListProduit from "./gestionProduit/listProduit"; 
-
+import ResultaOperateur from "./gestionOperateur/resultaOperateur";
 import CreeInventaire from "./inventaire/creeInventaire";
+import GestionInventaireTableau from "./inventaire/gestioninventaire";
 import { FaTachometerAlt, FaUser, FaShoppingCart, FaBuilding, FaMapMarkerAlt, FaUserCircle, FaWarehouse, FaBoxes, FaUsers } from "react-icons/fa";
 import { Bar, Pie } from "react-chartjs-2";
 import "chart.js/auto";
+import logo from "../../public/logo.png"; 
 
 const ClientDashboard = ({ onLogout }) => {
   const [orders, setOrders] = useState([]);
@@ -35,8 +37,8 @@ const ClientDashboard = ({ onLogout }) => {
   });
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("dashboard");
-  const [emplacementTab, setEmplacementTab] = useState("societes"); // Ajout pour la sous-navbar
-  const [produitTab, setProduitTab] = useState("creeProduit"); // Ajoutez ce state
+  const [emplacementTab, setEmplacementTab] = useState("societes"); 
+  const [produitTab, setProduitTab] = useState("creeProduit"); 
   const [error, setError] = useState("");
   const [stats, setStats] = useState({
     societes: 0,
@@ -48,7 +50,7 @@ const ClientDashboard = ({ onLogout }) => {
   });
   const [inventaireStatutData, setInventaireStatutData] = useState({});
   const [inventaireTypeData, setInventaireTypeData] = useState({});
-  const [ruptureData, setRuptureData] = useState({}); // Ajout pour les produits en rupture de stock
+  const [ruptureData, setRuptureData] = useState({}); 
   const [stockBarData, setStockBarData] = useState({});
   const [ruptureListData, setRuptureListData] = useState({});
 
@@ -57,9 +59,9 @@ const ClientDashboard = ({ onLogout }) => {
     loadStats();
     loadInventaireStatuts();
     loadInventaireTypes();
-    loadRuptureData(); // Chargement des données de rupture de stock
-    loadStockBarData(); // Chargement des données pour le graphique des stocks
-    loadRuptureListData(); // Chargement des données pour la liste des produits en rupture
+    loadRuptureData(); 
+    loadStockBarData(); 
+    loadRuptureListData(); 
   }, []);
 
   const loadClientData = async () => {
@@ -68,14 +70,12 @@ const ClientDashboard = ({ onLogout }) => {
     try {
       // Charger le profil client à jour - utiliser le nouveau endpoint
       const response = await axios.get("/api/Profil/me");
-      // Correction ici : utiliser directement response.data
+      
       if (response.data && (response.data.clientNom || response.data.ClientNom)) {
         setProfile(response.data);
       }
       
-      // Charger les commandes (à implémenter selon votre logique)
-      // const ordersResponse = await axios.get("/api/Client/orders");
-      // setOrders(ordersResponse.data);
+      
     } catch (error) {
       console.error("Erreur lors du chargement des données:", error);
       setError("Erreur lors du chargement des données");
@@ -108,7 +108,7 @@ const ClientDashboard = ({ onLogout }) => {
     }
   };
 
-  // Nouvelle fonction pour charger la répartition des statuts d'inventaire
+  //  fonction pour charger la répartition des statuts d'inventaire
   const loadInventaireStatuts = async () => {
     try {
       const res = await axios.get("/api/inventaire/statut-counts");
@@ -129,10 +129,10 @@ const ClientDashboard = ({ onLogout }) => {
     }
   };
 
-  // Nouvelle fonction pour charger la répartition par type d'inventaire
+  //  fonction pour charger la répartition par type d'inventaire
   const loadInventaireTypes = async () => {
     try {
-      // Utilise le nouvel endpoint simplifié
+      // Utilise le  endpoint simplifié
       const res = await axios.get("/api/inventaire/type-counts");
       const counts = res.data;
       setInventaireTypeData({
@@ -157,7 +157,7 @@ const ClientDashboard = ({ onLogout }) => {
     }
   };
 
-  // Nouvelle fonction pour charger les produits en rupture de stock
+  //  fonction pour charger les produits en rupture de stock
   const loadRuptureData = async () => {
     try {
       const res = await axios.get("/api/Produit/rupture-count");
@@ -180,7 +180,7 @@ const ClientDashboard = ({ onLogout }) => {
     }
   };
 
-  // Nouvelle fonction pour charger les données du graphique des stocks
+  //  fonction pour charger les données du graphique des stocks
   const loadStockBarData = async () => {
     try {
       const res = await axios.get("/api/Produit/stock-bar");
@@ -200,7 +200,7 @@ const ClientDashboard = ({ onLogout }) => {
     }
   };
 
-  // Nouvelle fonction pour charger la liste des produits en rupture
+  //  fonction pour charger la liste des produits en rupture
   const loadRuptureListData = async () => {
     try {
       const res = await axios.get("/api/Produit/rupture-list");
@@ -224,13 +224,16 @@ const ClientDashboard = ({ onLogout }) => {
       await axios.post("/api/ClientAuth/logout");
       localStorage.removeItem("clientInfo");
       if (onLogout) onLogout();
-      window.location.href = "/login"; // <-- Redirection vers la page login
+      window.location.href = "/login"; 
+      
     } catch (error) {
       console.error("Erreur lors de la déconnexion:", error);
-      // Déconnexion locale même en cas d'erreur
+    
+      
       localStorage.removeItem("clientInfo");
       if (onLogout) onLogout();
-      window.location.href = "/login"; // <-- Redirection même en cas d'erreur
+      window.location.href = "/login"; 
+      
     }
   };
 
@@ -314,31 +317,8 @@ const ClientDashboard = ({ onLogout }) => {
 
   const renderProfile = () => <Profile profile={profile} setProfile={setProfile} />;
 
-  const renderOrders = () => (
-    <div className="orders-content">
-      <h3>Mes Commandes</h3>
-      {orders.length === 0 ? (
-        <div className="no-orders">
-          <p>Aucune commande pour le moment</p>
-        </div>
-      ) : (
-        <div className="orders-list">
-          {orders.map(order => (
-            <div key={order.id} className="order-item">
-              <div className="order-info">
-                <h4>Commande #{order.id}</h4>
-                <p>Date: {new Date(order.date).toLocaleDateString()}</p>
-                <p>Statut: {order.status}</p>
-              </div>
-              <div className="order-total">
-                {order.total}€
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+ 
+  
 
   const renderSocietes = () => (
     <GestionSocietes clientId={profile.clientId} />
@@ -371,7 +351,10 @@ const ClientDashboard = ({ onLogout }) => {
       {/* Navbar horizontale */}
       <header className="dashboard-topbar">
         <div className="topbar-content">
-          <span className="topbar-title">{""}</span>
+          <div className="topbar-brand">
+            <img src={logo} alt="Logo" className="navbar-logo" />
+            <span className="topbar-title">StockPilot</span>
+          </div>
           <div className="topbar-user">
             <FaUserCircle
               size={24}
@@ -391,12 +374,13 @@ const ClientDashboard = ({ onLogout }) => {
           <ul className="nav-menu">
             {[
               { key: "dashboard", label: "Tableau de bord", icon: <FaTachometerAlt /> },
-              { key: "societes", label: "Sociétés", icon: <FaBuilding /> },
-              { key: "emplacement", label: "Emplacement", icon: <FaMapMarkerAlt /> },
+             { key: "emplacement", label: "Emplacement", icon: <FaMapMarkerAlt /> },
               { key: "operateur", label: "Ajouter Opérateur", icon: <FaUser /> },
               { key: "equipe", label: "Équipe", icon: <FaUserCircle /> },
               { key: "produit", label: "Gestion de Produit", icon: <FaShoppingCart /> },
-              { key: "inventaire", label: "Inventaire", icon: <FaShoppingCart /> } // Ajout de l'onglet Inventaire
+              { key: "inventaire", label: "Inventaire", icon: <FaShoppingCart /> } ,
+              { key: "gestion-inventaire", label: "Gestion Inventaire", icon: <FaWarehouse /> },
+            
             ].map(page => (
               <li key={page.key} className={activeTab === page.key ? "active" : ""}>
                 <button onClick={() => setActiveTab(page.key)}>
@@ -423,20 +407,23 @@ const ClientDashboard = ({ onLogout }) => {
               {produitTab === "fournisseur" && <Fournisseur />}
             </>
           )}
-          {activeTab === "inventaire" && <CreeInventaire />} {/* Affichage du composant */}
-          {/* Affichage de la navbar d'emplacement et des composants associés */}
+          {activeTab === "inventaire" && <CreeInventaire />}
           {activeTab === "emplacement" && (
             <>
               <Navbar active={emplacementTab} onNavigate={setEmplacementTab} />
               {emplacementTab === "villes" && <Ville />}
               {emplacementTab === "societes" && renderSocietes()}
-               {emplacementTab === "regions" && <Region />}
+              {emplacementTab === "regions" && <Region />}
               {emplacementTab === "sites" && <Site />}
               {emplacementTab === "zones" && <Zone />}
               {emplacementTab === "allees" && <Allee />}
               {emplacementTab === "rangees" && <Rangee />}
               {emplacementTab === "etages" && <Etage />}
             </>
+          )}
+          {activeTab === "resultat-operateur" && <ResultaOperateur />}
+          {activeTab === "gestion-inventaire" && (
+            <GestionInventaireTableau />
           )}
         </main>
       </div>

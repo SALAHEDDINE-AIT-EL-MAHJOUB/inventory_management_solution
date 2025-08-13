@@ -18,7 +18,7 @@ namespace Domain.Entities
         public int? InventaireTypeInventaireId { get; set; }
 
         public bool EstDoubleComptage => InventaireTypeInventaireId == (int)TypeInventaireIds.DoubleAvecArbitrage;
-
+public int? EquipeId { get; set; } 
         public DateTime? InventaireDate { get; set; }
 
        
@@ -40,7 +40,7 @@ namespace Domain.Entities
 
         public virtual ICollection<ResultatInventaire> ResultatInventaires { get; set; } = new List<ResultatInventaire>();
 
-        public string? MotDePasse { get; set; }
-
+        public int? ProduitId { get; set; }
+        public virtual Produit? Produit { get; set; }
     }
 }

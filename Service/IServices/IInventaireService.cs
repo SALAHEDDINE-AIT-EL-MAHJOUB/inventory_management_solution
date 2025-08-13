@@ -17,5 +17,7 @@ public interface IInventaireService
     Task<List<Inventaire>> GetAllAsync();
     Task<List<TypeInventaire>> GetTypesAsync();
     Task<List<Statut>> GetStatutsAsync();
-
+    Task<bool> AffecterProduitAsync(int inventaireId, int produitId);
+    Task<bool> ProduitExisteAsync(int produitId);
+    Task<List<Inventaire>> GetByEquipeIdsAsync(List<int> equipeIds);
 }

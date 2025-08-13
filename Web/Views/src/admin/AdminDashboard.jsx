@@ -57,14 +57,7 @@ const AdminDashboard = () => {
                 marginLeft: 260,
               }}
             >
-              <h1 style={{ margin: 0, fontWeight: 700, fontSize: "2.2rem", letterSpacing: 1 }}>
-                Tableau de bord Administrateur
-              </h1>
-              {admin && (
-                <p style={{ margin: "8px 0 0 0", fontSize: "1.1rem" }}>
-                  Bienvenue, <strong>{admin.userName || admin.email}</strong> !
-                </p>
-              )}
+             
             </div>
             <div
               style={{

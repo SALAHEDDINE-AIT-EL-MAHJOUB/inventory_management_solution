@@ -3,6 +3,7 @@ using Service.IServices;
 using Domain.Entities;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Linq;
 
 // Ajoutez ce DTO dans un dossier Dtos si besoin
 public class EquipeCreateDto
@@ -30,7 +31,7 @@ namespace Web.Controllers.equipe
     {
         private readonly IEquipeService _equipeService;
         private readonly IEquipeOperateurService _equipeOperateurService;
-        private readonly IInventaireService _inventaireService; // Ajout du service d'inventaire
+        private readonly IInventaireService _inventaireService;
 
         public EquipeController(IEquipeService equipeService, IEquipeOperateurService equipeOperateurService, IInventaireService inventaireService)
         {
@@ -48,7 +49,6 @@ namespace Web.Controllers.equipe
 
             foreach (var eq in equipes)
             {
-                // Utilise la bonne méthode pour récupérer les opérateurs de l'équipe
                 var equipeOperateurs = await _equipeOperateurService.GetByEquipeIdAsync(eq.EquipeId);
                 var membres = equipeOperateurs
                     .Select(eo => eo.EquipeOperateurOperateur?.Nom)
@@ -84,30 +84,31 @@ namespace Web.Controllers.equipe
             if (dto == null || dto.OperateurIds == null || dto.OperateurIds.Count == 0)
                 return BadRequest("Opérateurs requis.");
 
-            // 1. Créer l'inventaire associé à l'équipe
-            var inventaire = new Inventaire
-            {
-                InventaireDate = DateTime.UtcNow,
-                InventaireLibelle = $"Inventaire de l'équipe {dto.Nom}",
-                InventaireSiteId = dto.SiteId,
-            };
-            await _inventaireService.AddAsync(inventaire);
-
-            // 2. Créer l'équipe en la liant à l'inventaire
+            // 1. Créer l'équipe (sans EquipeInventaireId pour l'instant)
             var equipe = new Equipe
             {
                 Nom = dto.Nom,
                 Description = dto.Description,
-                SiteId = dto.SiteId,
-                EquipeInventaireId = inventaire.InventaireId
+                SiteId = dto.SiteId
             };
             await _equipeService.AddAsync(equipe);
 
-            // Recharge l'équipe pour obtenir l'ID généré si besoin
-            // (optionnel si AddAsync fait un SaveChanges et met à jour l'ID)
-            // Sinon, tu peux récupérer l'équipe par un critère unique ou utiliser le retour de AddAsync
+            // 2. Créer l'inventaire associé à l'équipe (sans ProduitId)
+            var inventaire = new Inventaire
+            {
+                EquipeId = equipe.EquipeId,
+                InventaireDate = DateTime.UtcNow,
+                InventaireLibelle = $"Inventaire  {dto.Nom}",
+                InventaireSiteId = dto.SiteId
+                
+            };
+            await _inventaireService.AddAsync(inventaire);
 
-            // 3. Ajouter les opérateurs à l'équipe
+            // 3. Mettre à jour l'équipe avec l'ID de l'inventaire
+            equipe.EquipeInventaireId = inventaire.InventaireId;
+            await _equipeService.UpdateAsync(equipe);
+
+            // 4. Ajouter les opérateurs à l'équipe
             foreach (var operateurId in dto.OperateurIds)
             {
                 var equipeOperateur = new EquipeOperateur
@@ -135,19 +136,17 @@ namespace Web.Controllers.equipe
             await _equipeService.UpdateAsync(equipe);
 
             // --- Mettre à jour les opérateurs de l'équipe ---
-            // 1. Supprimer les anciens liens
             var anciens = await _equipeOperateurService.GetByEquipeIdAsync(id);
             foreach (var eo in anciens)
                 await _equipeOperateurService.DeleteAsync(eo);
 
-            // 2. Ajouter les nouveaux liens
             foreach (var operateurId in dto.OperateurIds)
             {
-               var nouveau = new EquipeOperateur
-{
-    EquipeOperateurEquipeId = id,
-    EquipeOperateurOperateurId = operateurId
-};
+                var nouveau = new EquipeOperateur
+                {
+                    EquipeOperateurEquipeId = id,
+                    EquipeOperateurOperateurId = operateurId
+                };
                 await _equipeOperateurService.AddAsync(nouveau);
             }
 

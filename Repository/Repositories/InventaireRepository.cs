@@ -117,6 +117,7 @@ namespace Repository.Repositories
             return await _context.Inventaires
                 .Include(i => i.InventaireStatut)
                 .Include(i => i.InventaireTypeInventaire)
+                .Include(i => i.Produit) // Ajoutez ceci
                 .ToListAsync();
         }
 
@@ -129,9 +130,49 @@ namespace Repository.Repositories
         {
             return await _context.Statut.ToListAsync();
         }
-public async Task<int> CountAsync()
-{
-    return await _context.Sites.CountAsync();
-}
+        public async Task<int> CountAsync()
+        {
+            return await _context.Sites.CountAsync();
+        }
+
+        public async Task<bool> AffecterProduitAsync(int inventaireId, int produitId)
+        {
+            var inventaire = await _context.Inventaires.FindAsync(inventaireId);
+            if (inventaire == null)
+                return false;
+
+            var produit = await _context.Produits.FindAsync(produitId);
+            if (produit == null)
+                return false;
+
+            inventaire.ProduitId = produitId;
+            inventaire.Produit = produit;
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> ProduitExisteAsync(int produitId)
+        {
+            return await _context.Produits.AnyAsync(p => p.Id == produitId);
+        }
+
+        public async Task<List<Inventaire>> GetByEquipeIdsAsync(List<int> equipeIds)
+        {
+            return await _context.Inventaires
+                .Where(i => i.Equipes.Any(e => equipeIds.Contains(e.EquipeId)))
+                .Include(i => i.InventaireStatut)
+                .Include(i => i.InventaireTypeInventaire)
+                .Include(i => i.Produit)
+                .ToListAsync();
+        }
+
+        public async Task<Inventaire> CreateAsync(Inventaire entity)
+        {
+            _context.Inventaires.Add(entity);
+            await _context.SaveChangesAsync();
+            return entity;
+        }
+
+
     }
 }

@@ -77,7 +77,7 @@ namespace Service.Services
             var operateur = await _operateurRepository.GetByIdAsync(id);
             if (operateur == null) return false;
 
-            await _operateurRepository.DeleteAsync(operateur);
+            await _operateurRepository.DeleteAsync(operateur.Id);
             return true;
         }
    

@@ -63,6 +63,7 @@ const CreeInventaire = () => {
   const [inventaires, setInventaires] = useState([]);
   const [statuts, setStatuts] = useState([]);
   const [types, setTypes] = useState([]);
+  const [produits, setProduits] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editRow, setEditRow] = useState(null);
   const [editValues, setEditValues] = useState({});
@@ -71,6 +72,7 @@ const CreeInventaire = () => {
     fetchInventaires();
     fetchStatuts();
     fetchTypes();
+    fetchProduits(); // Ajoutez ceci
   }, []);
 
   const fetchInventaires = async () => {
@@ -90,6 +92,12 @@ const CreeInventaire = () => {
     const res = await fetch("/api/typeinventaire");
     const data = await res.json();
     setTypes(data);
+  };
+
+  const fetchProduits = async () => {
+    const res = await fetch("/api/produit");
+    const data = await res.json();
+    setProduits(data);
   };
 
   const handleEdit = (inv) => {
@@ -124,6 +132,13 @@ const CreeInventaire = () => {
         body: JSON.stringify({ typeInventaireId: editValues.typeInventaireId }),
       });
     }
+    if (editValues.produitId) {
+      await fetch(`/api/inventaire/${id}/produit`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ produitId: editValues.produitId }),
+      });
+    }
     setEditRow(null);
     setEditValues({});
     fetchInventaires();
@@ -132,74 +147,96 @@ const CreeInventaire = () => {
   if (loading) return <div style={{margin: "30px", fontSize: "18px"}}>Chargement...</div>;
 
   return (
-    <div style={{maxWidth: "1100px", margin: "40px auto", padding: "20px"}}>
-      <h2 style={{color: "#1976d2", textAlign: "center", marginBottom: "18px"}}>Liste des Inventaires</h2>
-      <div style={{overflowX: "auto"}}>
-        <table style={tableStyle}>
-          <thead>
-            <tr>
-              <th style={thStyle}>ID</th>
-              <th style={thStyle}>Libellé</th>
-              <th style={thStyle}>Statut</th>
-              <th style={thStyle}>Type</th>
-              <th style={thStyle}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {inventaires.map(inv => (
-              <tr key={inv.inventaireId}>
-                <td style={tdStyle}>{inv.inventaireId}</td>
-                <td style={tdStyle}>{inv.inventaireLibelle}</td>
-                <td style={tdStyle}>
-                  {editRow === inv.inventaireId ? (
-                    <select
-                      style={selectStyle}
-                      value={editValues.statutId}
-                      onChange={e => handleChange("statutId", e.target.value)}
-                    >
-                      <option value="" disabled>Choisir...</option>
-                      {statuts.map(s => (
-                        <option key={s.statutId} value={s.statutId}>
-                          {s.statutLibelle || s.statutNom}
-                        </option>
-                      ))}
-                    </select>
-                  ) : (
-                    inv.inventaireStatut?.statutLibelle || inv.inventaireStatut?.statutNom || "N/A"
-                  )}
-                </td>
-                <td style={tdStyle}>
-                  {editRow === inv.inventaireId ? (
-                    <select
-                      style={selectStyle}
-                      value={editValues.typeInventaireId}
-                      onChange={e => handleChange("typeInventaireId", e.target.value)}
-                    >
-                      <option value="" disabled>Choisir...</option>
-                      {types.map(t => (
-                        <option key={t.typeInventaireId} value={t.typeInventaireId}>
-                          {t.typeInventaireLibelle}
-                        </option>
-                      ))}
-                    </select>
-                  ) : (
-                    inv.inventaireTypeInventaire?.typeInventaireLibelle || "N/A"
-                  )}
-                </td>
-                <td style={tdStyle}>
-                  {editRow === inv.inventaireId ? (
-                    <>
-                      <button style={saveBtn} onClick={() => handleSave(inv.inventaireId)}>Enregistrer</button>
-                      <button style={cancelBtn} onClick={handleCancel}>Annuler</button>
-                    </>
-                  ) : (
-                    <button style={editBtn} onClick={() => handleEdit(inv)}>Modifier</button>
-                  )}
-                </td>
+    <div>
+     
+      <div style={{maxWidth: "1100px", margin: "40px auto", padding: "20px"}}>
+        <h2 style={{color: "#1976d2", textAlign: "center", marginBottom: "18px"}}>Liste des Inventaires</h2>
+        <div style={{overflowX: "auto"}}>
+          <table style={tableStyle}>
+            <thead>
+              <tr>
+                <th style={thStyle}>ID</th>
+                <th style={thStyle}>Libellé</th>
+                <th style={thStyle}>Statut</th>
+                <th style={thStyle}>Type</th>
+                <th style={thStyle}>Produit</th>
+                <th style={thStyle}>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {inventaires.map(inv => (
+                <tr key={inv.inventaireId}>
+                  <td style={tdStyle}>{inv.inventaireId}</td>
+                  <td style={tdStyle}>{inv.inventaireLibelle}</td>
+                  <td style={tdStyle}>
+                    {editRow === inv.inventaireId ? (
+                      <select
+                        style={selectStyle}
+                        value={editValues.statutId}
+                        onChange={e => handleChange("statutId", e.target.value)}
+                      >
+                        <option value="" disabled>Choisir...</option>
+                        {statuts.map(s => (
+                          <option key={s.statutId} value={s.statutId}>
+                            {s.statutLibelle || s.statutNom}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      inv.inventaireStatut?.statutLibelle || inv.inventaireStatut?.statutNom || "N/A"
+                    )}
+                  </td>
+                  <td style={tdStyle}>
+                    {editRow === inv.inventaireId ? (
+                      <select
+                        style={selectStyle}
+                        value={editValues.typeInventaireId}
+                        onChange={e => handleChange("typeInventaireId", e.target.value)}
+                      >
+                        <option value="" disabled>Choisir...</option>
+                        {types.map(t => (
+                          <option key={t.typeInventaireId} value={t.typeInventaireId}>
+                            {t.typeInventaireLibelle}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      inv.inventaireTypeInventaire?.typeInventaireLibelle || "N/A"
+                    )}
+                  </td>
+                  <td style={tdStyle}>
+                    {editRow === inv.inventaireId ? (
+                      <select
+                        style={selectStyle}
+                        value={editValues.produitId}
+                        onChange={e => handleChange("produitId", e.target.value)}
+                      >
+                        <option value="" disabled>Choisir...</option>
+                        {produits.map(p => (
+                          <option key={p.id} value={p.id}>
+                            {p.nom}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      inv.produit?.nom || "Aucun"
+                    )}
+                  </td>
+                  <td style={tdStyle}>
+                    {editRow === inv.inventaireId ? (
+                      <>
+                        <button style={saveBtn} onClick={() => handleSave(inv.inventaireId)}>Enregistrer</button>
+                        <button style={cancelBtn} onClick={handleCancel}>Annuler</button>
+                      </>
+                    ) : (
+                      <button style={editBtn} onClick={() => handleEdit(inv)}>Modifier</button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 using Domain.Entities;
-using Repository.IRepositories;
 using Service.IServices;
+using Repository.IRepositories;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -15,55 +15,28 @@ namespace Service.Services
             _repository = repository;
         }
 
-        public async Task<IEnumerable<ResultatInventaire>> GetByInventaireIdAsync(int inventaireId)
-        {
-            return await _repository.GetByInventaireIdAsync(inventaireId);
-        }
+        public async Task<IEnumerable<ResultatInventaire>> GetAllAsync() =>
+            await _repository.GetAllAsync();
 
-        public async Task AddAsync(ResultatInventaire entity)
-        {
+        public async Task<ResultatInventaire?> GetByIdAsync(int id) =>
+            await _repository.GetByIdAsync(id);
+
+        public async Task<IEnumerable<ResultatInventaire>> GetByProduitIdAsync(int produitId) =>
+            await _repository.GetByProduitIdAsync(produitId);
+
+        public async Task<IEnumerable<ResultatInventaire>> GetByInventaireIdAsync(int inventaireId) =>
+            await _repository.GetByInventaireIdAsync(inventaireId);
+
+        public async Task AddAsync(ResultatInventaire entity) =>
             await _repository.AddAsync(entity);
-        }
 
-        public async Task<ResultatInventaire?> GetByIdAsync(int id)
-        {
-            return await _repository.GetByIdAsync(id);
-        }
-
-        public async Task UpdateAsync(ResultatInventaire entity)
-        {
+        public async Task UpdateAsync(ResultatInventaire entity) =>
             await _repository.UpdateAsync(entity);
-            await _repository.SaveChangesAsync();
-        }
 
-        public async Task<bool> ExisteAsync(int gestionProduitId, int operateurId, int inventaireId, int etapeComptage)
-        {
-            return await _repository.ExisteAsync(gestionProduitId, operateurId, inventaireId, etapeComptage);
-        }
+        public async Task DeleteAsync(int id) =>
+            await _repository.DeleteAsync(id);
 
-        public async Task<List<int>> GetGestionProduitIdsScannesAsync(int operateurId, int inventaireId, int etapeComptage)
-        {
-            return await _repository.GetGestionProduitIdsScannesAsync(operateurId, inventaireId, etapeComptage);
-        }
-
-        public async Task<List<ResultatInventaire>> GetResultatsParInventaireEtOperateurAsync(int inventaireId, int operateurId)
-        {
-            return await _repository.GetResultatsParInventaireEtOperateurAsync(inventaireId, operateurId);
-        }
-
-        public async Task<List<ResultatInventaire>> GetByInventaireAndProduitAsync(int inventaireId, int gestionProduitId)
-        {
-            return await _repository.GetByInventaireAndProduitAsync(inventaireId, gestionProduitId);
-        }
-
-        public async Task<ResultatInventaire?> GetByInventaireProduitOperateurEtapeAsync(int inventaireId, int gestionProduitId, int operateurId, int etapeComptage)
-        {
-            return await _repository.GetByInventaireProduitOperateurEtapeAsync(inventaireId, gestionProduitId, operateurId, etapeComptage);
-        }
-
-        public async Task<bool> ExisteParGestionProduitEtInventaireAsync(int gestionProduit, int inventaireId, int etapeComptage)
-        {
-            return await _repository.ExisteParGestionProduitEtInventaireAsync(gestionProduit, inventaireId, etapeComptage);
-        }
+        public async Task<ResultatInventaire> AssignerProduitAsync(int gestionProduitId, int? equipeId, int? operateurId) =>
+            await _repository.AssignerProduitAsync(gestionProduitId, equipeId, operateurId);
     }
 }

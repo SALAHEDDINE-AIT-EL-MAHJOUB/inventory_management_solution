@@ -1,38 +1,60 @@
-﻿using System;
+﻿using Domain.Entities;
+using Microsoft.EntityFrameworkCore;
+using Repository.Data;
+using Repository.IRepositories;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Domain.Entities;
-using Repository.IRepositories;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Repository;
-using Repository.Data;
-namespace Repository.Repositories
+
+public class OperationInventaireRepository : IOperationInventaireRepository
 {
-    public class OperationInventaireRepository : GenericRepository<OperationInventaire>, IOperationInventaireRepository
+    private readonly ApplicationDbContext _context;
+
+    public OperationInventaireRepository(ApplicationDbContext context)
     {
-        private readonly ApplicationDbContext _context;
+        _context = context;
+    }
 
-        public OperationInventaireRepository(ApplicationDbContext context, ILogger<GenericRepository<OperationInventaire>> logger)
-            : base(context, logger)
-        {
-            _context = context;
-        }
+    public async Task<IEnumerable<OperationInventaire>> GetAllAsync() =>
+        await _context.OperationInventaires.ToListAsync();
 
-        public async Task<List<OperationInventaire>> GetByInventaireIdAsync(int inventaireId)
+    public async Task<OperationInventaire?> GetByIdAsync(int id) =>
+        await _context.OperationInventaires.FindAsync(id);
+
+    public async Task AddAsync(OperationInventaire entity)
+    {
+        _context.OperationInventaires.Add(entity);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task UpdateAsync(OperationInventaire entity)
+    {
+        _context.OperationInventaires.Update(entity);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task DeleteAsync(int id)
+    {
+        var entity = await _context.OperationInventaires.FindAsync(id);
+        if (entity != null)
         {
-            return await _context.OperationInventaires
-                .Include(o => o.OperationInventaireZone)
-                .Include(o => o.OperationInventaireInventaire)
-                .Where(o => o.OperationInventaireInventaireId == inventaireId)
-                .ToListAsync();
-        }
-        public async Task AddAsync(OperationInventaire operation)
-        {
-            await _context.OperationInventaires.AddAsync(operation);
+            _context.OperationInventaires.Remove(entity);
             await _context.SaveChangesAsync();
         }
+    }
 
+    // Ajoutez cette méthode :
+    public async Task<IEnumerable<OperationInventaire>> GetByZoneIdAsync(int zoneId)
+    {
+        return await _context.OperationInventaires
+            .Where(o => o.OperationInventaireZoneId == zoneId)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<OperationInventaire>> GetByInventaireIdAsync(int inventaireId)
+    {
+        return await _context.OperationInventaires
+            .Where(o => o.OperationInventaireInventaireId == inventaireId)
+            .ToListAsync();
     }
 }

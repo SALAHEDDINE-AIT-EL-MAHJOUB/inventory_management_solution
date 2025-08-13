@@ -46,7 +46,9 @@ const pages = [
   { key: "zones", label: "Zones" },
   { key: "allees", label: "Allées" },
   { key: "rangees", label: "Rangées" },
-  { key: "etages", label: "Étages" }
+  { key: "etages", label: "Étages" },
+  
+
 ];
 
 export default function Navbar({ active, onNavigate }) {

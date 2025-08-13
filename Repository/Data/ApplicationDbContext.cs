@@ -51,6 +51,7 @@ namespace Repository.Data
         public DbSet<CodeBarreCommercial> CodeBarreCommercials { get; set; }
 
        public DbSet<CodebarreProduit> CodebarreProduits { get; set; }
+       public DbSet<GestionInventaire> GestionInventaires { get; set; }
 
 
 
@@ -384,6 +385,16 @@ namespace Repository.Data
                 entity.Property(e => e.InventaireTypeInventaireId)
                     .HasComment("Référence au type d'inventaire, lié à l'identifiant du type dans la table TypeInventaire.")
                     .HasColumnName("Inventaire_TypeInventaireId");
+
+                // Ajoutez cette configuration pour la clé étrangère ProduitId
+                entity.Property(e => e.ProduitId)
+                    .HasColumnName("Inventaire_ProduitId");
+
+                entity.HasOne(e => e.Produit)
+                    .WithMany()
+                    .HasForeignKey(e => e.ProduitId)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasConstraintName("FK_Inventaire_Produit");
 
                 entity.HasOne(d => d.InventaireSite).WithMany(p => p.Inventaires)
                     .HasForeignKey(d => d.InventaireSiteId)
@@ -1045,6 +1056,47 @@ namespace Repository.Data
                 entity.HasIndex(e => e.Code)
                     .IsUnique();
             });
+          modelBuilder.Entity<GestionInventaire>(entity =>
+    {
+        entity.HasKey(e => e.Id);
+        entity.ToTable("GestionInventaire");
+
+        entity.Property(e => e.Id)
+            .HasColumnName("GestionInventaire_Id");
+
+        entity.Property(e => e.InventaireId)
+            .IsRequired()
+            .HasColumnName("GestionInventaire_InventaireId");
+
+        entity.Property(e => e.ProduitId)
+            .IsRequired()
+            .HasColumnName("GestionInventaire_ProduitId");
+
+        entity.Property(e => e.QuantiteInventaire)
+            .IsRequired()
+            .HasColumnName("GestionInventaire_QuantiteInventaire");
+
+        entity.Property(e => e.Statut)
+            .IsRequired()
+            .HasColumnName("GestionInventaire_Statut");
+
+        // Relationships
+        entity.HasOne(e => e.Inventaire)
+            .WithMany()
+            .HasForeignKey(e => e.InventaireId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        entity.HasOne(e => e.Produit)
+            .WithMany()
+            .HasForeignKey(e => e.ProduitId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        entity.HasMany(e => e.OperationInventaires)
+            .WithOne()
+            .HasForeignKey("GestionInventaireId")
+            .OnDelete(DeleteBehavior.Cascade);
+    });
+
             OnModelCreatingPartial(modelBuilder);
         }
 

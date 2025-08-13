@@ -2,6 +2,7 @@ using Domain.Entities;
 using Repository.IRepositories;
 using Service.IServices;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Service.Services
@@ -43,6 +44,12 @@ namespace Service.Services
         public async Task<List<EquipeOperateur>> GetByEquipeIdAsync(int equipeId)
         {
             return await _repository.GetByEquipeIdAsync(equipeId);
+        }
+
+        public async Task<List<EquipeOperateur>> GetByOperateurIdAsync(int operateurId)
+        {
+            var all = await _repository.GetAllAsync();
+            return all.Where(eo => eo.EquipeOperateurOperateurId == operateurId).ToList();
         }
     }
 }

@@ -52,5 +52,13 @@ namespace Repository.Repositories
                 .FirstOrDefaultAsync(); // Retourne null si pas trouvé
         }
 
+        public async Task<List<Equipe>> GetByOperateurIdAsync(int operateurId)
+        {
+            // Exemple avec Entity Framework
+            return await _context.Equipes
+                .Where(e => e.EquipeOperateurs.Any(eo => eo.EquipeOperateurOperateurId == operateurId))
+                .ToListAsync();
+        }
+
     }
 }

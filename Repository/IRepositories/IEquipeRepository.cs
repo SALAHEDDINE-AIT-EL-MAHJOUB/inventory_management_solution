@@ -1,5 +1,4 @@
-﻿
-using Domain.Entities;
+﻿using Domain.Entities;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 namespace Repository.IRepositories
@@ -10,6 +9,6 @@ namespace Repository.IRepositories
         Task<Equipe?> GetByIdAsync(int equipeId);
         Task<List<Equipe>> GetByIdsAsync(List<int> ids);
         Task<int?> GetEquipeIdByOperateurEtInventaireAsync(int operateurId, int inventaireId);
-
+        Task<List<Equipe>> GetByOperateurIdAsync(int operateurId);
     }
 }

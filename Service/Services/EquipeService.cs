@@ -54,5 +54,15 @@ namespace Service.Services
         {
             await _repository.DeleteAsync(entity);
         }
+
+        public async Task<List<Equipe>> GetEquipesByOperateurIdAsync(int operateurId)
+        {
+            return await GetByOperateurIdAsync(operateurId);
+        }
+
+        public async Task<List<Equipe>> GetByOperateurIdAsync(int operateurId)
+        {
+            return await _repository.GetByOperateurIdAsync(operateurId);
+        }
     }
 }

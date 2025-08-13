@@ -123,6 +123,14 @@ builder.Services.AddScoped<IStatutRepository, StatutRepository>();
 builder.Services.AddScoped<IStatutService, StatutService>();
 builder.Services.AddScoped<ITypeInventaireRepository, TypeInventaireRepository>();
 builder.Services.AddScoped<ITypeInventaireService, TypeInventaireService>();
+builder.Services.AddScoped<IGestionProduitService, GestionProduitService>();
+builder.Services.AddScoped<IGestionProduitRepository, GestionProduitRepository>();
+builder.Services.AddScoped<IResultatInventaireService, ResultatInventaireService>();
+builder.Services.AddScoped<IResultatInventaireRepository, Repository.Repositories.ResultatInventaireRepository>();
+builder.Services.AddScoped<IGestionInventaireService, GestionInventaireService>();
+builder.Services.AddScoped<IGestionInventaireRepository, GestionInventaireRepository>();
+
+
 
 
 var app = builder.Build();
