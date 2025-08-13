@@ -28,12 +28,10 @@ const CreateClientForm = ({ adminUserId, onClientCreated }) => {
     if (!form.email.trim()) errors.push("Email requis");
     if (!form.password.trim()) errors.push("Mot de passe requis");
     if (form.password.length < 6) errors.push("Mot de passe trop court");
-    
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (form.email && !emailRegex.test(form.email)) {
       errors.push("Format d'email invalide");
     }
-    
     return errors;
   };
 
@@ -62,10 +60,6 @@ const CreateClientForm = ({ adminUserId, onClientCreated }) => {
         IsActive: true,
       };
 
-      console.log("=== ENVOI REQUÊTE ===");
-      console.log("URL:", "/api/AdminClient/CreateClientFromAdmin");
-      console.log("Données:", requestData);
-
       const response = await axios.post("/api/AdminClient/CreateClientFromAdmin", requestData, {
         headers: {
           'Content-Type': 'application/json',
@@ -73,9 +67,6 @@ const CreateClientForm = ({ adminUserId, onClientCreated }) => {
         timeout: 30000,
       });
 
-      console.log("=== RÉPONSE RÉUSSIE ===");
-      console.log("Données:", response.data);
-      
       setMessage("Client créé avec succès !");
       setForm({
         email: "",
@@ -85,19 +76,11 @@ const CreateClientForm = ({ adminUserId, onClientCreated }) => {
         userName: "",
         password: "",
       });
-      
+
       if (onClientCreated) onClientCreated(response.data);
-      
+
     } catch (err) {
-      console.log("=== ERREUR COMPLÈTE ===");
-      console.log("Erreur:", err);
-      console.log("Response:", err.response);
-      console.log("Status:", err.response?.status);
-      console.log("Data:", err.response?.data);
-      console.log("Message:", err.message);
-      
       let errorMessage = "Erreur inconnue";
-      
       if (err.response?.data) {
         if (typeof err.response.data === 'string') {
           errorMessage = err.response.data;
@@ -107,7 +90,6 @@ const CreateClientForm = ({ adminUserId, onClientCreated }) => {
       } else if (err.message) {
         errorMessage = err.message;
       }
-      
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -115,15 +97,29 @@ const CreateClientForm = ({ adminUserId, onClientCreated }) => {
   };
 
   return (
-    <div className="create-client-container">
-      <form className="create-client-form" onSubmit={handleSubmit}>
-        <h3>Créer un nouveau client</h3>
+    <div className="create-client-container improved-bg">
+      <form className="create-client-form improved-form" onSubmit={handleSubmit}>
+        <div className="form-header">
         
+          <h3 style={{
+            color: "#1976d2",
+            fontWeight: 700,
+            fontSize: "1.3rem",
+            margin: 0,
+            letterSpacing: "0.5px"
+          }}>
+            Créer un nouveau client
+          </h3>
+        </div>
+
         {message && <div className="form-message success">{message}</div>}
         {error && <div className="form-message error">{error}</div>}
-        
+
         <div className="form-group">
-          <label>Nom du client *</label>
+          <label style={{ color: "#1976d2", fontWeight: 600 }}>
+            <i className="fas fa-id-card" style={{ color: "#42a5f5", marginRight: 8 }}></i>
+            Nom du client *
+          </label>
           <input
             type="text"
             name="clientNom"
@@ -132,11 +128,19 @@ const CreateClientForm = ({ adminUserId, onClientCreated }) => {
             onChange={handleChange}
             required
             disabled={loading}
+            style={{
+              border: "1px solid #bbdefb",
+              background: "#f5f7fa",
+              color: "#1976d2"
+            }}
           />
         </div>
-        
+
         <div className="form-group">
-          <label>Nom d'utilisateur *</label>
+          <label style={{ color: "#1976d2", fontWeight: 600 }}>
+            <i className="fas fa-user" style={{ color: "#42a5f5", marginRight: 8 }}></i>
+            Nom d'utilisateur *
+          </label>
           <input
             type="text"
             name="userName"
@@ -145,11 +149,19 @@ const CreateClientForm = ({ adminUserId, onClientCreated }) => {
             onChange={handleChange}
             required
             disabled={loading}
+            style={{
+              border: "1px solid #bbdefb",
+              background: "#f5f7fa",
+              color: "#1976d2"
+            }}
           />
         </div>
-        
+
         <div className="form-group">
-          <label>Email *</label>
+          <label style={{ color: "#1976d2", fontWeight: 600 }}>
+            <i className="fas fa-envelope" style={{ color: "#42a5f5", marginRight: 8 }}></i>
+            Email *
+          </label>
           <input
             type="email"
             name="email"
@@ -158,11 +170,19 @@ const CreateClientForm = ({ adminUserId, onClientCreated }) => {
             onChange={handleChange}
             required
             disabled={loading}
+            style={{
+              border: "1px solid #bbdefb",
+              background: "#f5f7fa",
+              color: "#1976d2"
+            }}
           />
         </div>
-        
+
         <div className="form-group">
-          <label>Mot de passe *</label>
+          <label style={{ color: "#1976d2", fontWeight: 600 }}>
+            <i className="fas fa-lock" style={{ color: "#42a5f5", marginRight: 8 }}></i>
+            Mot de passe *
+          </label>
           <input
             type="password"
             name="password"
@@ -172,11 +192,19 @@ const CreateClientForm = ({ adminUserId, onClientCreated }) => {
             required
             minLength="6"
             disabled={loading}
+            style={{
+              border: "1px solid #bbdefb",
+              background: "#f5f7fa",
+              color: "#1976d2"
+            }}
           />
         </div>
-        
+
         <div className="form-group">
-          <label>Adresse</label>
+          <label style={{ color: "#1976d2", fontWeight: 600 }}>
+            <i className="fas fa-map-marker-alt" style={{ color: "#42a5f5", marginRight: 8 }}></i>
+            Adresse
+          </label>
           <input
             type="text"
             name="adress"
@@ -184,11 +212,19 @@ const CreateClientForm = ({ adminUserId, onClientCreated }) => {
             value={form.adress}
             onChange={handleChange}
             disabled={loading}
+            style={{
+              border: "1px solid #bbdefb",
+              background: "#f5f7fa",
+              color: "#1976d2"
+            }}
           />
         </div>
-        
+
         <div className="form-group">
-          <label>Téléphone</label>
+          <label style={{ color: "#1976d2", fontWeight: 600 }}>
+            <i className="fas fa-phone" style={{ color: "#42a5f5", marginRight: 8 }}></i>
+            Téléphone
+          </label>
           <input
             type="tel"
             name="phone"
@@ -196,10 +232,15 @@ const CreateClientForm = ({ adminUserId, onClientCreated }) => {
             value={form.phone}
             onChange={handleChange}
             disabled={loading}
+            style={{
+              border: "1px solid #bbdefb",
+              background: "#f5f7fa",
+              color: "#1976d2"
+            }}
           />
         </div>
-        
-        <button type="submit" className="submit-button" disabled={loading}>
+
+        <button type="submit" className="submit-button improved-btn" disabled={loading}>
           {loading ? "Création en cours..." : "Créer le client"}
         </button>
       </form>
