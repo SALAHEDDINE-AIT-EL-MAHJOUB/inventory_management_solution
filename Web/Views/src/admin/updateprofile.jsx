@@ -15,7 +15,6 @@ const UpdateProfile = ({ onSelectPage }) => {
   const [message, setMessage] = useState("");
   const [editMode, setEditMode] = useState(false);
 
-  // Charger le profil actuel
   useEffect(() => {
     fetch("/api/admin/me", {
       credentials: "include",
@@ -39,7 +38,6 @@ const UpdateProfile = ({ onSelectPage }) => {
       });
   }, []);
 
-  // Gérer la modification des champs
   const handleChange = e => {
     setAdmin({ ...admin, [e.target.name]: e.target.value });
   };
@@ -48,7 +46,6 @@ const UpdateProfile = ({ onSelectPage }) => {
     setNewPassword(e.target.value);
   };
 
-  // Soumettre la modification
   const handleSubmit = e => {
     e.preventDefault();
     setMessage("");
@@ -77,8 +74,7 @@ const UpdateProfile = ({ onSelectPage }) => {
   return (
     <div
       style={{
-        paddingLeft: 0,
-        background: "#eaeef6",
+        background: "#f5f7fa",
         minHeight: "100vh",
         boxSizing: "border-box",
       }}
@@ -94,16 +90,71 @@ const UpdateProfile = ({ onSelectPage }) => {
         }}
       >
         {/* Profil affiché */}
-        <Card sx={{ minWidth: 400, maxWidth: 500, width: "100%", boxShadow: 6, borderRadius: 4, mb: 3 }}>
-          <CardHeader title="Mon profil" />
+        <Card sx={{
+          minWidth: 400,
+          maxWidth: 500,
+          width: "100%",
+          boxShadow: 6,
+          borderRadius: 4,
+          mb: 3,
+          background: "#fff",
+          border: "1px solid #e3eaf3"
+        }}>
+          <CardHeader
+            avatar={
+              <Box
+                sx={{
+                  background: "#1976d2",
+                  borderRadius: "50%",
+                  width: 56,
+                  height: 56,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow: "0 2px 8px rgba(25, 118, 210, 0.10)",
+                  mr: 2
+                }}
+              >
+                <i className="fas fa-user-shield" style={{ color: "#fff", fontSize: 28 }}></i>
+              </Box>
+            }
+            title={
+              <span style={{
+                color: "#1976d2",
+                fontWeight: 700,
+                fontSize: "1.2rem",
+                letterSpacing: "0.5px"
+              }}>
+                Mon profil
+              </span>
+            }
+          />
           <CardContent>
-            <Typography variant="subtitle1"><b>Nom :</b> {admin.adminName}</Typography>
-             <Typography variant="subtitle1"><b>Email :</b> {admin.email}</Typography>
-             <Typography variant="subtitle1"><b>Nom d'utilisateur :</b> {admin.userName}</Typography>
+            <Typography variant="subtitle1" sx={{ color: "#1976d2" }}>
+              <i className="fas fa-user" style={{ color: "#42a5f5", marginRight: 8 }}></i>
+              <b>Nom :</b> {admin.adminName}
+            </Typography>
+            <Typography variant="subtitle1" sx={{ color: "#1976d2" }}>
+              <i className="fas fa-envelope" style={{ color: "#42a5f5", marginRight: 8 }}></i>
+              <b>Email :</b> {admin.email}
+            </Typography>
+            <Typography variant="subtitle1" sx={{ color: "#1976d2" }}>
+              <i className="fas fa-user-tag" style={{ color: "#42a5f5", marginRight: 8 }}></i>
+              <b>Nom d'utilisateur :</b> {admin.userName}
+            </Typography>
             <Button
               variant="contained"
-              color="primary"
-              sx={{ mt: 2 }}
+              sx={{
+                mt: 2,
+                background: "linear-gradient(135deg, #1976d2 0%, #42a5f5 100%)",
+                color: "#fff",
+                fontWeight: 600,
+                borderRadius: 2,
+                boxShadow: "0 2px 8px rgba(25, 118, 210, 0.10)",
+                '&:hover': {
+                  background: "linear-gradient(135deg, #1565c0 0%, #1976d2 100%)"
+                }
+              }}
               onClick={() => setEditMode(!editMode)}
             >
               {editMode ? "Annuler" : "Modifier"}
@@ -113,30 +164,87 @@ const UpdateProfile = ({ onSelectPage }) => {
 
         {/* Formulaire de modification */}
         {editMode && (
-          <Card sx={{ minWidth: 400, maxWidth: 500, width: "100%", boxShadow: 6, borderRadius: 4 }}>
-            <CardHeader title="Modifier mon profil" />
+          <Card sx={{
+            minWidth: 400,
+            maxWidth: 500,
+            width: "100%",
+            boxShadow: 6,
+            borderRadius: 4,
+            background: "#fff",
+            border: "1px solid #e3eaf3"
+          }}>
+            <CardHeader
+              avatar={
+                <Box
+                  sx={{
+                    background: "#1976d2",
+                    borderRadius: "50%",
+                    width: 56,
+                    height: 56,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    boxShadow: "0 2px 8px rgba(25, 118, 210, 0.10)",
+                    mr: 2
+                  }}
+                >
+                  <i className="fas fa-user-edit" style={{ color: "#fff", fontSize: 26 }}></i>
+                </Box>
+              }
+              title={
+                <span style={{
+                  color: "#1976d2",
+                  fontWeight: 700,
+                  fontSize: "1.2rem",
+                  letterSpacing: "0.5px"
+                }}>
+                  Modifier mon profil
+                </span>
+              }
+            />
             <CardContent>
               <form onSubmit={handleSubmit}>
                 <TextField
-                  label="Nom"
+                  label={
+                    <span>
+                      <i className="fas fa-user" style={{ color: "#42a5f5", marginRight: 8 }}></i>
+                      Nom
+                    </span>
+                  }
                   name="adminName"
                   value={admin.adminName}
                   onChange={handleChange}
                   required
                   fullWidth
                   margin="normal"
+                  InputProps={{
+                    style: { color: "#1976d2", background: "#f5f7fa", borderRadius: 8 }
+                  }}
                 />
                 <TextField
-                  label="Nom d'utilisateur"
+                  label={
+                    <span>
+                      <i className="fas fa-user-tag" style={{ color: "#42a5f5", marginRight: 8 }}></i>
+                      Nom d'utilisateur
+                    </span>
+                  }
                   name="userName"
                   value={admin.userName}
                   onChange={e => setAdmin({ ...admin, userName: e.target.value })}
                   required
                   fullWidth
                   margin="normal"
+                  InputProps={{
+                    style: { color: "#1976d2", background: "#f5f7fa", borderRadius: 8 }
+                  }}
                 />
                 <TextField
-                  label="Email"
+                  label={
+                    <span>
+                      <i className="fas fa-envelope" style={{ color: "#42a5f5", marginRight: 8 }}></i>
+                      Email
+                    </span>
+                  }
                   name="email"
                   type="email"
                   value={admin.email}
@@ -144,9 +252,17 @@ const UpdateProfile = ({ onSelectPage }) => {
                   required
                   fullWidth
                   margin="normal"
+                  InputProps={{
+                    style: { color: "#1976d2", background: "#f5f7fa", borderRadius: 8 }
+                  }}
                 />
                 <TextField
-                  label="Nouveau mot de passe"
+                  label={
+                    <span>
+                      <i className="fas fa-lock" style={{ color: "#42a5f5", marginRight: 8 }}></i>
+                      Nouveau mot de passe
+                    </span>
+                  }
                   name="newPassword"
                   type="password"
                   value={newPassword}
@@ -155,12 +271,25 @@ const UpdateProfile = ({ onSelectPage }) => {
                   margin="normal"
                   helperText="Laisser vide pour ne pas changer"
                   disabled
+                  InputProps={{
+                    style: { color: "#1976d2", background: "#f5f7fa", borderRadius: 8 }
+                  }}
                 />
                 <Button
                   type="submit"
                   variant="contained"
-                  color="primary"
-                  sx={{ mt: 2, width: "100%" }}
+                  sx={{
+                    mt: 2,
+                    width: "100%",
+                    background: "linear-gradient(135deg, #1976d2 0%, #42a5f5 100%)",
+                    color: "#fff",
+                    fontWeight: 700,
+                    borderRadius: 2,
+                    boxShadow: "0 2px 8px rgba(25, 118, 210, 0.10)",
+                    '&:hover': {
+                      background: "linear-gradient(135deg, #1565c0 0%, #1976d2 100%)"
+                    }
+                  }}
                 >
                   Enregistrer
                 </Button>
