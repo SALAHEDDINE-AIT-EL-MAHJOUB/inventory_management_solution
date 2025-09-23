@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-
+import "../emplacement/emplacement.css"; 
 const Ville = () => {
   const [villes, setVilles] = useState([]);
   const [regions, setRegions] = useState([]);
@@ -87,251 +87,373 @@ const Ville = () => {
     return <div style={{ color: "red", padding: 30 }}>{error}</div>;
 
   return (
-    <div
-      style={{
-        maxWidth: 700,
-        margin: "40px auto",
-        background: "#fff",
-        borderRadius: 10,
-        boxShadow: "0 2px 12px #eee",
-        padding: 30,
-      }}
-    >
-       <div style={{ textAlign: "right", marginBottom: 10 }}>
-        <button
-          onClick={() => setShowForm((f) => !f)}
+    <div style={{ padding: "20px", background: "#f8fafc", minHeight: "100vh" }}>
+      <div
+        style={{
+          background: "white",
+          borderRadius: "12px",
+          padding: "24px",
+          boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
+        }}
+      >
+        <div
           style={{
-            background: "#1976d2",
-            color: "#fff",
-            border: "none",
-            borderRadius: 4,
-            padding: "8px 20px",
-            fontWeight: "bold",
-            cursor: "pointer",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "24px",
           }}
         >
-          {showForm ? "Fermer le formulaire" : "Ajouter une ville"}
-        </button>
-      </div>
- {/* Bouton pour afficher/masquer le formulaire */}
-           {showForm && (
-        <>
-          <h3 style={{ color: "#1976d2", marginBottom: 10 }}>Ajouter une ville</h3>
-          <form
-            onSubmit={handleCreateVille}
+          <h2
             style={{
-              background: "#f9f9f9",
-              borderRadius: 8,
-              padding: 20,
-              border: "1px solid #eee",
+              color: "#1e293b",
+              margin: 0,
+              fontSize: "28px",
+              fontWeight: "600",
             }}
           >
-            <div style={{ marginBottom: 15 }}>
-              <label style={{ display: "block", marginBottom: 6 }}>
-                Nom:
-                <input
-                  type="text"
-                  name="nom"
-                  value={newVille.nom}
-                  onChange={handleChange}
-                  required
-                  style={{
-                    marginLeft: 10,
-                    padding: 7,
-                    borderRadius: 4,
-                    border: "1px solid #ccc",
-                    width: "70%",
-                  }}
-                />
-              </label>
-            </div>
-            <div style={{ marginBottom: 15 }}>
-              <label style={{ display: "block", marginBottom: 6 }}>
-                Région:
-                <select
-                  name="regionId"
-                  value={newVille.regionId}
-                  onChange={handleChange}
-                  required
-                  style={{
-                    marginLeft: 10,
-                    padding: 7,
-                    borderRadius: 4,
-                    border: "1px solid #ccc",
-                    width: "75%",
-                  }}
-                >
-                  <option value="">Sélectionnez une région</option>
-                  {regions.map((region) => (
-                    <option key={region.id} value={region.id}>
-                      {region.name ?? region.Name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
-            <button
-              type="submit"
-              disabled={creating}
+            🏙️ Gestion des Villes
+          </h2>
+          <button
+            onClick={() => setShowForm((f) => !f)}
+            style={{
+              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+              color: "#fff",
+              border: "none",
+              borderRadius: "8px",
+              padding: "12px 24px",
+              fontWeight: "600",
+              cursor: "pointer",
+              boxShadow: "0 4px 15px rgba(102, 126, 234, 0.3)",
+              transition: "all 0.3s ease",
+            }}
+          >
+            {showForm ? "✕ Fermer" : "+ Ajouter une ville"}
+          </button>
+        </div>
+
+        {showForm && (
+          <div
+            style={{
+              background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
+              borderRadius: "12px",
+              padding: "24px",
+              marginBottom: "24px",
+              border: "1px solid #e2e8f0",
+            }}
+          >
+            <h3 style={{ color: "#334155", marginBottom: "20px" }}>
+              🆕 Nouvelle ville
+            </h3>
+            <form onSubmit={handleCreateVille}>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: "16px",
+                  marginBottom: "20px",
+                }}
+              >
+                <div>
+                  <label
+                    style={{
+                      display: "block",
+                      marginBottom: "8px",
+                      color: "#475569",
+                      fontWeight: "600",
+                    }}
+                  >
+                    Nom de la ville
+                  </label>
+                  <input
+                    type="text"
+                    name="nom"
+                    value={newVille.nom}
+                    onChange={handleChange}
+                    required
+                    style={{
+                      width: "100%",
+                      padding: "12px 16px",
+                      border: "2px solid #e2e8f0",
+                      borderRadius: "8px",
+                      fontSize: "14px",
+                    }}
+                  />
+                </div>
+                <div>
+                  <label
+                    style={{
+                      display: "block",
+                      marginBottom: "8px",
+                      color: "#475569",
+                      fontWeight: "600",
+                    }}
+                  >
+                    Région
+                  </label>
+                  <select
+                    name="regionId"
+                    value={newVille.regionId}
+                    onChange={handleChange}
+                    required
+                    style={{
+                      width: "100%",
+                      padding: "12px 16px",
+                      border: "2px solid #e2e8f0",
+                      borderRadius: "8px",
+                      fontSize: "14px",
+                    }}
+                  >
+                    <option value="">Sélectionnez une région</option>
+                    {regions.map((region) => (
+                      <option key={region.id} value={region.id}>
+                        {region.name ?? region.Name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <button
+                type="submit"
+                disabled={creating}
+                style={{
+                  background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)",
+                  color: "#ffffff",
+                  border: "none",
+                  padding: "12px 24px",
+                  borderRadius: "8px",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  boxShadow: "0 4px 15px rgba(34, 197, 94, 0.3)",
+                }}
+              >
+                {creating ? "⏳ Création..." : "✓ Créer la ville"}
+              </button>
+            </form>
+          </div>
+        )}
+
+        {villes.length === 0 ? (
+          <div
+            style={{
+              textAlign: "center",
+              padding: "40px",
+              color: "#64748b",
+              background: "#f1f5f9",
+              borderRadius: "12px",
+            }}
+          >
+            <div style={{ fontSize: "48px", marginBottom: "16px" }}>🏙️</div>
+            <div style={{ fontSize: "18px" }}>Aucune ville trouvée</div>
+          </div>
+        ) : (
+          <>
+            <div
               style={{
-                background: "#1976d2",
-                color: "#fff",
-                border: "none",
-                borderRadius: 4,
-                padding: "10px 22px",
-                cursor: "pointer",
-                fontWeight: "bold",
+                overflowX: "auto",
+                borderRadius: "12px",
+                border: "1px solid #e2e8f0",
               }}
             >
-              {creating ? "Création en cours..." : "Créer la ville"}
-            </button>
-          </form>
-        </>
-      )}
-      <h2 style={{ color: "#1976d2", marginBottom: 20 }}>Liste des villes</h2>
-      {villes.length === 0 ? (
-        <div style={{ marginBottom: 20 }}>Aucune ville trouvée.</div>
-      ) : (
-        <>
-          <table
-            style={{
-              width: "100%",
-              borderCollapse: "collapse",
-              marginBottom: 30,
-            }}
-          >
-            <thead>
-              <tr style={{ background: "#f5f5f5" }}>
-                <th
-                  style={{
-                    padding: 10,
-                    border: "1px solid #eee",
-                    textAlign: "left",
-                  }}
-                >
-                  Nom
-                </th>
-                <th
-                  style={{
-                    padding: 10,
-                    border: "1px solid #eee",
-                    textAlign: "left",
-                  }}
-                >
-                  Région
-                </th>
-                <th
-                  style={{
-                    padding: 10,
-                    border: "1px solid #eee",
-                    textAlign: "center",
-                  }}
-                >
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentVilles.map((ville) => (
-                <tr key={ville.id}>
-                  <td
+              <table
+                style={{
+                  width: "100%",
+                  borderCollapse: "collapse",
+                  background: "#ffffff",
+                }}
+              >
+                <thead>
+                  <tr
                     style={{
-                      padding: 10,
-                      border: "1px solid #eee",
+                      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                     }}
                   >
-                    {ville.nom ?? ville.Nom ?? "Nom inconnu"}
-                  </td>
-                  <td
-                    style={{
-                      padding: 10,
-                      border: "1px solid #eee",
-                    }}
-                  >
-                    {ville.region?.name || ville.Region?.name || "Non défini"}
-                  </td>
-                  <td
-                    style={{
-                      padding: 10,
-                      border: "1px solid #eee",
-                      textAlign: "center",
-                    }}
-                  >
-                    <button
-                      onClick={() => handleDelete(ville.id)}
-                      disabled={deletingId === ville.id}
+                    <th
                       style={{
-                        background: "#e53935",
-                        color: "#fff",
-                        border: "none",
-                        borderRadius: 4,
-                        padding: "6px 14px",
-                        cursor: "pointer",
-                        fontWeight: "bold",
+                        padding: "16px",
+                        color: "#ffffff",
+                        fontWeight: "600",
+                        textAlign: "left",
+                        fontSize: "14px",
                       }}
                     >
-                      {deletingId === ville.id ? "Suppression..." : "Supprimer"}
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          {/* Pagination Controls */}
-          {totalPages > 1 && (
-            <div style={{ marginTop: 16, textAlign: "center" }}>
-              <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
+                      🏙️ Nom de la ville
+                    </th>
+                    <th
+                      style={{
+                        padding: "16px",
+                        color: "#ffffff",
+                        fontWeight: "600",
+                        textAlign: "left",
+                        fontSize: "14px",
+                      }}
+                    >
+                      🗺️ Région
+                    </th>
+                    <th
+                      style={{
+                        padding: "16px",
+                        color: "#ffffff",
+                        fontWeight: "600",
+                        textAlign: "center",
+                        fontSize: "14px",
+                      }}
+                    >
+                      ⚙️ Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {currentVilles.map((ville, idx) => (
+                    <tr
+                      key={ville.id}
+                      style={{
+                        background: idx % 2 === 0 ? "#ffffff" : "#f8fafc",
+                        transition: "all 0.2s ease",
+                      }}
+                      onMouseOver={(e) => (e.currentTarget.style.background = "#e0f2fe")}
+                      onMouseOut={(e) =>
+                        (e.currentTarget.style.background =
+                          idx % 2 === 0 ? "#ffffff" : "#f8fafc")
+                      }
+                    >
+                      <td
+                        style={{
+                          padding: "16px",
+                          borderBottom: "1px solid #e2e8f0",
+                          color: "#334155",
+                          fontWeight: "600",
+                        }}
+                      >
+                        {ville.nom ?? ville.Nom ?? "Nom inconnu"}
+                      </td>
+                      <td
+                        style={{
+                          padding: "16px",
+                          borderBottom: "1px solid #e2e8f0",
+                          color: "#64748b",
+                        }}
+                      >
+                        <span
+                          style={{
+                            background:
+                              "linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)",
+                            color: "#ffffff",
+                            padding: "4px 12px",
+                            borderRadius: "20px",
+                            fontSize: "12px",
+                            fontWeight: "600",
+                          }}
+                        >
+                          {ville.region?.name || ville.Region?.name || "Non défini"}
+                        </span>
+                      </td>
+                      <td
+                        style={{
+                          padding: "16px",
+                          borderBottom: "1px solid #e2e8f0",
+                          textAlign: "center",
+                        }}
+                      >
+                        <button
+                          onClick={() => handleDelete(ville.id)}
+                          disabled={deletingId === ville.id}
+                          style={{
+                            background:
+                              "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
+                            color: "#ffffff",
+                            border: "none",
+                            borderRadius: "6px",
+                            padding: "8px 16px",
+                            cursor: "pointer",
+                            fontWeight: "600",
+                            fontSize: "12px",
+                            boxShadow: "0 2px 8px rgba(239, 68, 68, 0.3)",
+                          }}
+                        >
+                          {deletingId === ville.id ? "⏳" : "🗑️ Supprimer"}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div
                 style={{
-                  marginRight: 8,
-                  padding: "6px 12px",
-                  borderRadius: 4,
-                  border: "1px solid #1976d2",
-                  background: "#fff",
-                  color: "#1976d2",
-                  fontWeight: "bold",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginTop: "24px",
+                  gap: "8px",
                 }}
               >
-                Précédent
-              </button>
-              {[...Array(totalPages)].map((_, idx) => (
                 <button
-                  key={idx + 1}
-                  onClick={() => handlePageChange(idx + 1)}
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
                   style={{
-                    margin: "0 2px",
-                    padding: "6px 12px",
-                    borderRadius: 4,
-                    border: "1px solid #1976d2",
-                    background: currentPage === idx + 1 ? "#1976d2" : "#fff",
-                    color: currentPage === idx + 1 ? "#fff" : "#1976d2",
-                    fontWeight: "bold",
+                    padding: "8px 16px",
+                    border: "2px solid #e2e8f0",
+                    borderRadius: "8px",
+                    background: "#ffffff",
+                    color: "#64748b",
+                    fontWeight: "600",
+                    cursor: currentPage === 1 ? "not-allowed" : "pointer",
+                    opacity: currentPage === 1 ? 0.5 : 1,
                   }}
                 >
-                  {idx + 1}
+                  ← Précédent
                 </button>
-              ))}
-              <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                style={{
-                  marginLeft: 8,
-                  padding: "6px 12px",
-                  borderRadius: 4,
-                  border: "1px solid #1976d2",
-                  background: "#fff",
-                  color: "#1976d2",
-                  fontWeight: "bold",
-                }}
-              >
-                Suivant
-              </button>
-            </div>
-          )}
-        </>
-      )}
-     
+
+                {[...Array(totalPages)].map((_, idx) => (
+                  <button
+                    key={idx + 1}
+                    onClick={() => handlePageChange(idx + 1)}
+                    style={{
+                      padding: "8px 16px",
+                      border: "none",
+                      borderRadius: "8px",
+                      background:
+                        currentPage === idx + 1
+                          ? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+                          : "#ffffff",
+                      color: currentPage === idx + 1 ? "#ffffff" : "#64748b",
+                      fontWeight: "600",
+                      cursor: "pointer",
+                      boxShadow:
+                        currentPage === idx + 1
+                          ? "0 4px 15px rgba(102, 126, 234, 0.3)"
+                          : "none",
+                    }}
+                  >
+                    {idx + 1}
+                  </button>
+                ))}
+
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  style={{
+                    padding: "8px 16px",
+                    border: "2px solid #e2e8f0",
+                    borderRadius: "8px",
+                    background: "#ffffff",
+                    color: "#64748b",
+                    fontWeight: "600",
+                    cursor: currentPage === totalPages ? "not-allowed" : "pointer",
+                    opacity: currentPage === totalPages ? 0.5 : 1,
+                  }}
+                >
+                  Suivant →
+                </button>
+              </div>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 };

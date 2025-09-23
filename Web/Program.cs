@@ -129,7 +129,7 @@ builder.Services.AddScoped<IResultatInventaireService, ResultatInventaireService
 builder.Services.AddScoped<IResultatInventaireRepository, Repository.Repositories.ResultatInventaireRepository>();
 builder.Services.AddScoped<IGestionInventaireService, GestionInventaireService>();
 builder.Services.AddScoped<IGestionInventaireRepository, GestionInventaireRepository>();
-
+builder.Services.AddScoped<IPredictionService, PredictionService>();
 
 
 

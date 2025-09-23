@@ -15,22 +15,29 @@ const NavbarProduit = ({ active, onNavigate }) => (
         className={`navbar-produit-btn${active === "listeProduit" ? " active" : ""}`}
         onClick={() => onNavigate("listeProduit")}
       >
-        <span className="btn-icon" aria-hidden>📦</span>
+        <span className="btn-icon" aria-hidden></span>
         Liste des produits
       </button>
       <button
         className={`navbar-produit-btn${active === "creeProduit" ? " active" : ""}`}
         onClick={() => onNavigate("creeProduit")}
       >
-        <span className="btn-icon" aria-hidden>➕</span>
+        <span className="btn-icon" aria-hidden></span>
         Créer Produit
       </button>
       <button
         className={`navbar-produit-btn${active === "fournisseur" ? " active" : ""}`}
         onClick={() => onNavigate("fournisseur")}
       >
-        <span className="btn-icon" aria-hidden>🏷️</span>
+        <span className="btn-icon" aria-hidden></span>
         Fournisseurs
+      </button>
+      <button
+        className={`navbar-produit-btn${active === "predictionStock" ? " active" : ""}`}
+        onClick={() => onNavigate("predictionStock")}
+      >
+        <span className="btn-icon" aria-hidden></span>
+        Prédiction Stock
       </button>
     </div>
   </nav>

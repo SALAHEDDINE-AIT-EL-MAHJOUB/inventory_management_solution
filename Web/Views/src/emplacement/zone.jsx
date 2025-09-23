@@ -15,20 +15,27 @@ const Zone = () => {
   const [editZoneId, setEditZoneId] = useState(null);
   const [editZoneNom, setEditZoneNom] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const zonesPerPage = 7; // Afficher 7 zones par page
+  const [loading, setLoading] = useState(false);
+  const zonesPerPage = 7;
 
   // Charger toutes les zones au montage
   useEffect(() => {
-    axios.get("/api/zone")
-      .then(res => setZones(res.data))
-      .catch(() => setZones([]));
-    axios.get("/api/client-societes")
-      .then(res => setSocietes(res.data))
-      .catch(() => setSocietes([]));
-    // Charger tous les sites pour affichage du nom
-    axios.get("/api/site")
-      .then(res => setAllSites(res.data))
-      .catch(() => setAllSites([]));
+    setLoading(true);
+    Promise.all([
+      axios.get("/api/zone"),
+      axios.get("/api/client-societes"),
+      axios.get("/api/site")
+    ]).then(([zonesRes, societesRes, sitesRes]) => {
+      setZones(zonesRes.data);
+      setSocietes(societesRes.data);
+      setAllSites(sitesRes.data);
+    }).catch(() => {
+      setZones([]);
+      setSocietes([]);
+      setAllSites([]);
+    }).finally(() => {
+      setLoading(false);
+    });
   }, []);
 
   // Charger les sites quand une société est sélectionnée
@@ -37,7 +44,7 @@ const Zone = () => {
       axios.get(`/api/Site/societe/${societeId}`)
         .then(res => setSites(res.data))
         .catch(() => setSites([]));
-      setZoneSiteId(""); // reset site selection
+      setZoneSiteId("");
     } else {
       setSites([]);
       setZoneSiteId("");
@@ -50,6 +57,7 @@ const Zone = () => {
       setMessage("Veuillez remplir tous les champs.");
       return;
     }
+    setLoading(true);
     try {
       await axios.post("/api/zone", {
         ZoneNom: zoneNom,
@@ -70,22 +78,23 @@ const Zone = () => {
         "Erreur lors de la création de la zone: " +
         (err.response?.data?.toString() || err.message)
       );
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Fonction utilitaire pour trouver le nom du site
   const getSiteNom = (siteId) => {
     const site = allSites.find(s => s.id === siteId);
     return site ? site.siteNom : siteId;
   };
 
-  // Modifier une zone
   const handleEditClick = (zone) => {
     setEditZoneId(zone.zoneId);
     setEditZoneNom(zone.zoneNom);
   };
 
   const handleEditSave = async (zone) => {
+    setLoading(true);
     try {
       await axios.put(`/api/zone/${zone.zoneId}`, {
         ...zone,
@@ -96,9 +105,11 @@ const Zone = () => {
       axios.get("/api/zone")
         .then(res => setZones(res.data))
         .catch(() => setZones([]));
-      setMessage("Zone modifiée !");
+      setMessage("Zone modifiée avec succès !");
     } catch (err) {
       setMessage("Erreur lors de la modification.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -107,15 +118,17 @@ const Zone = () => {
     setEditZoneNom("");
   };
 
-  // Supprimer une zone
   const handleDelete = async (zoneId) => {
     if (!window.confirm("Voulez-vous vraiment supprimer cette zone ?")) return;
+    setLoading(true);
     try {
       await axios.delete(`/api/zone/${zoneId}`);
       setZones(zones.filter(z => z.zoneId !== zoneId));
-      setMessage("Zone supprimée !");
+      setMessage("Zone supprimée avec succès !");
     } catch (err) {
       setMessage("Erreur lors de la suppression.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -131,126 +144,246 @@ const Zone = () => {
 
   return (
     <div className="emp">
-      <button className="btn-primary mb-16" onClick={() => setShowForm(f => !f)}>
-        {showForm ? "Masquer le formulaire" : "Créer une zone"}
-      </button>
+      <div className="page-header">
+        <h2 className="page-title">
+          <i className="fas fa-industry"></i>
+          Gestion des Zones
+        </h2>
+        <button 
+          className={`btn ${showForm ? 'btn-secondary' : 'btn-primary'}`}
+          onClick={() => setShowForm(f => !f)}
+        >
+          <i className={`fas ${showForm ? 'fa-times' : 'fa-plus'}`}></i>
+          {showForm ? "Fermer le formulaire" : "Créer une nouvelle zone"}
+        </button>
+      </div>
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="card form-grid mb-24">
-          <div>
-            <label>Société:</label>
-            <select value={societeId} onChange={e => setSocieteId(e.target.value)}>
-              <option value="">-- Choisir une société --</option>
-              {societes.map(soc => (
-                <option key={soc.id} value={soc.id}>
-                  {soc.nom}
-                </option>
-              ))}
-            </select>
+        <div className="form-card">
+          <div className="form-header">
+            <i className="fas fa-edit"></i>
+            <h3>Formulaire de création de zone</h3>
           </div>
-          <div>
-            <label>Site:</label>
-            <select value={zoneSiteId} onChange={e => setZoneSiteId(e.target.value)} disabled={!societeId}>
-              <option value="">-- Choisir un site --</option>
-              {sites.map(site => (
-                <option key={site.id} value={site.id}>
-                  {site.siteNom}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label>Nom de la zone:</label>
-            <input type="text" value={zoneNom} onChange={e => setZoneNom(e.target.value)} disabled={!zoneSiteId} />
-          </div>
-          <button type="submit" className="btn-primary" disabled={!zoneSiteId || !zoneNom}>
-            Créer
-          </button>
-        </form>
+          <form onSubmit={handleSubmit} className="form-grid">
+            <div className="form-group">
+              <label>
+                <i className="fas fa-building"></i>
+                Société *
+              </label>
+              <select value={societeId} onChange={e => setSocieteId(e.target.value)} required>
+                <option value="">Sélectionnez une société</option>
+                {societes.map(soc => (
+                  <option key={soc.id} value={soc.id}>
+                    {soc.nom}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label>
+                <i className="fas fa-map-marker-alt"></i>
+                Site *
+              </label>
+              <select value={zoneSiteId} onChange={e => setZoneSiteId(e.target.value)} disabled={!societeId} required>
+                <option value="">Sélectionnez un site</option>
+                {sites.map(site => (
+                  <option key={site.id} value={site.id}>
+                    {site.siteNom}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label>
+                <i className="fas fa-industry"></i>
+                Nom de la zone *
+              </label>
+              <input 
+                type="text" 
+                value={zoneNom} 
+                onChange={e => setZoneNom(e.target.value)} 
+                disabled={!zoneSiteId}
+                placeholder="Ex: Zone A"
+                required
+              />
+            </div>
+
+            <button 
+              type="submit" 
+              className="btn btn-primary" 
+              disabled={!zoneSiteId || !zoneNom || loading}
+            >
+              <i className={`fas ${loading ? 'fa-spinner fa-spin' : 'fa-check'}`}></i>
+              {loading ? "Création..." : "Créer la zone"}
+            </button>
+          </form>
+
+          {message && (
+            <div className={`alert ${message.includes("succès") ? "alert-success" : "alert-error"}`}>
+              <i className={`fas ${message.includes("succès") ? 'fa-check-circle' : 'fa-exclamation-triangle'}`}></i>
+              {message}
+            </div>
+          )}
+        </div>
       )}
 
-      {message && <p>{message}</p>}
-
-      <div style={{ overflowX: "auto" }}>
-        <table>
-          <thead>
-            <tr>
-              <th style={{ padding: 8, border: "1px solid #ddd" }}>ID</th>
-              <th style={{ padding: 8, border: "1px solid #ddd" }}>Nom</th>
-              <th style={{ padding: 8, border: "1px solid #ddd" }}>Site</th>
-              <th style={{ padding: 8, border: "1px solid #ddd" }}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentZones.map(zone => (
-              <tr key={zone.zoneId}>
-                <td style={{ padding: "10px", borderBottom: "1px solid #e0e0e0" }}>{zone.zoneId}</td>
-                <td style={{ padding: "10px", borderBottom: "1px solid #e0e0e0" }}>
-                  {editZoneId === zone.zoneId ? (
-                    <input
-                      type="text"
-                      value={editZoneNom}
-                      onChange={e => setEditZoneNom(e.target.value)}
-                      style={{ padding: 5, borderRadius: 4, border: "1px solid #bdbdbd" }}
-                    />
-                  ) : (
-                    zone.zoneNom
-                  )}
-                </td>
-                <td style={{ padding: "10px", borderBottom: "1px solid #e0e0e0" }}>
-                  {getSiteNom(zone.zoneSiteId)}
-                </td>
-                <td style={{ padding: "10px", borderBottom: "1px solid #e0e0e0" }}>
-                  {editZoneId === zone.zoneId ? (
-                    <>
-                      <button className="btn-primary mr-8" onClick={() => handleEditSave(zone)} type="button">
-                        Enregistrer
-                      </button>
-                      <button className="btn-secondary" onClick={handleEditCancel} type="button">
-                        Annuler
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <button className="btn-secondary mr-8" onClick={() => handleEditClick(zone)} type="button">
-                        Modifier
-                      </button>
-                      <button className="btn-danger" onClick={() => handleDelete(zone.zoneId)} type="button">
-                        Supprimer
-                      </button>
-                    </>
-                  )}
-                </td>
-              </tr>
-            ))}
-            {zones.length === 0 && (
-              <tr>
-                <td colSpan={4} style={{ textAlign: "center", padding: 20 }}>Aucune zone trouvée.</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-        {/* Pagination Controls */}
-        {totalPages > 1 && (
-          <div className="pagination">
-            <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
-              Précédent
-            </button>
-            {[...Array(totalPages)].map((_, idx) => (
-              <button
-                key={idx + 1}
-                onClick={() => handlePageChange(idx + 1)}
-                className={currentPage === idx + 1 ? "active" : undefined}
-              >
-                {idx + 1}
-              </button>
-            ))}
-            <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
-              Suivant
-            </button>
+      {loading && (
+        <div className="loading-overlay">
+          <div className="spinner">
+            <i className="fas fa-spinner fa-spin"></i>
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {!loading && (
+        <div className="table-card">
+          <div className="table-header">
+            <h3>
+              <i className="fas fa-list"></i>
+              Liste des zones ({zones.length})
+            </h3>
+          </div>
+          
+          <div className="table-responsive">
+            <table className="modern-table">
+              <thead>
+                <tr>
+                  <th>
+                    <i className="fas fa-hashtag"></i>
+                    ID
+                  </th>
+                  <th>
+                    <i className="fas fa-industry"></i>
+                    Nom
+                  </th>
+                  <th>
+                    <i className="fas fa-map-marker-alt"></i>
+                    Site
+                  </th>
+                  <th>
+                    <i className="fas fa-cogs"></i>
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentZones.map(zone => (
+                  <tr key={zone.zoneId} className="table-row">
+                    <td>
+                      <span className="id-badge">#{zone.zoneId}</span>
+                    </td>
+                    <td>
+                      {editZoneId === zone.zoneId ? (
+                        <input
+                          type="text"
+                          value={editZoneNom}
+                          onChange={e => setEditZoneNom(e.target.value)}
+                          className="edit-input"
+                        />
+                      ) : (
+                        <span className="zone-name">{zone.zoneNom}</span>
+                      )}
+                    </td>
+                    <td>
+                      <span className="site-name">{getSiteNom(zone.zoneSiteId)}</span>
+                    </td>
+                    <td>
+                      {editZoneId === zone.zoneId ? (
+                        <div className="action-buttons">
+                          <button 
+                            className="btn btn-success btn-sm" 
+                            onClick={() => handleEditSave(zone)} 
+                            type="button" 
+                            disabled={loading}
+                          >
+                            <i className="fas fa-check"></i>
+                            Enregistrer
+                          </button>
+                          <button 
+                            className="btn btn-secondary btn-sm" 
+                            onClick={handleEditCancel} 
+                            type="button"
+                          >
+                            <i className="fas fa-times"></i>
+                            Annuler
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="action-buttons">
+                          <button 
+                            className="btn btn-warning btn-sm" 
+                            onClick={() => handleEditClick(zone)} 
+                            type="button"
+                          >
+                            <i className="fas fa-edit"></i>
+                            Modifier
+                          </button>
+                          <button 
+                            className="btn btn-danger btn-sm" 
+                            onClick={() => handleDelete(zone.zoneId)} 
+                            type="button" 
+                            disabled={loading}
+                          >
+                            <i className="fas fa-trash"></i>
+                            Supprimer
+                          </button>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+                {zones.length === 0 && (
+                  <tr>
+                    <td colSpan={4} className="empty-state">
+                      <div className="empty-icon">
+                        <i className="fas fa-industry fa-3x"></i>
+                      </div>
+                      <h3>Aucune zone trouvée</h3>
+                      <p>Commencez par créer votre première zone</p>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+
+            {totalPages > 1 && (
+              <div className="pagination">
+                <button 
+                  className="btn btn-outline" 
+                  onClick={() => handlePageChange(currentPage - 1)} 
+                  disabled={currentPage === 1}
+                >
+                  <i className="fas fa-chevron-left"></i>
+                  Précédent
+                </button>
+                
+                <div className="page-numbers">
+                  {[...Array(totalPages)].map((_, idx) => (
+                    <button
+                      key={idx + 1}
+                      className={`btn ${currentPage === idx + 1 ? 'btn-primary' : 'btn-outline'}`}
+                      onClick={() => handlePageChange(idx + 1)}
+                    >
+                      {idx + 1}
+                    </button>
+                  ))}
+                </div>
+                
+                <button 
+                  className="btn btn-outline" 
+                  onClick={() => handlePageChange(currentPage + 1)} 
+                  disabled={currentPage === totalPages}
+                >
+                  Suivant
+                  <i className="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

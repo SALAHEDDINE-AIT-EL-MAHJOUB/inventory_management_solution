@@ -24,11 +24,11 @@ import ListProduit from "./gestionProduit/listProduit";
 import ResultaOperateur from "./gestionOperateur/resultaOperateur";
 import CreeInventaire from "./inventaire/creeInventaire";
 import GestionInventaireTableau from "./inventaire/gestioninventaire";
-import { FaTachometerAlt, FaUser, FaShoppingCart, FaBuilding, FaMapMarkerAlt, FaUserCircle, FaWarehouse, FaBoxes, FaUsers } from "react-icons/fa";
 import { Bar, Pie } from "react-chartjs-2";
 import "chart.js/auto";
 import logo from "../../public/logo.png"; 
-
+import PredictionStock from "./gestionProduit/predictionStock";
+import PredictiondeStock from "./gestionProduit/PrédictiondeStock";
 const ClientDashboard = ({ onLogout }) => {
   const [orders, setOrders] = useState([]);
   const [profile, setProfile] = useState(() => {
@@ -68,18 +68,15 @@ const ClientDashboard = ({ onLogout }) => {
     setLoading(true);
     setError("");
     try {
-      // Charger le profil client à jour - utiliser le nouveau endpoint
       const response = await axios.get("/api/Profil/me");
       
       if (response.data && (response.data.clientNom || response.data.ClientNom)) {
         setProfile(response.data);
       }
       
-      
     } catch (error) {
       console.error("Erreur lors du chargement des données:", error);
       setError("Erreur lors du chargement des données");
-      // En cas d'erreur, utiliser les données du localStorage
       const savedClientInfo = localStorage.getItem("clientInfo");
       if (savedClientInfo) {
         const parsedData = JSON.parse(savedClientInfo);
@@ -108,7 +105,6 @@ const ClientDashboard = ({ onLogout }) => {
     }
   };
 
-  //  fonction pour charger la répartition des statuts d'inventaire
   const loadInventaireStatuts = async () => {
     try {
       const res = await axios.get("/api/inventaire/statut-counts");
@@ -129,10 +125,8 @@ const ClientDashboard = ({ onLogout }) => {
     }
   };
 
-  //  fonction pour charger la répartition par type d'inventaire
   const loadInventaireTypes = async () => {
     try {
-      // Utilise le  endpoint simplifié
       const res = await axios.get("/api/inventaire/type-counts");
       const counts = res.data;
       setInventaireTypeData({
@@ -157,7 +151,6 @@ const ClientDashboard = ({ onLogout }) => {
     }
   };
 
-  //  fonction pour charger les produits en rupture de stock
   const loadRuptureData = async () => {
     try {
       const res = await axios.get("/api/Produit/rupture-count");
@@ -180,7 +173,6 @@ const ClientDashboard = ({ onLogout }) => {
     }
   };
 
-  //  fonction pour charger les données du graphique des stocks
   const loadStockBarData = async () => {
     try {
       const res = await axios.get("/api/Produit/stock-bar");
@@ -200,14 +192,12 @@ const ClientDashboard = ({ onLogout }) => {
     }
   };
 
-  //  fonction pour charger la liste des produits en rupture
   const loadRuptureListData = async () => {
     try {
       const res = await axios.get("/api/Produit/rupture-list");
       setRuptureListData({
         labels: res.data.map(p => p.nom || p.Nom),
         datasets: [{
-          // Correction ici : on utilise la quantité réelle
           data: res.data.map(p => p.quantite ?? p.Quantite ?? 0),
           backgroundColor: [
             "#e53935", "#ffa726", "#43a047", "#8e24aa", "#00838f", "#bdbdbd"
@@ -228,97 +218,19 @@ const ClientDashboard = ({ onLogout }) => {
       
     } catch (error) {
       console.error("Erreur lors de la déconnexion:", error);
-    
-      
       localStorage.removeItem("clientInfo");
       if (onLogout) onLogout();
       window.location.href = "/login"; 
-      
     }
   };
 
   const renderDashboard = () => (
     <div className="dashboard-content">
-      <h3 style={{ color: "#1976d2", marginBottom: 24 }}>Tableau de bord</h3>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 32, justifyContent: "center" }}>
-        {/* Statut des inventaires */}
-        <div style={{ flex: "1 1 350px", background: "#fff", borderRadius: 12, boxShadow: "0 2px 12px #1976d211", padding: 24 }}>
-          <h4 style={{ color: "#1976d2", marginBottom: 16 }}>Statut des inventaires</h4>
-          {inventaireStatutData.labels && inventaireStatutData.labels.length > 0 ? (
-            <Pie
-              data={inventaireStatutData}
-              width={220}
-              height={220}
-              options={{
-                plugins: { legend: { position: "bottom" } },
-                responsive: false,
-              }}
-            />
-          ) : (
-            <div style={{ color: "#888" }}>Aucune donnée de statut d'inventaire.</div>
-          )}
-        </div>
-        {/* Répartition par type d'inventaire */}
-        <div style={{ flex: "1 1 350px", background: "#fff", borderRadius: 12, boxShadow: "0 2px 12px #1976d211", padding: 24 }}>
-          <h4 style={{ color: "#1976d2", marginBottom: 16 }}>Répartition par type d'inventaire</h4>
-          {inventaireTypeData.labels && inventaireTypeData.labels.length > 0 ? (
-            <Pie
-              data={inventaireTypeData}
-              width={220}
-              height={220}
-              options={{
-                plugins: { legend: { position: "bottom" } },
-                responsive: false,
-              }}
-            />
-          ) : (
-            <div style={{ color: "#888" }}>Aucune donnée de type d'inventaire.</div>
-          )}
-        </div>
-        {/* Diagramme de quantité en stock */}
-        <div style={{ flex: "1 1 500px", background: "#fff", borderRadius: 12, boxShadow: "0 2px 12px #1976d211", padding: 24 }}>
-          <h4 style={{ color: "#1976d2", marginBottom: 16 }}>Quantité en stock par produit</h4>
-          {stockBarData.labels && stockBarData.labels.length > 0 ? (
-            <Bar
-              data={stockBarData}
-              width={400}
-              height={220}
-              options={{
-                plugins: { legend: { display: false } },
-                responsive: false,
-                scales: {
-                  x: { title: { display: true, text: "Produit" } },
-                  y: { title: { display: true, text: "Quantité" }, beginAtZero: true }
-                }
-              }}
-            />
-          ) : (
-            <div style={{ color: "#888" }}>Aucune donnée de stock disponible.</div>
-          )}
-        </div>
-      </div>
+      <PredictiondeStock />
     </div>
   );
 
-  const cardStyle = {
-    background: "#f5faff",
-    borderRadius: 10,
-    boxShadow: "0 2px 8px #1976d211",
-    padding: "18px 24px",
-    minWidth: 120,
-    textAlign: "center",
-    fontWeight: 600,
-    fontSize: 18,
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    gap: 6,
-  };
-
   const renderProfile = () => <Profile profile={profile} setProfile={setProfile} />;
-
- 
-  
 
   const renderSocietes = () => (
     <GestionSocietes clientId={profile.clientId} />
@@ -334,7 +246,6 @@ const ClientDashboard = ({ onLogout }) => {
         Nom: newVille.nom,
         RegionId: parseInt(newVille.regionId, 10),
       });
-      // Recharger les données après ajout
       loadClientData();
     } catch (error) {
       console.error("Erreur lors de l'ajout de la ville:", error);
@@ -348,20 +259,30 @@ const ClientDashboard = ({ onLogout }) => {
 
   return (
     <div className="client-dashboard">
-      {/* Navbar horizontale */}
+      {/* Navbar horizontale fixe */}
       <header className="dashboard-topbar">
         <div className="topbar-content">
-          <div className="topbar-brand">
+          <div 
+            className="topbar-brand" 
+            onClick={() => setActiveTab("profile")}
+            style={{ cursor: "pointer" }}
+          >
             <img src={logo} alt="Logo" className="navbar-logo" />
             <span className="topbar-title">StockPilot</span>
           </div>
           <div className="topbar-user">
-            <FaUserCircle
-              size={24}
-              style={{ marginRight: 6, cursor: "pointer" }}
+            <div 
+              className="user-info"
               onClick={() => setActiveTab("profile")}
-            />
+              style={{ cursor: "pointer" }}
+            >
+              <i className="fas fa-user-circle"></i>
+              <span className="user-name">
+                {profile.clientNom || profile.ClientNom || "Utilisateur"}
+              </span>
+            </div>
             <button onClick={handleLogout} className="logout-btn">
+              <i className="fas fa-sign-out-alt"></i>
               Déconnexion
             </button>
           </div>
@@ -369,23 +290,23 @@ const ClientDashboard = ({ onLogout }) => {
       </header>
 
       <div className="dashboard-container">
-        {/* Sidebar verticale */}
+        {/* Sidebar verticale fixe */}
         <nav className="dashboard-sidebar">
           <ul className="nav-menu">
             {[
-              { key: "dashboard", label: "Tableau de bord", icon: <FaTachometerAlt /> },
-             { key: "emplacement", label: "Emplacement", icon: <FaMapMarkerAlt /> },
-              { key: "operateur", label: "Ajouter Opérateur", icon: <FaUser /> },
-              { key: "equipe", label: "Équipe", icon: <FaUserCircle /> },
-              { key: "produit", label: "Gestion de Produit", icon: <FaShoppingCart /> },
-              { key: "inventaire", label: "Inventaire", icon: <FaShoppingCart /> } ,
-              { key: "gestion-inventaire", label: "Gestion Inventaire", icon: <FaWarehouse /> },
-            
+              { key: "dashboard", label: "Tableau de bord", icon: "fas fa-tachometer-alt" },
+             
+              { key: "emplacement", label: "Emplacement", icon: "fas fa-map-marker-alt" },
+              { key: "operateur", label: "Ajouter Opérateur", icon: "fas fa-user-plus" },
+              { key: "equipe", label: "Équipe", icon: "fas fa-users" },
+              { key: "produit", label: "Gestion de Produit", icon: "fas fa-shopping-cart" },
+              { key: "inventaire", label: "Inventaire", icon: "fas fa-boxes" },
+              { key: "gestion-inventaire", label: "Gestion Inventaire", icon: "fas fa-warehouse" },
             ].map(page => (
               <li key={page.key} className={activeTab === page.key ? "active" : ""}>
                 <button onClick={() => setActiveTab(page.key)}>
-                  {page.icon}
-                  {page.label}
+                  <i className={page.icon}></i>
+                  <span>{page.label}</span>
                 </button>
               </li>
             ))}
@@ -395,7 +316,6 @@ const ClientDashboard = ({ onLogout }) => {
         <main className="dashboard-main">
           {activeTab === "dashboard" && renderDashboard()}
           {activeTab === "profile" && renderProfile()}
-          {activeTab === "orders" && renderOrders()}
           {activeTab === "societes" && renderSocietes()}
           {activeTab === "operateur" && <RegisterOperateur />}
           {activeTab === "equipe" && <EquipeManager />}
@@ -405,6 +325,7 @@ const ClientDashboard = ({ onLogout }) => {
               {produitTab === "creeProduit" && <CreeProduit />}
               {produitTab === "listeProduit" && <ListProduit />}
               {produitTab === "fournisseur" && <Fournisseur />}
+              {produitTab === "predictionStock" && <PredictionStock showTable={false} />}
             </>
           )}
           {activeTab === "inventaire" && <CreeInventaire />}

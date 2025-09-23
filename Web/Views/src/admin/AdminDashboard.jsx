@@ -5,12 +5,49 @@ import AdminRegisterView from "./AdminRegisterView";
 import ClientProfile from "./client/ClientProfile";
 import CreateClientForm from "./client/CreateClientForm";
 import UpdateProfile from "./updateprofile";
+import ChartWidgets from "./ChartWidgets";
+
+// Material Icons (JSX) instead of emojis / font-awesome class names
+import PeopleIcon from "@mui/icons-material/People";
+import GroupIcon from "@mui/icons-material/Group";
+import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
+import BuildIcon from "@mui/icons-material/Build";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import InventoryIcon from "@mui/icons-material/Inventory";
+import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
 
 const stats = [
-  { label: "Utilisateurs", value: 12, color: "#1976d2", icon: "fas fa-users" },
-  { label: "Clients", value: 8, color: "#43a047", icon: "fas fa-user-friends" },
-  { label: "Admins", value: 4, color: "#fbc02d", icon: "fas fa-user-shield" },
-  { label: "Opérateurs", value: 3, color: "#e53935", icon: "fas fa-user-cog" },
+  { label: "Utilisateurs", value: 12, color: "#1976d2", Icon: PeopleIcon },
+  { label: "Clients", value: 8, color: "#43a047", Icon: GroupIcon },
+  { label: "Admins", value: 4, color: "#fbc02d", Icon: AdminPanelSettingsIcon },
+  { label: "Opérateurs", value: 3, color: "#e53935", Icon: BuildIcon },
+];
+
+const recentActivities = [
+  {
+    id: 1,
+    title: "Nouveau client ajouté",
+    description: "Il y a 2 heures",
+    icon: PersonAddIcon,
+    color: "#1976d2",
+    bgColor: "#e3f2fd"
+  },
+  {
+    id: 2,
+    title: "Mise à jour des stocks",
+    description: "Il y a 5 heures",
+    icon: InventoryIcon,
+    color: "#43a047",
+    bgColor: "#e8f5e8"
+  },
+  {
+    id: 3,
+    title: "Nouvel admin ajouté",
+    description: "Il y a 1 jour",
+    icon: AdminPanelSettingsOutlinedIcon,
+    color: "#fbc02d",
+    bgColor: "#fffde7"
+  }
 ];
 
 const cardStyle = {
@@ -57,7 +94,8 @@ const AdminDashboard = () => {
                 marginLeft: 260,
               }}
             >
-             
+              {/* En-tête : titre simple */}
+              <h2 style={{ color: "#fff", margin: 0, paddingTop: 8 }}>Tableau de bord</h2>
             </div>
             <div
               style={{
@@ -69,13 +107,97 @@ const AdminDashboard = () => {
                 marginLeft: 260,
               }}
             >
-              {stats.map((s, i) => (
-                <div key={i} style={{ ...cardStyle, borderTop: `4px solid ${s.color}` }}>
-                  <i className={s.icon} style={{ fontSize: 32, color: s.color, marginBottom: 12 }}></i>
-                  <div style={{ fontSize: 28, fontWeight: 700 }}>{s.value}</div>
-                  <div style={{ color: "#888", fontSize: 16, marginTop: 4 }}>{s.label}</div>
+              {stats.map((s, i) => {
+                const Icon = s.Icon;
+                return (
+                  <div key={i} style={{ ...cardStyle, borderTop: `4px solid ${s.color}` }}>
+                    <Icon style={{ fontSize: 32, color: s.color, marginBottom: 12 }} />
+                    <div style={{ fontSize: 28, fontWeight: 700 }}>{s.value}</div>
+                    <div style={{ color: "#888", fontSize: 16, marginTop: 4 }}>{s.label}</div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Diagrammes légers */}
+            <div style={{ marginLeft: 260, padding: "0 40px" }}>
+              <ChartWidgets />
+            </div>
+
+            {/* Section Activités récentes */}
+            <div style={{ marginLeft: 260, padding: "20px 40px 40px 40px" }}>
+              <div style={{
+                background: "#fff",
+                borderRadius: "16px",
+                padding: "24px",
+                boxShadow: "0 2px 12px rgba(0,0,0,0.07)"
+              }}>
+                <h3 style={{
+                  margin: "0 0 20px 0",
+                  fontSize: "20px",
+                  fontWeight: "600",
+                  color: "#333"
+                }}>
+                  Activités récentes
+                </h3>
+                
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                  {recentActivities.map((activity) => {
+                    const Icon = activity.icon;
+                    return (
+                      <div key={activity.id} style={{
+                        display: "flex",
+                        alignItems: "center",
+                        padding: "16px",
+                        borderRadius: "12px",
+                        background: "#f8f9fa",
+                        border: "1px solid #e9ecef",
+                        transition: "all 0.2s ease",
+                        cursor: "pointer"
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.background = "#f1f3f4";
+                        e.target.style.transform = "translateY(-1px)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.background = "#f8f9fa";
+                        e.target.style.transform = "translateY(0)";
+                      }}
+                      >
+                        <div style={{
+                          width: "48px",
+                          height: "48px",
+                          borderRadius: "12px",
+                          background: activity.bgColor,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          marginRight: "16px"
+                        }}>
+                          <Icon style={{ fontSize: 24, color: activity.color }} />
+                        </div>
+                        
+                        <div style={{ flex: 1 }}>
+                          <div style={{
+                            fontSize: "16px",
+                            fontWeight: "500",
+                            color: "#333",
+                            marginBottom: "4px"
+                          }}>
+                            {activity.title}
+                          </div>
+                          <div style={{
+                            fontSize: "14px",
+                            color: "#666"
+                          }}>
+                            {activity.description}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-              ))}
+              </div>
             </div>
           </>
         );

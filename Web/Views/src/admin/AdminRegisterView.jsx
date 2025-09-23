@@ -1,4 +1,8 @@
 import React, { useState } from "react";
+import PersonIcon from "@mui/icons-material/Person";
+import EmailIcon from "@mui/icons-material/Email";
+import BadgeIcon from "@mui/icons-material/Badge";
+import LockIcon from "@mui/icons-material/Lock";
 
 export default function AdminRegisterView() {
   const [form, setForm] = useState({
@@ -38,7 +42,7 @@ export default function AdminRegisterView() {
     <div
       style={{
         minHeight: "100vh",
-        background: "#f5f7fa", // Couleur de fond blanche/bleutée claire
+        background: "#f5f7fa",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -46,7 +50,6 @@ export default function AdminRegisterView() {
         padding: "20px",
       }}
     >
-      {/* Plus d'overlay ni d'image */}
       <div
         style={{
           position: "relative",
@@ -55,7 +58,6 @@ export default function AdminRegisterView() {
           margin: "40px auto",
         }}
       >
-        {/* Icône décorative */}
         <div
           style={{
             position: "absolute",
@@ -73,10 +75,7 @@ export default function AdminRegisterView() {
             zIndex: 2,
           }}
         >
-          <i
-            className="fas fa-user-shield"
-            style={{ fontSize: "28px", color: "#fff" }}
-          ></i>
+          <PersonIcon sx={{ fontSize: 30, color: "#fff" }} />
         </div>
 
         <form
@@ -116,7 +115,9 @@ export default function AdminRegisterView() {
                 color: "#1976d2",
               }}
             >
-              Nom d'utilisateur
+              <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <PersonIcon sx={{ color: '#1976d2' }} /> Nom d'utilisateur
+              </span>
             </label>
             <div style={{ position: "relative" }}>
               <span
@@ -128,7 +129,7 @@ export default function AdminRegisterView() {
                   color: "#1976d2",
                 }}
               >
-                <i className="fas fa-user"></i>
+                <PersonIcon sx={{ fontSize: 18 }} />
               </span>
               <input
                 name="userName"
@@ -159,7 +160,9 @@ export default function AdminRegisterView() {
                 color: "#1976d2",
               }}
             >
-              Email
+              <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <EmailIcon sx={{ color: '#1976d2' }} /> Email
+              </span>
             </label>
             <div style={{ position: "relative" }}>
               <span
@@ -171,7 +174,7 @@ export default function AdminRegisterView() {
                   color: "#1976d2",
                 }}
               >
-                <i className="fas fa-envelope"></i>
+                <EmailIcon sx={{ fontSize: 18 }} />
               </span>
               <input
                 name="email"
@@ -203,7 +206,9 @@ export default function AdminRegisterView() {
                 color: "#1976d2",
               }}
             >
-              Nom Admin
+              <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <BadgeIcon sx={{ color: '#1976d2' }} /> Nom Admin
+              </span>
             </label>
             <div style={{ position: "relative" }}>
               <span
@@ -215,7 +220,7 @@ export default function AdminRegisterView() {
                   color: "#1976d2",
                 }}
               >
-                <i className="fas fa-id-badge"></i>
+                <BadgeIcon sx={{ fontSize: 18 }} />
               </span>
               <input
                 name="adminName"
@@ -246,7 +251,9 @@ export default function AdminRegisterView() {
                 color: "#1976d2",
               }}
             >
-              Mot de passe
+              <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <LockIcon sx={{ color: '#1976d2' }} /> Mot de passe
+              </span>
             </label>
             <div style={{ position: "relative" }}>
               <span
@@ -258,7 +265,7 @@ export default function AdminRegisterView() {
                   color: "#1976d2",
                 }}
               >
-                <i className="fas fa-lock"></i>
+                <LockIcon sx={{ fontSize: 18 }} />
               </span>
               <input
                 name="password"
@@ -279,7 +286,7 @@ export default function AdminRegisterView() {
               />
             </div>
           </div>
-
+         
           {/* Bouton de soumission */}
           <button
             type="submit"

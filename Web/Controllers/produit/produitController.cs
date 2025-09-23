@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
-using Service.IServices;
+using Domain.Models;
 using Domain.Entities;
-using System.Threading.Tasks;
+using Service.IServices;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Web.Controllers.produit
 {
@@ -18,6 +20,7 @@ namespace Web.Controllers.produit
         private readonly IAlleeService _alleeService;
         private readonly IRangeeService _rangeeService;
         private readonly IEtageService _etageService;
+        private readonly IPredictionService _predictionService;
 
         public ProduitController(
             IProduitService produitService,
@@ -26,7 +29,8 @@ namespace Web.Controllers.produit
             IZoneService zoneService,
             IAlleeService alleeService,
             IRangeeService rangeeService,
-            IEtageService etageService)
+            IEtageService etageService,
+            IPredictionService predictionService)
         {
             _produitService = produitService;
             _societeService = societeService;
@@ -35,6 +39,7 @@ namespace Web.Controllers.produit
             _alleeService = alleeService;
             _rangeeService = rangeeService;
             _etageService = etageService;
+            _predictionService = predictionService;
         }
 
         // GET: api/Produit/societes
@@ -252,6 +257,24 @@ namespace Web.Controllers.produit
         public class AjouterQuantiteRequest
         {
             public int Quantite { get; set; }
+        }
+
+        // GET: api/Produit/ai-stock-prediction
+        [HttpGet("ai-stock-prediction")]
+        public async Task<ActionResult<IEnumerable<StockPrediction>>> GetAIStockPrediction()
+        {
+            try
+            {
+                var predictions = await _predictionService.PredictStockAsync();
+                return Ok(predictions);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { 
+                    message = "Erreur lors du calcul de la prédiction IA", 
+                    error = ex.Message 
+                });
+            }
         }
 
     }

@@ -32,13 +32,45 @@ const ClientApp = () => {
 
   if (loading) {
     return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh' 
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        color: '#fff'
       }}>
-        Chargement...
+        <div style={{
+          width: '60px',
+          height: '60px',
+          border: '4px solid rgba(255, 255, 255, 0.3)',
+          borderTop: '4px solid #fff',
+          borderRadius: '50%',
+          animation: 'spin 1s linear infinite',
+          marginBottom: '20px'
+        }}></div>
+        <h2 style={{ 
+          margin: 0, 
+          fontSize: '24px', 
+          fontWeight: '300',
+          letterSpacing: '2px'
+        }}>
+          StockPilot
+        </h2>
+        <p style={{ 
+          margin: '10px 0 0', 
+          fontSize: '16px', 
+          opacity: 0.8 
+        }}>
+          Chargement de l'application...
+        </p>
+        <style jsx>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
       </div>
     );
   }

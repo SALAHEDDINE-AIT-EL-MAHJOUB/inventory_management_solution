@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 
 // --- SiteForm ---
-const SiteForm = ({ onClose }) => {
+const SiteForm = ({ onClose, onSuccess }) => {
   const [villes, setVilles] = useState([]);
   const [societes, setSocietes] = useState([]);
   const [form, setForm] = useState({
@@ -14,6 +14,7 @@ const SiteForm = ({ onClose }) => {
     societeId: "",
   });
   const [message, setMessage] = useState("");
+  const [creating, setCreating] = useState(false);
 
   useEffect(() => {
     axios.get("/api/ville")
@@ -29,13 +30,13 @@ const SiteForm = ({ onClose }) => {
     setForm(prev => ({
       ...prev,
       [name]: value,
-      // Si on change la ville, on réinitialise la société
       ...(name === "siteVilleId" ? { societeId: "" } : {})
     }));
   };
 
   const handleSubmit = async e => {
     e.preventDefault();
+    setCreating(true);
     setMessage("");
     try {
       const payload = {
@@ -56,144 +57,309 @@ const SiteForm = ({ onClose }) => {
         siteVilleId: "",
         societeId: "",
       });
+      if (onSuccess) onSuccess();
       if (onClose) onClose();
     } catch (err) {
       setMessage("Erreur serveur : " + (err.response?.data || err.message));
+    } finally {
+      setCreating(false);
     }
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      style={{
-        margin: "20px 0",
-        padding: 24,
-        border: "1px solid #1976d2",
-        borderRadius: 10,
-        background: "#f4f8fb",
-        boxShadow: "0 2px 8px #e3eaf2",
-        maxWidth: 500
-      }}
-    >
-      <h3 style={{ color: "#1976d2", marginBottom: 20 }}>Créer un site</h3>
-      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <label style={{ fontWeight: 500 }}>Nom du site :</label>
-          <input
-            type="text"
-            name="siteNom"
-            value={form.siteNom}
-            onChange={handleChange}
-            required
-            style={{ padding: 8, borderRadius: 5, border: "1px solid #b3c0d1" }}
-          />
+    <div style={{
+      background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
+      borderRadius: "12px",
+      padding: "24px",
+      marginBottom: "24px",
+      border: "1px solid #e2e8f0",
+      boxShadow: "0 4px 15px rgba(0, 0, 0, 0.05)"
+    }}>
+      <h3 style={{ 
+        color: "#334155", 
+        marginBottom: "20px", 
+        fontSize: "20px",
+        display: "flex",
+        alignItems: "center",
+        gap: "12px"
+      }}>
+        <i className="fas fa-building" style={{ color: "#667eea" }}></i>
+        Nouveau site
+      </h3>
+      <form onSubmit={handleSubmit}>
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+          gap: "16px",
+          marginBottom: "20px"
+        }}>
+          <div>
+            <label style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              marginBottom: "8px",
+              color: "#475569",
+              fontWeight: "600"
+            }}>
+              <i className="fas fa-tag" style={{ fontSize: "14px", color: "#667eea" }}></i>
+              Nom du site
+            </label>
+            <input
+              type="text"
+              name="siteNom"
+              value={form.siteNom}
+              onChange={handleChange}
+              required
+              style={{
+                width: "100%",
+                padding: "12px 16px",
+                border: "2px solid #e2e8f0",
+                borderRadius: "8px",
+                fontSize: "14px",
+                transition: "border-color 0.2s",
+                outline: "none"
+              }}
+              onFocus={(e) => e.target.style.borderColor = "#667eea"}
+              onBlur={(e) => e.target.style.borderColor = "#e2e8f0"}
+            />
+          </div>
+          <div>
+            <label style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              marginBottom: "8px",
+              color: "#475569",
+              fontWeight: "600"
+            }}>
+              <i className="fas fa-map-marker-alt" style={{ fontSize: "14px", color: "#667eea" }}></i>
+              Adresse
+            </label>
+            <input
+              type="text"
+              name="adress"
+              value={form.adress}
+              onChange={handleChange}
+              required
+              style={{
+                width: "100%",
+                padding: "12px 16px",
+                border: "2px solid #e2e8f0",
+                borderRadius: "8px",
+                fontSize: "14px",
+                transition: "border-color 0.2s",
+                outline: "none"
+              }}
+              onFocus={(e) => e.target.style.borderColor = "#667eea"}
+              onBlur={(e) => e.target.style.borderColor = "#e2e8f0"}
+            />
+          </div>
+          <div>
+            <label style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              marginBottom: "8px",
+              color: "#475569",
+              fontWeight: "600"
+            }}>
+              <i className="fas fa-phone" style={{ fontSize: "14px", color: "#667eea" }}></i>
+              Téléphone
+            </label>
+            <input
+              type="tel"
+              name="siteTelephone"
+              value={form.siteTelephone}
+              onChange={handleChange}
+              style={{
+                width: "100%",
+                padding: "12px 16px",
+                border: "2px solid #e2e8f0",
+                borderRadius: "8px",
+                fontSize: "14px",
+                transition: "border-color 0.2s",
+                outline: "none"
+              }}
+              onFocus={(e) => e.target.style.borderColor = "#667eea"}
+              onBlur={(e) => e.target.style.borderColor = "#e2e8f0"}
+            />
+          </div>
+          <div>
+            <label style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              marginBottom: "8px",
+              color: "#475569",
+              fontWeight: "600"
+            }}>
+              <i className="fas fa-envelope" style={{ fontSize: "14px", color: "#667eea" }}></i>
+              Email
+            </label>
+            <input
+              type="email"
+              name="email"
+              value={form.email}
+              onChange={handleChange}
+              style={{
+                width: "100%",
+                padding: "12px 16px",
+                border: "2px solid #e2e8f0",
+                borderRadius: "8px",
+                fontSize: "14px",
+                transition: "border-color 0.2s",
+                outline: "none"
+              }}
+              onFocus={(e) => e.target.style.borderColor = "#667eea"}
+              onBlur={(e) => e.target.style.borderColor = "#e2e8f0"}
+            />
+          </div>
+          <div>
+            <label style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              marginBottom: "8px",
+              color: "#475569",
+              fontWeight: "600"
+            }}>
+              <i className="fas fa-city" style={{ fontSize: "14px", color: "#667eea" }}></i>
+              Ville
+            </label>
+            <select
+              name="siteVilleId"
+              value={form.siteVilleId}
+              onChange={handleChange}
+              required
+              style={{
+                width: "100%",
+                padding: "12px 16px",
+                border: "2px solid #e2e8f0",
+                borderRadius: "8px",
+                fontSize: "14px",
+                transition: "border-color 0.2s",
+                outline: "none"
+              }}
+              onFocus={(e) => e.target.style.borderColor = "#667eea"}
+              onBlur={(e) => e.target.style.borderColor = "#e2e8f0"}
+            >
+              <option value="">Choisir une ville</option>
+              {villes.map(v => (
+                <option key={v.id} value={v.id}>{v.nom}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              marginBottom: "8px",
+              color: "#475569",
+              fontWeight: "600"
+            }}>
+              <i className="fas fa-industry" style={{ fontSize: "14px", color: "#667eea" }}></i>
+              Société
+            </label>
+            <select
+              name="societeId"
+              value={form.societeId}
+              onChange={handleChange}
+              required
+              disabled={!form.siteVilleId}
+              style={{
+                width: "100%",
+                padding: "12px 16px",
+                border: "2px solid #e2e8f0",
+                borderRadius: "8px",
+                fontSize: "14px",
+                background: !form.siteVilleId ? "#f1f5f9" : "#fff",
+                opacity: !form.siteVilleId ? 0.6 : 1,
+                transition: "border-color 0.2s",
+                outline: "none"
+              }}
+              onFocus={(e) => !form.siteVilleId || (e.target.style.borderColor = "#667eea")}
+              onBlur={(e) => e.target.style.borderColor = "#e2e8f0"}
+            >
+              <option value="">Choisir une société</option>
+              {societes.map(s => (
+                <option key={s.id} value={s.id}>{s.nom}</option>
+              ))}
+            </select>
+          </div>
         </div>
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <label style={{ fontWeight: 500 }}>Adresse :</label>
-          <input
-            type="text"
-            name="adress"
-            value={form.adress}
-            onChange={handleChange}
-            required
-            style={{ padding: 8, borderRadius: 5, border: "1px solid #b3c0d1" }}
-          />
-        </div>
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <label style={{ fontWeight: 500 }}>Téléphone :</label>
-          <input
-            type="number"
-            name="siteTelephone"
-            value={form.siteTelephone}
-            onChange={handleChange}
-            style={{ padding: 8, borderRadius: 5, border: "1px solid #b3c0d1" }}
-          />
-        </div>
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <label style={{ fontWeight: 500 }}>Email :</label>
-          <input
-            type="email"
-            name="email"
-            value={form.email}
-            onChange={handleChange}
-            style={{ padding: 8, borderRadius: 5, border: "1px solid #b3c0d1" }}
-          />
-        </div>
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <label style={{ fontWeight: 500 }}>Ville :</label>
-          <select
-            name="siteVilleId"
-            value={form.siteVilleId}
-            onChange={handleChange}
-            required
-            style={{ padding: 8, borderRadius: 5, border: "1px solid #b3c0d1" }}
-          >
-            <option value="">Choisir une ville</option>
-            {villes.map(v => (
-              <option key={v.id} value={v.id}>{v.nom}</option>
-            ))}
-          </select>
-        </div>
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <label style={{ fontWeight: 500 }}>Société :</label>
-          <select
-            name="societeId"
-            value={form.societeId}
-            onChange={handleChange}
-            required
-            disabled={!form.siteVilleId}
+        <div style={{ display: "flex", gap: "12px" }}>
+          <button
+            type="submit"
+            disabled={creating}
             style={{
-              padding: 8,
-              borderRadius: 5,
-              border: "1px solid #b3c0d1",
-              background: !form.siteVilleId ? "#e0e0e0" : "#fff"
+              background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)",
+              color: "#ffffff",
+              border: "none",
+              padding: "12px 24px",
+              borderRadius: "8px",
+              fontWeight: "600",
+              cursor: "pointer",
+              boxShadow: "0 4px 15px rgba(34, 197, 94, 0.3)",
+              opacity: creating ? 0.7 : 1,
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              transition: "transform 0.2s"
             }}
+            onMouseOver={(e) => !creating && (e.target.style.transform = "translateY(-2px)")}
+            onMouseOut={(e) => e.target.style.transform = "translateY(0)"}
           >
-            <option value="">Choisir une société</option>
-            {societes.map(s => (
-              <option key={s.id} value={s.id}>{s.nom}</option>
-            ))}
-          </select>
+            <i className={`fas ${creating ? "fa-spinner fa-spin" : "fa-check"}`}></i>
+            {creating ? "Création..." : "Créer le site"}
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            style={{
+              background: "linear-gradient(135deg, #64748b 0%, #475569 100%)",
+              color: "#ffffff",
+              border: "none",
+              padding: "12px 24px",
+              borderRadius: "8px",
+              fontWeight: "600",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              transition: "transform 0.2s"
+            }}
+            onMouseOver={(e) => e.target.style.transform = "translateY(-2px)"}
+            onMouseOut={(e) => e.target.style.transform = "translateY(0)"}
+          >
+            <i className="fas fa-times"></i>
+            Annuler
+          </button>
         </div>
-      </div>
-      <div style={{ marginTop: 18, display: "flex", gap: 10 }}>
-        <button
-          type="submit"
-          style={{
-            background: "#1976d2",
-            color: "#fff",
-            border: "none",
-            borderRadius: 5,
-            padding: "10px 20px",
-            fontWeight: 600,
-            cursor: "pointer"
-          }}
-        >
-          Créer le site
-        </button>
-        <button
-          type="button"
-          style={{
-            background: "#e53935",
-            color: "#fff",
-            border: "none",
-            borderRadius: 5,
-            padding: "10px 20px",
-            fontWeight: 600,
-            cursor: "pointer"
-          }}
-          onClick={onClose}
-        >
-          Annuler
-        </button>
-      </div>
-      {message && <div style={{ marginTop: 14, color: "#1976d2" }}>{message}</div>}
-    </form>
+        {message && (
+          <div style={{
+            marginTop: "12px",
+            padding: "12px 16px",
+            borderRadius: "8px",
+            color: message.includes("Erreur") ? "#ef4444" : "#22c55e",
+            background: message.includes("Erreur") ? "#fef2f2" : "#f0fdf4",
+            border: `1px solid ${message.includes("Erreur") ? "#fecaca" : "#bbf7d0"}`,
+            display: "flex",
+            alignItems: "center",
+            gap: "8px"
+          }}>
+            <i className={`fas ${message.includes("Erreur") ? "fa-exclamation-triangle" : "fa-check-circle"}`}></i>
+            {message}
+          </div>
+        )}
+      </form>
+    </div>
   );
 };
 
 // --- SiteList ---
-const SiteList = () => {
+const SiteList = ({ refreshTrigger }) => {
   const [sites, setSites] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editId, setEditId] = useState(null);
@@ -208,13 +374,8 @@ const SiteList = () => {
 
   useEffect(() => {
     fetchSites();
-    axios.get("/api/ville")
-      .then(res => setVilles(res.data))
-      .catch(() => setVilles([]));
-    axios.get("/api/client-societes")
-      .then(res => setSocietes(res.data))
-      .catch(() => setSocietes([]));
-  }, []);
+    fetchRelatedData();
+  }, [refreshTrigger]);
 
   const fetchSites = () => {
     setLoading(true);
@@ -222,6 +383,15 @@ const SiteList = () => {
       .then(res => setSites(res.data))
       .catch(() => setSites([]))
       .finally(() => setLoading(false));
+  };
+
+  const fetchRelatedData = () => {
+    axios.get("/api/ville")
+      .then(res => setVilles(res.data))
+      .catch(() => setVilles([]));
+    axios.get("/api/client-societes")
+      .then(res => setSocietes(res.data))
+      .catch(() => setSocietes([]));
   };
 
   const handleEdit = (site) => {
@@ -246,9 +416,11 @@ const SiteList = () => {
       setEditId(null);
       setEditValues({});
       fetchSites();
-      setMessage("Site modifié !");
+      setMessage("Site modifié avec succès !");
+      setTimeout(() => setMessage(""), 3000);
     } catch (err) {
       setMessage("Erreur lors de la modification.");
+      setTimeout(() => setMessage(""), 3000);
     }
   };
 
@@ -262,20 +434,22 @@ const SiteList = () => {
     try {
       await axios.delete(`/api/site/${id}`);
       setSites(sites.filter(s => s.id !== id));
-      setMessage("Site supprimé !");
+      setMessage("Site supprimé avec succès !");
+      setTimeout(() => setMessage(""), 3000);
     } catch (err) {
       setMessage("Erreur lors de la suppression.");
+      setTimeout(() => setMessage(""), 3000);
     }
   };
 
-  // Utilitaires pour trouver le nom à partir de l'id
   const getVilleNom = (id) => {
     const ville = villes.find(v => v.id === id);
-    return ville ? ville.nom : id;
+    return ville ? ville.nom : `ID: ${id}`;
   };
+
   const getSocieteNom = (id) => {
     const soc = societes.find(s => s.id === id);
-    return soc ? soc.nom : id;
+    return soc ? soc.nom : `ID: ${id}`;
   };
 
   // Pagination helpers
@@ -288,241 +462,430 @@ const SiteList = () => {
     setCurrentPage(pageNumber);
   };
 
-  if (loading) return <div>Chargement...</div>;
+  if (loading) {
+    return (
+      <div style={{ 
+        textAlign: "center", 
+        padding: "40px", 
+        color: "#64748b",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: "16px"
+      }}>
+        <div style={{
+          width: "40px",
+          height: "40px",
+          border: "4px solid #e2e8f0",
+          borderTop: "4px solid #667eea",
+          borderRadius: "50%",
+          animation: "spin 1s linear infinite"
+        }}></div>
+        <div style={{ fontSize: "18px" }}>Chargement...</div>
+        <style jsx>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
+      </div>
+    );
+  }
+
+  const tableHeaders = [
+    { icon: "fas fa-building", label: "Nom" },
+    { icon: "fas fa-map-marker-alt", label: "Adresse" },
+    { icon: "fas fa-phone", label: "Téléphone" },
+    { icon: "fas fa-envelope", label: "Email" },
+    { icon: "fas fa-city", label: "Ville" },
+    { icon: "fas fa-industry", label: "Société" },
+    { icon: "fas fa-cogs", label: "Actions" }
+  ];
 
   return (
     <div>
-      <h2>Liste des sites</h2>
-      {message && <div style={{ margin: "10px 0", color: "#1976d2" }}>{message}</div>}
-      <table style={{
-        borderCollapse: "collapse",
-        width: "100%",
-        background: "#fff",
-        boxShadow: "0 2px 8px #eee"
-      }}>
-        <thead style={{ background: "#1976d2", color: "#fff" }}>
-          <tr>
-            <th style={{ padding: 8, border: "1px solid #ddd" }}>Nom</th>
-            <th style={{ padding: 8, border: "1px solid #ddd" }}>Adresse</th>
-            <th style={{ padding: 8, border: "1px solid #ddd" }}>Téléphone</th>
-            <th style={{ padding: 8, border: "1px solid #ddd" }}>Email</th>
-            <th style={{ padding: 8, border: "1px solid #ddd" }}>Ville</th>
-            <th style={{ padding: 8, border: "1px solid #ddd" }}>Société</th>
-            <th style={{ padding: 8, border: "1px solid #ddd" }}>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {currentSites.map(site => (
-            <tr key={site.id}>
-              <td style={{ padding: 8, border: "1px solid #ddd" }}>
-                {editId === site.id ? (
-                  <input
-                    value={editValues.siteNom}
-                    onChange={e => handleEditChange("siteNom", e.target.value)}
-                  />
-                ) : (
-                  site.siteNom
-                )}
-              </td>
-              <td style={{ padding: 8, border: "1px solid #ddd" }}>
-                {editId === site.id ? (
-                  <input
-                    value={editValues.adress}
-                    onChange={e => handleEditChange("adress", e.target.value)}
-                  />
-                ) : (
-                  site.adress
-                )}
-              </td>
-              <td style={{ padding: 8, border: "1px solid #ddd" }}>
-                {editId === site.id ? (
-                  <input
-                    value={editValues.siteTelephone}
-                    onChange={e => handleEditChange("siteTelephone", e.target.value)}
-                  />
-                ) : (
-                  site.siteTelephone
-                )}
-              </td>
-              <td style={{ padding: 8, border: "1px solid #ddd" }}>
-                {editId === site.id ? (
-                  <input
-                    value={editValues.email}
-                    onChange={e => handleEditChange("email", e.target.value)}
-                  />
-                ) : (
-                  site.email
-                )}
-              </td>
-              <td style={{ padding: 8, border: "1px solid #ddd" }}>
-                {editId === site.id ? (
-                  <select
-                    value={editValues.siteVilleId}
-                    onChange={e => handleEditChange("siteVilleId", e.target.value)}
-                  >
-                    <option value="">Choisir une ville</option>
-                    {villes.map(v => (
-                      <option key={v.id} value={v.id}>{v.nom}</option>
-                    ))}
-                  </select>
-                ) : (
-                  getVilleNom(site.siteVilleId)
-                )}
-              </td>
-              <td style={{ padding: 8, border: "1px solid #ddd" }}>
-                {editId === site.id ? (
-                  <select
-                    value={editValues.societeId}
-                    onChange={e => handleEditChange("societeId", e.target.value)}
-                  >
-                    <option value="">Choisir une société</option>
-                    {societes.map(s => (
-                      <option key={s.id} value={s.id}>{s.nom}</option>
-                    ))}
-                  </select>
-                ) : (
-                  getSocieteNom(site.societeId)
-                )}
-              </td>
-              <td style={{ padding: 8, border: "1px solid #ddd" }}>
-                {editId === site.id ? (
-                  <>
-                    <button
-                      onClick={() => handleEditSave(site.id)}
-                      style={{
-                        background: "linear-gradient(90deg, #43a047 0%, #66bb6a 100%)",
-                        color: "#fff",
-                        border: "none",
-                        borderRadius: 5,
-                        padding: "7px 16px",
-                        fontWeight: 600,
-                        marginRight: 6,
-                        boxShadow: "0 2px 6px #43a04722",
-                        transition: "background 0.2s",
-                        cursor: "pointer"
-                      }}
-                    >
-                      Enregistrer
-                    </button>
-                    <button
-                      onClick={handleEditCancel}
-                      style={{
-                        background: "linear-gradient(90deg, #e53935 0%, #ff7043 100%)",
-                        color: "#fff",
-                        border: "none",
-                        borderRadius: 5,
-                        padding: "7px 16px",
-                        fontWeight: 600,
-                        boxShadow: "0 2px 6px #e5393522",
-                        transition: "background 0.2s",
-                        cursor: "pointer"
-                      }}
-                    >
-                      Annuler
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <button
-                      onClick={() => handleEdit(site)}
-                      style={{
-                        background: "linear-gradient(90deg, #1976d2 0%, #64b5f6 100%)",
-                        color: "#fff",
-                        border: "none",
-                        borderRadius: 5,
-                        padding: "7px 16px",
-                        fontWeight: 600,
-                        marginRight: 6,
-                        boxShadow: "0 2px 6px #1976d222",
-                        transition: "background 0.2s",
-                        cursor: "pointer"
-                      }}
-                    >
-                      Modifier
-                    </button>
-                    <button
-                      onClick={() => handleDelete(site.id)}
-                      style={{
-                        background: "linear-gradient(90deg, #e53935 0%, #ff7043 100%)",
-                        color: "#fff",
-                        border: "none",
-                        borderRadius: 5,
-                        padding: "7px 16px",
-                        fontWeight: 600,
-                        boxShadow: "0 2px 6px #e5393522",
-                        transition: "background 0.2s",
-                        cursor: "pointer"
-                      }}
-                    >
-                      Supprimer
-                    </button>
-                  </>
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      {/* Pagination Controls */}
-      {totalPages > 1 && (
-        <div style={{ marginTop: 16, textAlign: "center" }}>
-          <button
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-            style={{
-              marginRight: 8,
-              padding: "7px 16px",
-              borderRadius: 5,
-              border: "1px solid #1976d2",
-              background: "#fff",
-              color: "#1976d2",
-              fontWeight: "bold",
-              boxShadow: "0 2px 6px #1976d222",
-              cursor: currentPage === 1 ? "not-allowed" : "pointer",
-              transition: "background 0.2s"
-            }}
-          >
-            Précédent
-          </button>
-          {[...Array(totalPages)].map((_, idx) => (
-            <button
-              key={idx + 1}
-              onClick={() => handlePageChange(idx + 1)}
-              style={{
-                margin: "0 2px",
-                padding: "7px 16px",
-                borderRadius: 5,
-                border: "1px solid #1976d2",
-                background: currentPage === idx + 1 ? "linear-gradient(90deg, #1976d2 0%, #64b5f6 100%)" : "#fff",
-                color: currentPage === idx + 1 ? "#fff" : "#1976d2",
-                fontWeight: "bold",
-                boxShadow: currentPage === idx + 1 ? "0 2px 6px #1976d222" : "none",
-                cursor: "pointer",
-                transition: "background 0.2s"
-              }}
-            >
-              {idx + 1}
-            </button>
-          ))}
-          <button
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-            style={{
-              marginLeft: 8,
-              padding: "7px 16px",
-              borderRadius: 5,
-              border: "1px solid #1976d2",
-              background: "#fff",
-              color: "#1976d2",
-              fontWeight: "bold",
-              boxShadow: "0 2px 6px #1976d222",
-              cursor: currentPage === totalPages ? "not-allowed" : "pointer",
-              transition: "background 0.2s"
-            }}
-          >
-            Suivant
-          </button>
+      {message && (
+        <div style={{
+          marginBottom: "20px",
+          padding: "12px 16px",
+          borderRadius: "8px",
+          color: message.includes("Erreur") ? "#ef4444" : "#22c55e",
+          background: message.includes("Erreur") ? "#fef2f2" : "#f0fdf4",
+          border: `1px solid ${message.includes("Erreur") ? "#fecaca" : "#bbf7d0"}`,
+          display: "flex",
+          alignItems: "center",
+          gap: "8px"
+        }}>
+          <i className={`fas ${message.includes("Erreur") ? "fa-exclamation-triangle" : "fa-check-circle"}`}></i>
+          {message}
         </div>
+      )}
+
+      {sites.length === 0 ? (
+        <div style={{
+          textAlign: "center",
+          padding: "40px",
+          color: "#64748b",
+          background: "#f1f5f9",
+          borderRadius: "12px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "16px"
+        }}>
+          <i className="fas fa-building" style={{ fontSize: "48px", color: "#94a3b8" }}></i>
+          <div style={{ fontSize: "18px" }}>Aucun site trouvé</div>
+        </div>
+      ) : (
+        <>
+          <div style={{
+            overflowX: "auto",
+            borderRadius: "12px",
+            border: "1px solid #e2e8f0",
+            boxShadow: "0 4px 15px rgba(0, 0, 0, 0.05)"
+          }}>
+            <table style={{
+              width: "100%",
+              borderCollapse: "collapse",
+              background: "#ffffff"
+            }}>
+              <thead>
+                <tr style={{
+                  background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+                }}>
+                  {tableHeaders.map(header => (
+                    <th key={header.label} style={{
+                      padding: "16px 12px",
+                      color: "#ffffff",
+                      fontWeight: "600",
+                      textAlign: "left",
+                      fontSize: "14px"
+                    }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                        <i className={header.icon}></i>
+                        {header.label}
+                      </div>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {currentSites.map((site, idx) => (
+                  <tr
+                    key={site.id}
+                    style={{
+                      background: idx % 2 === 0 ? "#ffffff" : "#f8fafc",
+                      transition: "all 0.2s ease"
+                    }}
+                    onMouseOver={(e) => e.currentTarget.style.background = "#e0f2fe"}
+                    onMouseOut={(e) => e.currentTarget.style.background = idx % 2 === 0 ? "#ffffff" : "#f8fafc"}
+                  >
+                    <td style={{
+                      padding: "12px",
+                      borderBottom: "1px solid #e2e8f0",
+                      color: "#334155",
+                      fontWeight: "600"
+                    }}>
+                      {editId === site.id ? (
+                        <input
+                          value={editValues.siteNom}
+                          onChange={e => handleEditChange("siteNom", e.target.value)}
+                          style={{
+                            width: "100%",
+                            padding: "8px",
+                            border: "1px solid #e2e8f0",
+                            borderRadius: "4px"
+                          }}
+                        />
+                      ) : (
+                        site.siteNom
+                      )}
+                    </td>
+                    <td style={{
+                      padding: "12px",
+                      borderBottom: "1px solid #e2e8f0",
+                      color: "#64748b"
+                    }}>
+                      {editId === site.id ? (
+                        <input
+                          value={editValues.adress}
+                          onChange={e => handleEditChange("adress", e.target.value)}
+                          style={{
+                            width: "100%",
+                            padding: "8px",
+                            border: "1px solid #e2e8f0",
+                            borderRadius: "4px"
+                          }}
+                        />
+                      ) : (
+                        site.adress
+                      )}
+                    </td>
+                    <td style={{
+                      padding: "12px",
+                      borderBottom: "1px solid #e2e8f0",
+                      color: "#64748b"
+                    }}>
+                      {editId === site.id ? (
+                        <input
+                          value={editValues.siteTelephone}
+                          onChange={e => handleEditChange("siteTelephone", e.target.value)}
+                          style={{
+                            width: "100%",
+                            padding: "8px",
+                            border: "1px solid #e2e8f0",
+                            borderRadius: "4px"
+                          }}
+                        />
+                      ) : (
+                        site.siteTelephone
+                      )}
+                    </td>
+                    <td style={{
+                      padding: "12px",
+                      borderBottom: "1px solid #e2e8f0",
+                      color: "#64748b"
+                    }}>
+                      {editId === site.id ? (
+                        <input
+                          value={editValues.email}
+                          onChange={e => handleEditChange("email", e.target.value)}
+                          style={{
+                            width: "100%",
+                            padding: "8px",
+                            border: "1px solid #e2e8f0",
+                            borderRadius: "4px"
+                          }}
+                        />
+                      ) : (
+                        site.email
+                      )}
+                    </td>
+                    <td style={{
+                      padding: "12px",
+                      borderBottom: "1px solid #e2e8f0",
+                      color: "#64748b"
+                    }}>
+                      {editId === site.id ? (
+                        <select
+                          value={editValues.siteVilleId}
+                          onChange={e => handleEditChange("siteVilleId", e.target.value)}
+                          style={{
+                            width: "100%",
+                            padding: "8px",
+                            border: "1px solid #e2e8f0",
+                            borderRadius: "4px"
+                          }}
+                        >
+                          <option value="">Choisir une ville</option>
+                          {villes.map(v => (
+                            <option key={v.id} value={v.id}>{v.nom}</option>
+                          ))}
+                        </select>
+                      ) : (
+                        <span style={{
+                          background: "linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)",
+                          color: "#ffffff",
+                          padding: "4px 12px",
+                          borderRadius: "20px",
+                          fontSize: "12px",
+                          fontWeight: "600"
+                        }}>
+                          {getVilleNom(site.siteVilleId)}
+                        </span>
+                      )}
+                    </td>
+                    <td style={{
+                      padding: "12px",
+                      borderBottom: "1px solid #e2e8f0",
+                      color: "#64748b"
+                    }}>
+                      {editId === site.id ? (
+                        <select
+                          value={editValues.societeId}
+                          onChange={e => handleEditChange("societeId", e.target.value)}
+                          style={{
+                            width: "100%",
+                            padding: "8px",
+                            border: "1px solid #e2e8f0",
+                            borderRadius: "4px"
+                          }}
+                        >
+                          <option value="">Choisir une société</option>
+                          {societes.map(s => (
+                            <option key={s.id} value={s.id}>{s.nom}</option>
+                          ))}
+                        </select>
+                      ) : (
+                        <span style={{
+                          background: "linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)",
+                          color: "#ffffff",
+                          padding: "4px 12px",
+                          borderRadius: "20px",
+                          fontSize: "12px",
+                          fontWeight: "600"
+                        }}>
+                          {getSocieteNom(site.societeId)}
+                        </span>
+                      )}
+                    </td>
+                    <td style={{
+                      padding: "12px",
+                      borderBottom: "1px solid #e2e8f0",
+                      textAlign: "center"
+                    }}>
+                      {editId === site.id ? (
+                        <div style={{ display: "flex", gap: "8px", justifyContent: "center" }}>
+                          <button
+                            onClick={() => handleEditSave(site.id)}
+                            style={{
+                              background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)",
+                              color: "#ffffff",
+                              border: "none",
+                              borderRadius: "6px",
+                              padding: "6px 12px",
+                              cursor: "pointer",
+                              fontWeight: "600",
+                              fontSize: "12px"
+                            }}
+                          >
+                            <i className="fas fa-check"></i>
+                          </button>
+                          <button
+                            onClick={handleEditCancel}
+                            style={{
+                              background: "linear-gradient(135deg, #64748b 0%, #475569 100%)",
+                              color: "#ffffff",
+                              border: "none",
+                              borderRadius: "6px",
+                              padding: "6px 12px",
+                              cursor: "pointer",
+                              fontWeight: "600",
+                              fontSize: "12px"
+                            }}
+                          >
+                            <i className="fas fa-times"></i>
+                          </button>
+                        </div>
+                      ) : (
+                        <div style={{ display: "flex", gap: "8px", justifyContent: "center" }}>
+                          <button
+                            onClick={() => handleEdit(site)}
+                            style={{
+                              background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)",
+                              color: "#ffffff",
+                              border: "none",
+                              borderRadius: "6px",
+                              padding: "6px 12px",
+                              cursor: "pointer",
+                              fontWeight: "600",
+                              fontSize: "12px"
+                            }}
+                            title="Modifier"
+                          >
+                            <i className="fas fa-edit"></i>
+                          </button>
+                          <button
+                            onClick={() => handleDelete(site.id)}
+                            style={{
+                              background: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
+                              color: "#ffffff",
+                              border: "none",
+                              borderRadius: "6px",
+                              padding: "6px 12px",
+                              cursor: "pointer",
+                              fontWeight: "600",
+                              fontSize: "12px"
+                            }}
+                            title="Supprimer"
+                          >
+                            <i className="fas fa-trash"></i>
+                          </button>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              marginTop: "24px",
+              gap: "8px"
+            }}>
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                style={{
+                  padding: "8px 16px",
+                  border: "2px solid #e2e8f0",
+                  borderRadius: "8px",
+                  background: "#ffffff",
+                  color: "#64748b",
+                  fontWeight: "600",
+                  cursor: currentPage === 1 ? "not-allowed" : "pointer",
+                  opacity: currentPage === 1 ? 0.5 : 1,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px"
+                }}
+              >
+                <i className="fas fa-chevron-left"></i>
+                Précédent
+              </button>
+
+              {[...Array(totalPages)].map((_, idx) => (
+                <button
+                  key={idx + 1}
+                  onClick={() => handlePageChange(idx + 1)}
+                  style={{
+                    padding: "8px 16px",
+                    border: "none",
+                    borderRadius: "8px",
+                    background: currentPage === idx + 1
+                      ? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+                      : "#ffffff",
+                    color: currentPage === idx + 1 ? "#ffffff" : "#64748b",
+                    fontWeight: "600",
+                    cursor: "pointer",
+                    boxShadow: currentPage === idx + 1
+                      ? "0 4px 15px rgba(102, 126, 234, 0.3)"
+                      : "none"
+                  }}
+                >
+                  {idx + 1}
+                </button>
+              ))}
+
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                style={{
+                  padding: "8px 16px",
+                  border: "2px solid #e2e8f0",
+                  borderRadius: "8px",
+                  background: "#ffffff",
+                  color: "#64748b",
+                  fontWeight: "600",
+                  cursor: currentPage === totalPages ? "not-allowed" : "pointer",
+                  opacity: currentPage === totalPages ? 0.5 : 1,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px"
+                }}
+              >
+                Suivant
+                <i className="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
@@ -531,32 +894,50 @@ const SiteList = () => {
 // --- Export principal ---
 const SitePage = () => {
   const [showForm, setShowForm] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const handleShowForm = () => setShowForm(true);
   const handleCloseForm = () => setShowForm(false);
+  const handleFormSuccess = () => {
+    setRefreshTrigger(prev => prev + 1);
+  };
 
   return (
-    <div style={{ maxWidth: 900, margin: "0 auto", padding: 20 }}>
-      <button
-        onClick={handleShowForm}
-        style={{
-          background: "linear-gradient(90deg, #1976d2 0%, #64b5f6 100%)",
-          color: "#fff",
-          border: "none",
-          borderRadius: 5,
-          padding: "12px 28px",
-          marginBottom: 20,
-          cursor: "pointer",
-          fontSize: 17,
-          fontWeight: 700,
-          boxShadow: "0 2px 8px #1976d222",
-          transition: "background 0.2s"
-        }}
-      >
-        Ajouter un site
-      </button>
-      {showForm && <SiteForm onClose={handleCloseForm} />}
-      <SiteList />
+    <div className="emp">
+      <div className="card">
+        <div style={{ 
+          display: "flex", 
+          justifyContent: "space-between", 
+          alignItems: "center", 
+          marginBottom: "24px" 
+        }}>
+          <h2 className="page-title" style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            margin: 0
+          }}>
+            <i className="fas fa-building" style={{ color: "#667eea" }}></i>
+            Gestion des Sites
+          </h2>
+          <button 
+            onClick={handleShowForm} 
+            className="btn btn-primary"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px"
+            }}
+          >
+            <i className={`fas ${showForm ? "fa-times" : "fa-plus"}`}></i>
+            {showForm ? "Fermer" : "Ajouter un site"}
+          </button>
+        </div>
+
+        {showForm && <SiteForm onClose={handleCloseForm} onSuccess={handleFormSuccess} />}
+        
+        <SiteList refreshTrigger={refreshTrigger} />
+       </div>
     </div>
   );
 };

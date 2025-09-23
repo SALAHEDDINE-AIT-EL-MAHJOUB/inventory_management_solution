@@ -1,6 +1,11 @@
 import React, { useState } from "react";
 import axios from "axios";
-import "./CreateClientForm.css";
+import PersonIcon from "@mui/icons-material/Person";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import EmailIcon from "@mui/icons-material/Email";
+import LockIcon from "@mui/icons-material/Lock";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import PhoneIcon from "@mui/icons-material/Phone";
 
 const CreateClientForm = ({ adminUserId, onClientCreated }) => {
   const [form, setForm] = useState({
@@ -61,9 +66,7 @@ const CreateClientForm = ({ adminUserId, onClientCreated }) => {
       };
 
       const response = await axios.post("/api/AdminClient/CreateClientFromAdmin", requestData, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { "Content-Type": "application/json" },
         timeout: 30000,
       });
 
@@ -78,11 +81,10 @@ const CreateClientForm = ({ adminUserId, onClientCreated }) => {
       });
 
       if (onClientCreated) onClientCreated(response.data);
-
     } catch (err) {
       let errorMessage = "Erreur inconnue";
       if (err.response?.data) {
-        if (typeof err.response.data === 'string') {
+        if (typeof err.response.data === "string") {
           errorMessage = err.response.data;
         } else if (err.response.data.message) {
           errorMessage = err.response.data.message;
@@ -97,153 +99,347 @@ const CreateClientForm = ({ adminUserId, onClientCreated }) => {
   };
 
   return (
-    <div className="create-client-container improved-bg">
-      <form className="create-client-form improved-form" onSubmit={handleSubmit}>
-        <div className="form-header">
-        
-          <h3 style={{
-            color: "#1976d2",
-            fontWeight: 700,
-            fontSize: "1.3rem",
-            margin: 0,
-            letterSpacing: "0.5px"
-          }}>
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#f5f7fa",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        position: "relative",
+        padding: "20px",
+      }}
+    >
+      <div style={{ position: "relative", width: "100%", maxWidth: "520px", margin: "40px auto" }}>
+        <div
+          style={{
+            position: "absolute",
+            top: "-30px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            background: "#1976d2",
+            borderRadius: "50%",
+            width: "80px",
+            height: "80px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            boxShadow: "0 6px 16px rgba(0,0,0,0.12)",
+            zIndex: 2,
+          }}
+        >
+          <PersonIcon sx={{ fontSize: 36, color: "#fff" }} />
+        </div>
+
+        <form
+          onSubmit={handleSubmit}
+          style={{
+            width: "100%",
+            padding: "60px 32px 32px",
+            borderRadius: "12px",
+            boxShadow: "0 6px 24px rgba(25, 118, 210, 0.08)",
+            background: "#fff",
+            position: "relative",
+            zIndex: 1,
+            border: "1px solid #e6eef8",
+            boxSizing: "border-box",
+          }}
+        >
+          <h2
+            style={{
+              textAlign: "center",
+              marginBottom: 20,
+              color: "#1976d2",
+              fontWeight: 700,
+              fontSize: 22,
+              letterSpacing: "0.3px",
+            }}
+          >
             Créer un nouveau client
-          </h3>
-        </div>
+          </h2>
 
-        {message && <div className="form-message success">{message}</div>}
-        {error && <div className="form-message error">{error}</div>}
+          {message && (
+            <div
+              style={{
+                marginBottom: 14,
+                padding: "10px",
+                borderRadius: 8,
+                backgroundColor: "#e6f4ea",
+                color: "#2e7d32",
+                textAlign: "center",
+                fontWeight: 600,
+              }}
+            >
+              {message}
+            </div>
+          )}
 
-        <div className="form-group">
-          <label style={{ color: "#1976d2", fontWeight: 600 }}>
-            <i className="fas fa-id-card" style={{ color: "#42a5f5", marginRight: 8 }}></i>
-            Nom du client *
-          </label>
-          <input
-            type="text"
-            name="clientNom"
-            placeholder="Nom du client"
-            value={form.clientNom}
-            onChange={handleChange}
-            required
-            disabled={loading}
+          {error && (
+            <div
+              style={{
+                marginBottom: 14,
+                padding: "10px",
+                borderRadius: 8,
+                backgroundColor: "#ffebee",
+                color: "#b71c1c",
+                textAlign: "center",
+                fontWeight: 600,
+              }}
+            >
+              {error}
+            </div>
+          )}
+
+          <div style={{ marginBottom: 14 }}>
+            <label style={{ display: "block", marginBottom: 8, fontWeight: 600, color: "#1976d2" }}>
+              <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <PersonIcon sx={{ color: "#1976d2" }} /> Nom du client
+              </span>
+            </label>
+            <div style={{ position: "relative" }}>
+              <span
+                style={{
+                  position: "absolute",
+                  left: 12,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  color: "#1976d2",
+                }}
+              >
+                <PersonIcon sx={{ fontSize: 18 }} />
+              </span>
+              <input
+                name="clientNom"
+                value={form.clientNom}
+                onChange={handleChange}
+                placeholder="Nom du client"
+                style={{
+                  width: "100%",
+                  padding: "12px 12px 12px 44px",
+                  borderRadius: 8,
+                  border: "1px solid #bbdefb",
+                  fontSize: 15,
+                  backgroundColor: "#fbfdff",
+                }}
+                required
+                disabled={loading}
+              />
+            </div>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 14 }}>
+            <div>
+              <label style={{ display: "block", marginBottom: 8, fontWeight: 600, color: "#1976d2" }}>
+                <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <AccountCircleIcon sx={{ color: "#1976d2" }} /> Nom d'utilisateur
+                </span>
+              </label>
+              <div style={{ position: "relative" }}>
+                <span
+                  style={{
+                    position: "absolute",
+                    left: 12,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    color: "#1976d2",
+                  }}
+                >
+                  <AccountCircleIcon sx={{ fontSize: 18 }} />
+                </span>
+                <input
+                  name="userName"
+                  value={form.userName}
+                  onChange={handleChange}
+                  placeholder="Nom d'utilisateur"
+                  style={{
+                    width: "100%",
+                    padding: "12px 12px 12px 44px",
+                    borderRadius: 8,
+                    border: "1px solid #bbdefb",
+                    fontSize: 15,
+                    backgroundColor: "#fbfdff",
+                  }}
+                  required
+                  disabled={loading}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label style={{ display: "block", marginBottom: 8, fontWeight: 600, color: "#1976d2" }}>
+                <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <EmailIcon sx={{ color: "#1976d2" }} /> Email
+                </span>
+              </label>
+              <div style={{ position: "relative" }}>
+                <span
+                  style={{
+                    position: "absolute",
+                    left: 12,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    color: "#1976d2",
+                  }}
+                >
+                  <EmailIcon sx={{ fontSize: 18 }} />
+                </span>
+                <input
+                  name="email"
+                  type="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  placeholder="email@exemple.com"
+                  style={{
+                    width: "100%",
+                    padding: "12px 12px 12px 44px",
+                    borderRadius: 8,
+                    border: "1px solid #bbdefb",
+                    fontSize: 15,
+                    backgroundColor: "#fbfdff",
+                  }}
+                  required
+                  disabled={loading}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 14 }}>
+            <div>
+              <label style={{ display: "block", marginBottom: 8, fontWeight: 600, color: "#1976d2" }}>
+                <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <LockIcon sx={{ color: "#1976d2" }} /> Mot de passe
+                </span>
+              </label>
+              <div style={{ position: "relative" }}>
+                <span
+                  style={{
+                    position: "absolute",
+                    left: 12,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    color: "#1976d2",
+                  }}
+                >
+                  <LockIcon sx={{ fontSize: 18 }} />
+                </span>
+                <input
+                  name="password"
+                  type="password"
+                  value={form.password}
+                  onChange={handleChange}
+                  placeholder="Minimum 6 caractères"
+                  style={{
+                    width: "100%",
+                    padding: "12px 12px 12px 44px",
+                    borderRadius: 8,
+                    border: "1px solid #bbdefb",
+                    fontSize: 15,
+                    backgroundColor: "#fbfdff",
+                  }}
+                  required
+                  minLength={6}
+                  disabled={loading}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label style={{ display: "block", marginBottom: 8, fontWeight: 600, color: "#1976d2" }}>
+                <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <PhoneIcon sx={{ color: "#1976d2" }} /> Téléphone
+                </span>
+              </label>
+              <div style={{ position: "relative" }}>
+                <span
+                  style={{
+                    position: "absolute",
+                    left: 12,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    color: "#1976d2",
+                  }}
+                >
+                  <PhoneIcon sx={{ fontSize: 18 }} />
+                </span>
+                <input
+                  name="phone"
+                  value={form.phone}
+                  onChange={handleChange}
+                  placeholder="Téléphone"
+                  style={{
+                    width: "100%",
+                    padding: "12px 12px 12px 44px",
+                    borderRadius: 8,
+                    border: "1px solid #bbdefb",
+                    fontSize: 15,
+                    backgroundColor: "#fbfdff",
+                  }}
+                  disabled={loading}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div style={{ marginBottom: 18 }}>
+            <label style={{ display: "block", marginBottom: 8, fontWeight: 600, color: "#1976d2" }}>
+              <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <LocationOnIcon sx={{ color: "#1976d2" }} /> Adresse
+              </span>
+            </label>
+            <div style={{ position: "relative" }}>
+              <span
+                style={{
+                  position: "absolute",
+                  left: 12,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  color: "#1976d2",
+                }}
+              >
+                <LocationOnIcon sx={{ fontSize: 18 }} />
+              </span>
+              <input
+                name="adress"
+                value={form.adress}
+                onChange={handleChange}
+                placeholder="Adresse"
+                style={{
+                  width: "100%",
+                  padding: "12px 12px 12px 44px",
+                  borderRadius: 8,
+                  border: "1px solid #bbdefb",
+                  fontSize: 15,
+                  backgroundColor: "#fbfdff",
+                }}
+                disabled={loading}
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
             style={{
-              border: "1px solid #bbdefb",
-              background: "#f5f7fa",
-              color: "#1976d2"
+              width: "100%",
+              padding: "14px 0",
+              borderRadius: 8,
+              background: "linear-gradient(135deg, #1976d2 0%, #42a5f5 100%)",
+              color: "#fff",
+              fontWeight: 600,
+              fontSize: 16,
+              border: "none",
+              cursor: "pointer",
+              boxShadow: "0 6px 18px rgba(25,118,210,0.12)",
+              transition: "all 0.18s",
             }}
-          />
-        </div>
-
-        <div className="form-group">
-          <label style={{ color: "#1976d2", fontWeight: 600 }}>
-            <i className="fas fa-user" style={{ color: "#42a5f5", marginRight: 8 }}></i>
-            Nom d'utilisateur *
-          </label>
-          <input
-            type="text"
-            name="userName"
-            placeholder="Nom d'utilisateur"
-            value={form.userName}
-            onChange={handleChange}
-            required
             disabled={loading}
-            style={{
-              border: "1px solid #bbdefb",
-              background: "#f5f7fa",
-              color: "#1976d2"
-            }}
-          />
-        </div>
-
-        <div className="form-group">
-          <label style={{ color: "#1976d2", fontWeight: 600 }}>
-            <i className="fas fa-envelope" style={{ color: "#42a5f5", marginRight: 8 }}></i>
-            Email *
-          </label>
-          <input
-            type="email"
-            name="email"
-            placeholder="email@exemple.com"
-            value={form.email}
-            onChange={handleChange}
-            required
-            disabled={loading}
-            style={{
-              border: "1px solid #bbdefb",
-              background: "#f5f7fa",
-              color: "#1976d2"
-            }}
-          />
-        </div>
-
-        <div className="form-group">
-          <label style={{ color: "#1976d2", fontWeight: 600 }}>
-            <i className="fas fa-lock" style={{ color: "#42a5f5", marginRight: 8 }}></i>
-            Mot de passe *
-          </label>
-          <input
-            type="password"
-            name="password"
-            placeholder="Minimum 6 caractères"
-            value={form.password}
-            onChange={handleChange}
-            required
-            minLength="6"
-            disabled={loading}
-            style={{
-              border: "1px solid #bbdefb",
-              background: "#f5f7fa",
-              color: "#1976d2"
-            }}
-          />
-        </div>
-
-        <div className="form-group">
-          <label style={{ color: "#1976d2", fontWeight: 600 }}>
-            <i className="fas fa-map-marker-alt" style={{ color: "#42a5f5", marginRight: 8 }}></i>
-            Adresse
-          </label>
-          <input
-            type="text"
-            name="adress"
-            placeholder="Adresse"
-            value={form.adress}
-            onChange={handleChange}
-            disabled={loading}
-            style={{
-              border: "1px solid #bbdefb",
-              background: "#f5f7fa",
-              color: "#1976d2"
-            }}
-          />
-        </div>
-
-        <div className="form-group">
-          <label style={{ color: "#1976d2", fontWeight: 600 }}>
-            <i className="fas fa-phone" style={{ color: "#42a5f5", marginRight: 8 }}></i>
-            Téléphone
-          </label>
-          <input
-            type="tel"
-            name="phone"
-            placeholder="Téléphone"
-            value={form.phone}
-            onChange={handleChange}
-            disabled={loading}
-            style={{
-              border: "1px solid #bbdefb",
-              background: "#f5f7fa",
-              color: "#1976d2"
-            }}
-          />
-        </div>
-
-        <button type="submit" className="submit-button improved-btn" disabled={loading}>
-          {loading ? "Création en cours..." : "Créer le client"}
-        </button>
-      </form>
+            onMouseOver={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
+            onMouseOut={(e) => (e.currentTarget.style.transform = "translateY(0)")}
+          >
+            {loading ? "Création en cours..." : "Créer le client"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

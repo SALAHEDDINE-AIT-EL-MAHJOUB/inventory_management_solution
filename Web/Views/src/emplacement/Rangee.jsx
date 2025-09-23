@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import "./emplacement.css";
 
 const API_URL = "/api/rangee";
@@ -15,53 +16,44 @@ function Rangee() {
   });
   const [editing, setEditing] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
 
-  // Pagination state
+  // Pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const rangeesPerPage = 6;
+  const rangeesPerPage = 7;
 
-  // Pour listes déroulantes hiérarchiques
+  // Dropdown lists
   const [societes, setSocietes] = useState([]);
   const [sites, setSites] = useState([]);
   const [zones, setZones] = useState([]);
   const [allees, setAllees] = useState([]);
 
   useEffect(() => {
-    fetchRangees();
-    fetchSocietes();
-    fetchAllSites();
-    fetchAllZones();
-    fetchAllAllees();
+    loadAll();
   }, []);
 
-  const fetchRangees = async () => {
-    const res = await fetch(API_URL);
-    const data = await res.json();
-    setRangees(data);
-  };
-
-  const fetchSocietes = async () => {
-    const res = await fetch(`/api/client-societes`);
-    const data = await res.json();
-    setSocietes(data);
-  };
-
-  const fetchAllSites = async () => {
-    const res = await fetch(`/api/site`);
-    const data = await res.json();
-    setSites(data);
-  };
-
-  const fetchAllZones = async () => {
-    const res = await fetch(`/api/zone`);
-    const data = await res.json();
-    setZones(data);
-  };
-
-  const fetchAllAllees = async () => {
-    const res = await fetch(`/api/allee`);
-    const data = await res.json();
-    setAllees(data);
+  const loadAll = async () => {
+    setLoading(true);
+    try {
+      const [rRes, sRes, sitesRes, zonesRes, alleesRes] = await Promise.all([
+        axios.get(API_URL),
+        axios.get("/api/client-societes"),
+        axios.get("/api/site"),
+        axios.get("/api/zone"),
+        axios.get("/api/allee")
+      ]);
+      setRangees(rRes.data || []);
+      setSocietes(sRes.data || []);
+      setSites(sitesRes.data || []);
+      setZones(zonesRes.data || []);
+      setAllees(alleesRes.data || []);
+    } catch (err) {
+      console.error(err);
+      setMessage("Erreur de chargement des données");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const fetchSites = async (societeId) => {
@@ -69,9 +61,12 @@ function Rangee() {
       setSites([]);
       return;
     }
-    const res = await fetch(`${API_URL}/sites/${societeId}`);
-    const data = await res.json();
-    setSites(data);
+    try {
+      const res = await axios.get(`${API_URL}/sites/${societeId}`);
+      setSites(res.data || []);
+    } catch {
+      setSites([]);
+    }
   };
 
   const fetchZones = async (siteId) => {
@@ -79,11 +74,12 @@ function Rangee() {
       setZones([]);
       return;
     }
-    const res = await fetch(`${API_URL}/zones/${siteId}`);
-    let data = await res.json();
-    // Sécurise : si data n'est pas un tableau, force un tableau vide
-    if (!Array.isArray(data)) data = [];
-    setZones(data);
+    try {
+      const res = await axios.get(`${API_URL}/zones/${siteId}`);
+      setZones(Array.isArray(res.data) ? res.data : []);
+    } catch {
+      setZones([]);
+    }
   };
 
   const fetchAllees = async (zoneId) => {
@@ -91,105 +87,106 @@ function Rangee() {
       setAllees([]);
       return;
     }
-    const res = await fetch(`${API_URL}/allees/${zoneId}`);
-    const data = await res.json();
-    setAllees(data);
+    try {
+      const res = await axios.get(`${API_URL}/allees/${zoneId}`);
+      setAllees(res.data || []);
+    } catch {
+      setAllees([]);
+    }
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]: value
-    }));
+    setForm(prev => ({ ...prev, [name]: value }));
 
-    // Gestion du reset des listes dépendantes
     if (name === "societeId") {
-      setForm((prev) => ({
-        ...prev,
-        siteId: "",
-        zoneId: "",
-        alleeId: "",
-      }));
+      setForm(prev => ({ ...prev, siteId: "", zoneId: "", alleeId: "" }));
       fetchSites(value);
       setZones([]);
       setAllees([]);
     }
+
     if (name === "siteId") {
-      setForm((prev) => ({
-        ...prev,
-        zoneId: "",
-        alleeId: "",
-      }));
-      fetchZones(Number(value)); // <-- Force la conversion ici
+      setForm(prev => ({ ...prev, zoneId: "", alleeId: "" }));
+      fetchZones(value);
       setAllees([]);
     }
+
     if (name === "zoneId") {
-      setForm((prev) => ({
-        ...prev,
-        alleeId: "",
-      }));
-      fetchAllees(Number(value)); // <-- Idem ici si besoin
+      setForm(prev => ({ ...prev, alleeId: "" }));
+      fetchAllees(value);
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (editing) {
-      await fetch(`${API_URL}/${form.rangeeId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-    } else {
-      // Utilise l'endpoint hiérarchique pour la création
-      await fetch(`${API_URL}/create`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+    if (!form.rangeeNom || !form.societeId || !form.siteId || !form.zoneId || !form.alleeId) {
+      setMessage("Remplissez tous les champs obligatoires.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      if (editing) {
+        await axios.put(`${API_URL}/${form.rangeeId}`, form);
+        setMessage("Rangée modifiée.");
+      } else {
+        await axios.post(`${API_URL}/create`, {
           rangeeNom: form.rangeeNom,
           societeId: parseInt(form.societeId),
           siteId: parseInt(form.siteId),
           zoneId: parseInt(form.zoneId),
-          alleeId: parseInt(form.alleeId),
-        }),
-      });
+          alleeId: parseInt(form.alleeId)
+        });
+        setMessage("Rangée ajoutée.");
+      }
+      setForm({ rangeeId: 0, rangeeNom: "", societeId: "", siteId: "", zoneId: "", alleeId: "" });
+      setEditing(false);
+      setShowForm(false);
+      await loadAll();
+    } catch (err) {
+      console.error(err);
+      setMessage("Erreur lors de l'opération.");
+    } finally {
+      setLoading(false);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      setTimeout(() => setMessage(""), 3000);
     }
-    setForm({
-      rangeeId: 0,
-      rangeeNom: "",
-      societeId: "",
-      siteId: "",
-      zoneId: "",
-      alleeId: ""
-    });
-    setEditing(false);
-    setShowForm(false);
-    fetchRangees();
   };
 
-  const handleEdit = (rangee) => {
+  const handleEdit = (r) => {
     setForm({
-      rangeeId: rangee.rangeeId,
-      rangeeNom: rangee.rangeeNom,
-      societeId: rangee.societeId || "",
-      siteId: rangee.siteId || "",
-      zoneId: rangee.zoneId || "",
-      alleeId: rangee.alleeId || ""
+      rangeeId: r.rangeeId,
+      rangeeNom: r.rangeeNom,
+      societeId: r.societeId || "",
+      siteId: r.siteId || "",
+      zoneId: r.zoneId || "",
+      alleeId: r.alleeId || ""
     });
     setEditing(true);
     setShowForm(true);
-    if (rangee.societeId) fetchSites(rangee.societeId);
-    if (rangee.siteId) fetchZones(rangee.siteId);
-    if (rangee.zoneId) fetchAllees(rangee.zoneId);
+    if (r.societeId) fetchSites(r.societeId);
+    if (r.siteId) fetchZones(r.siteId);
+    if (r.zoneId) fetchAllees(r.zoneId);
   };
 
   const handleDelete = async (id) => {
-    await fetch(`${API_URL}/${id}`, { method: "DELETE" });
-    fetchRangees();
+    if (!window.confirm("Voulez-vous vraiment supprimer cette rangée ?")) return;
+    setLoading(true);
+    try {
+      await axios.delete(`${API_URL}/${id}`);
+      setMessage("Rangée supprimée.");
+      await loadAll();
+    } catch (err) {
+      console.error(err);
+      setMessage("Erreur lors de la suppression.");
+    } finally {
+      setLoading(false);
+      setTimeout(() => setMessage(""), 3000);
+    }
   };
 
-  // Fonctions utilitaires pour trouver les noms
+  // helpers for display names (robust to API shape)
   const getSocieteNom = (id) => {
     const s = societes.find(x => x.id === id || x.Id === id);
     return s ? (s.nom || s.Nom || s.raisonSociale || s.RaisonSociale) : id;
@@ -207,180 +204,176 @@ function Rangee() {
     return a ? (a.alleeNom || a.nom || a.Nom) : id;
   };
 
-  // Pagination helpers
+  // pagination slice
   const indexOfLastRangee = currentPage * rangeesPerPage;
   const indexOfFirstRangee = indexOfLastRangee - rangeesPerPage;
   const currentRangees = rangees.slice(indexOfFirstRangee, indexOfLastRangee);
   const totalPages = Math.ceil(rangees.length / rangeesPerPage);
 
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
-
   return (
     <div className="emp">
-      <h2>Gestion des Rangées</h2>
-      {!showForm && (
-        <button className="btn-primary" style={{ marginBottom: 20 }}
+      <div className="page-header">
+        <h2 className="page-title">
+          <i className="fas fa-layer-group" style={{ marginRight: 8 }}></i>
+          Gestion des Rangées
+        </h2>
+        <button
+          className={`btn ${showForm ? "btn-secondary" : "btn-primary"}`}
           onClick={() => {
-            setShowForm(true);
+            setShowForm(f => !f);
             setEditing(false);
-            setForm({
-              rangeeId: 0,
-              rangeeNom: "",
-              societeId: "",
-              siteId: "",
-              zoneId: "",
-              alleeId: ""
-            });
+            setForm({ rangeeId: 0, rangeeNom: "", societeId: "", siteId: "", zoneId: "", alleeId: "" });
           }}
         >
-          Ajouter une rangée
+          <i className={`fas ${showForm ? "fa-times" : "fa-plus"}`} style={{ marginRight: 8 }}></i>
+          {showForm ? "Fermer" : "Créer une rangée"}
         </button>
+      </div>
+
+      {message && (
+        <div className={`alert ${message.includes("succès") || message.includes("ajout") || message.includes("modifiée") ? "alert-success" : "alert-error"}`}>
+          <i className={`fas ${message.includes("succès") || message.includes("ajout") || message.includes("modifiée") ? "fa-check-circle" : "fa-exclamation-triangle"}`}></i>
+          {message}
+        </div>
       )}
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="card form-grid mb-24">
-          <select
-            name="societeId"
-            value={form.societeId}
-            onChange={handleChange}
-            required
-            style={{ flex: "1 1 180px", padding: 8, borderRadius: 4, border: "1px solid #ccc" }}
-          >
-            <option value="">Sélectionner une société</option>
-            {societes.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.raisonSociale}
-              </option>
-            ))}
-          </select>
-          <select
-            name="siteId"
-            value={form.siteId}
-            onChange={handleChange}
-            required
-            disabled={!form.societeId}
-            style={{ flex: "1 1 160px", padding: 8, borderRadius: 4, border: "1px solid #ccc" }}
-          >
-            <option value="">Sélectionner un site</option>
-            {sites.map((s) => (
-              <option key={s.siteId || s.id} value={s.siteId || s.id}>
-                {s.siteNom}
-              </option>
-            ))}
-          </select>
-          <select
-            name="zoneId"
-            value={form.zoneId}
-            onChange={handleChange}
-            required
-            disabled={!form.siteId}
-            style={{ flex: "1 1 160px", padding: 8, borderRadius: 4, border: "1px solid #ccc" }}
-          >
-            <option value="">Sélectionner une zone</option>
-            {zones.map((z) => (
-              <option key={z.zoneId} value={z.zoneId}>
-                {z.zoneNom}
-              </option>
-            ))}
-          </select>
-          <select
-            name="alleeId"
-            value={form.alleeId}
-            onChange={handleChange}
-            required
-            disabled={!form.zoneId}
-            style={{ flex: "1 1 160px", padding: 8, borderRadius: 4, border: "1px solid #ccc" }}
-          >
-            <option value="">Sélectionner une allée</option>
-            {allees.map((a) => (
-              <option key={a.alleeId} value={a.alleeId}>
-                {a.alleeNom}
-              </option>
-            ))}
-          </select>
-          <input
-            name="rangeeNom"
-            placeholder="Nom de la rangée"
-            value={form.rangeeNom}
-            onChange={handleChange}
-            required
-            style={{ flex: "1 1 180px", padding: 8, borderRadius: 4, border: "1px solid #ccc" }}
-          />
-          <button type="submit" className="btn-primary">
-            {editing ? "Modifier" : "Ajouter"}
-          </button>
-          <button type="button" className="btn-secondary"
-            onClick={() => {
-              setEditing(false);
-              setShowForm(false);
-              setForm({
-                rangeeId: 0,
-                rangeeNom: "",
-                societeId: "",
-                siteId: "",
-                zoneId: "",
-                alleeId: ""
-              });
-            }}
-          >
-            Annuler
-          </button>
-        </form>
+        <div className="form-card">
+          <div className="form-header">
+            <i className="fas fa-edit"></i>
+            <h3>{editing ? "Modifier la rangée" : "Nouvelle rangée"}</h3>
+          </div>
+
+          <form onSubmit={handleSubmit} className="form-grid">
+            <div className="form-group">
+              <label><i className="fas fa-building"></i> Société *</label>
+              <select name="societeId" value={form.societeId} onChange={handleChange} required>
+                <option value="">Sélectionnez une société</option>
+                {societes.map(s => (<option key={s.id} value={s.id}>{s.raisonSociale || s.nom}</option>))}
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label><i className="fas fa-map-marker-alt"></i> Site *</label>
+              <select name="siteId" value={form.siteId} onChange={handleChange} disabled={!form.societeId} required>
+                <option value="">Sélectionnez un site</option>
+                {sites.map(s => (<option key={s.siteId || s.id} value={s.siteId || s.id}>{s.siteNom || s.nom}</option>))}
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label><i className="fas fa-industry"></i> Zone *</label>
+              <select name="zoneId" value={form.zoneId} onChange={handleChange} disabled={!form.siteId} required>
+                <option value="">Sélectionnez une zone</option>
+                {zones.map(z => (<option key={z.zoneId} value={z.zoneId}>{z.zoneNom}</option>))}
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label><i className="fas fa-road"></i> Allée *</label>
+              <select name="alleeId" value={form.alleeId} onChange={handleChange} disabled={!form.zoneId} required>
+                <option value="">Sélectionnez une allée</option>
+                {allees.map(a => (<option key={a.alleeId} value={a.alleeId}>{a.alleeNom}</option>))}
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label><i className="fas fa-hashtag"></i> Nom de la rangée *</label>
+              <input name="rangeeNom" value={form.rangeeNom} onChange={handleChange} placeholder="Ex: R1" required />
+            </div>
+
+            <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+              <button type="submit" className="btn btn-primary" disabled={loading}>
+                <i className={`fas ${loading ? "fa-spinner fa-spin" : editing ? "fa-save" : "fa-plus"}`} style={{ marginRight: 8 }}></i>
+                {loading ? "Traitement..." : editing ? "Enregistrer" : "Créer"}
+              </button>
+              <button type="button" className="btn btn-outline" onClick={() => { setShowForm(false); setEditing(false); setMessage(""); }}>
+                Annuler
+              </button>
+            </div>
+          </form>
+        </div>
       )}
 
-      <table>
-        <thead>
-          <tr>
-            <th style={{ padding: 10 }}>ID</th>
-            <th style={{ padding: 10 }}>Société</th>
-            <th style={{ padding: 10 }}>Site</th>
-            <th style={{ padding: 10 }}>Zone</th>
-            <th style={{ padding: 10 }}>Allée</th>
-            <th style={{ padding: 10 }}>Nom</th>
-            <th style={{ padding: 10 }}>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {currentRangees.map((r) => (
-            <tr key={r.rangeeId}>
-              <td style={{ padding: 8 }}>{r.rangeeId}</td>
-              <td style={{ padding: 8 }}>{getSocieteNom(r.societeId)}</td>
-              <td style={{ padding: 8 }}>{getSiteNom(r.siteId)}</td>
-              <td style={{ padding: 8 }}>{getZoneNom(r.zoneId)}</td>
-              <td style={{ padding: 8 }}>{getAlleeNom(r.alleeId)}</td>
-              <td style={{ padding: 8 }}>{r.rangeeNom}</td>
-              <td style={{ padding: 8 }}>
-                <button onClick={() => handleEdit(r)} className="btn-secondary" style={{ marginRight: 8 }}>
-                  Modifier
+      {!loading && (
+        <div className="table-card" style={{ marginTop: 16 }}>
+          <div className="table-header">
+            <h3><i className="fas fa-list"></i> Liste des rangées ({rangees.length})</h3>
+          </div>
+
+          <div className="table-responsive">
+            <table className="modern-table">
+              <thead>
+                <tr>
+                  <th><i className="fas fa-hashtag"></i> ID</th>
+                  <th><i className="fas fa-building"></i> Société</th>
+                  <th><i className="fas fa-map-marker-alt"></i> Site</th>
+                  <th><i className="fas fa-industry"></i> Zone</th>
+                  <th><i className="fas fa-road"></i> Allée</th>
+                  <th><i className="fas fa-tag"></i> Nom</th>
+                  <th><i className="fas fa-cogs"></i> Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentRangees.map(r => (
+                  <tr key={r.rangeeId} className="table-row">
+                    <td><span className="id-badge">#{r.rangeeId}</span></td>
+                    <td>{getSocieteNom(r.societeId)}</td>
+                    <td>{getSiteNom(r.siteId)}</td>
+                    <td>{getZoneNom(r.zoneId)}</td>
+                    <td>{getAlleeNom(r.alleeId)}</td>
+                    <td><strong>{r.rangeeNom}</strong></td>
+                    <td>
+                      <div className="action-buttons">
+                        <button className="btn btn-warning btn-sm" onClick={() => handleEdit(r)}><i className="fas fa-edit"></i> Modifier</button>
+                        <button className="btn btn-danger btn-sm" onClick={() => handleDelete(r.rangeeId)}><i className="fas fa-trash"></i> Supprimer</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+
+                {rangees.length === 0 && (
+                  <tr>
+                    <td colSpan={7} className="empty-state">
+                      <div className="empty-icon"><i className="fas fa-layer-group fa-3x"></i></div>
+                      <h3>Aucune rangée trouvée</h3>
+                      <p>Ajoutez votre première rangée pour commencer</p>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+
+            {totalPages > 1 && (
+              <div className="pagination" style={{ marginTop: 12 }}>
+                <button className="btn btn-outline" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}>
+                  <i className="fas fa-chevron-left"></i> Précédent
                 </button>
-                <button onClick={() => handleDelete(r.rangeeId)} className="btn-danger">
-                  Supprimer
+
+                <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                  {[...Array(totalPages)].map((_, idx) => (
+                    <button
+                      key={idx + 1}
+                      className={`btn ${currentPage === idx + 1 ? "btn-primary" : "btn-outline"}`}
+                      onClick={() => setCurrentPage(idx + 1)}
+                    >
+                      {idx + 1}
+                    </button>
+                  ))}
+                </div>
+
+                <button className="btn btn-outline" onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>
+                  Suivant <i className="fas fa-chevron-right"></i>
                 </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      {/* Pagination Controls */}
-      {totalPages > 1 && (
-        <div className="pagination">
-          <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
-            Précédent
-          </button>
-          {[...Array(totalPages)].map((_, idx) => (
-            <button
-              key={idx + 1}
-              onClick={() => handlePageChange(idx + 1)}
-              className={currentPage === idx + 1 ? "active" : undefined}
-            >
-              {idx + 1}
-            </button>
-          ))}
-          <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
-            Suivant
-          </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {loading && (
+        <div className="loading-overlay">
+          <div className="spinner"><i className="fas fa-spinner fa-spin"></i></div>
         </div>
       )}
     </div>
