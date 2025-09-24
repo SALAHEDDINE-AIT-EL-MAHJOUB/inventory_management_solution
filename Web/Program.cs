@@ -12,24 +12,24 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Ajoute cette ligne AVANT AddIdentity :
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Add this line:
+
 builder.Services.AddScoped<DbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
 
-// ...puis AddIdentity...
+
 builder.Services.AddIdentity<User, Role>(options =>
 {
-    // Configuration des options d'Identity
+
     options.Password.RequireDigit = false;
     options.Password.RequireLowercase = false;
     options.Password.RequireUppercase = false;
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequiredLength = 6;
     
-    // Configuration de l'utilisateur
+  
     options.User.RequireUniqueEmail = true;
 })
 .AddEntityFrameworkStores<ApplicationDbContext>()
